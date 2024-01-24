@@ -1,8 +1,4 @@
 import Image from "next/image"
-import Logo from "@/public/logo.svg"
-import TruckIcon from "@/public/homepage/truck.svg"
-import PackageIcon from "@/public/homepage/package.svg"
-import SmileIcon from "@/public/homepage/smile.svg"
 import Link from "next/link"
 
 const Header = () => {
@@ -14,7 +10,7 @@ const Header = () => {
                     <Link href={"/runda-stickers"}>Runda stickers</Link>
                 </div>
                 <div className="w-[25%] flex justify-center">
-                    <Image src={Logo} alt="logo" width={150} height={100} />
+                    <Image src="/logo.svg" alt="logo" width={150} height={100} />
                 </div>
                 <div className="flex-auto flex justify-start gap-10">
                     <Link href={"/die-cut-stickers"}>Die Cut Stickers</Link>
@@ -23,15 +19,15 @@ const Header = () => {
             </header>
             <div className="bg-[#121212] text-white flex w-full justify-center items-center gap-10 h-10 text-sm drop-shadow-lg">
                 <div className="flex gap-2 justify-center items-center">
-                    <Image src={TruckIcon} alt="logo" width={18} />
+                    <Image src="/homepage/truck.svg" alt="truck-icon" width={18} height={18} />
                     <span>Leverans  2-3 dagar</span>
                 </div>
-                <div className="flex gap-1.2ustify-center items-center">
-                    <Image src={PackageIcon} alt="logo" width={18} />
+                <div className="flex gap-2 justify-center items-center">
+                    <Image src="/homepage/package.svg" alt="package-icon" width={18} height={18} />
                     <span>Frakt endast 39 kr</span>
                 </div>
                 <div className="flex gap-2 justify-center items-center">
-                    <Image src={SmileIcon} alt="logo" width={18} />
+                    <Image src="/homepage/smile.svg" alt="smile-icon" width={18} height={18} />
                     <span>Egen design</span>
                 </div>
             </div>

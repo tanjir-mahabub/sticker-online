@@ -1,6 +1,6 @@
-import Image from "next/image";
-import Header from "@/app/ui/Homepage/Header";
-import Hero from "./ui/Homepage/Hero";
+import Header from "@/components/Homepage/Header";
+import Hero from "@/components/Homepage/Hero";
+
 
 export default function Home() {
   return (
