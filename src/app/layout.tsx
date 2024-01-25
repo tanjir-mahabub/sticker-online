@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import { Red_Hat_Display } from "next/font/google";
 import "./globals.css";
 
-const inter = Red_Hat_Display({ subsets: ["latin"] });
+const RedHatDisplay = Red_Hat_Display({
+  weight: ["400", "500", "600", "700", "800", "900"],
+  subsets: ["latin"]
+});
 
 export const metadata: Metadata = {
   title: "Sticker Online App",
@@ -16,7 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className + ' font-normal text-[15px] text-so-black antialiased'}>{children}</body>
+      <body className={RedHatDisplay.className + ' font-normal text-[15px] text-so-black antialiased'}>{children}</body>
     </html>
   );
 }
