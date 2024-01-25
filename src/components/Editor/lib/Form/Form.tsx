@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import BreddInput from './BreddInput'; // Import your BreddInput component
-import HojdInput from './HojdInput'; // Import your HojdInput component
-import LaminatDropdown from './LaminatDropdown'; // Import the new LaminatDropdown component
+import BreddInput from './BreddInput';
+import HojdInput from './HojdInput';
+import LaminatDropdown from './LaminatDropdown';
 import MaterialDropdown from './MaterialDropdown';
 import AntalDropdown from './AntalDropdown';
 

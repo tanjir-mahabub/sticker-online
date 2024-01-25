@@ -19,7 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={RedHatDisplay.className + ' font-normal text-[15px] text-so-black antialiased'}>{children}</body>
+      <body className={RedHatDisplay.className + ' font-normal text-[15px] bg-[#fafafa] text-so-black antialiased'}>{children}</body>
     </html>
   );
 }

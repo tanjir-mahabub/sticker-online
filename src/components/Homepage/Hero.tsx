@@ -19,7 +19,7 @@ const Hero = () => {
                 <p className="text-sm">Du designar, vi trycker och skickar dina stickers på nolltid.</p>
 
                 <div className="py-20 flex gap-7">
-                    <div className="flex flex-col justify-around items-center border-2 border-so-black/50 border-dashed rounded w-40 h-40 px-1">
+                    <div className="flex flex-col justify-around items-center bg-white border border-white drop-shadow-2xl rounded w-40 h-40 px-1">
                         <div className="flex items-center h-[60%]">
                             <Image src="/homepage/hero/cut.svg" alt="cut-icon" width={120} height={100} />
                         </div>
