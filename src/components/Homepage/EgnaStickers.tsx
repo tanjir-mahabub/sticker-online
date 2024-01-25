@@ -4,14 +4,14 @@ import Link from "next/link"
 
 const EgnaStickers = () => {
     return (
-        <section className="container mx-auto w-[60%] flex flex-col justify-center items-center gap-10 py-10">
+        <section className="container mx-auto w-[60%] flex flex-col justify-center items-center gap-10 py-14">
             <div className="flex flex-col gap-4 justify-center items-center">
                 <Image src="/homepage/hang-loose.svg" alt="hang-loose" width={120} height={100} />
-                <h2 className="text-5xl italic uppercase font-extrabold">Gör dina egna stickers</h2>
+                <h2 className="text-5xl italic uppercase font-extrabold pt-3">Gör dina egna stickers</h2>
                 <p>Skapa unika stickers, välj material, redigera i editorn och se direkt hur det kommer se ut.</p>
             </div>
 
-            <div className="flex pt-3">
+            <div className="flex py-5">
 
                 <div className="flex items-start gap-3">
                     <Image src="/homepage/one.svg" alt="one-icon" width={28} height={100} />
