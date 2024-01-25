@@ -4,7 +4,7 @@ import Link from "next/link"
 const Header = () => {
     return (
         <section className="w-full">
-            <header className="flex w-full justify-center items-center gap-5 border-b py-5 text-[#121212] font-extrabold">
+            <header className="flex w-full justify-center items-center gap-5 border-b py-5 text-so-black font-extrabold">
                 <div className="flex-auto flex justify-end gap-10">
                     <Link href={"/die-cut-stickers"}>Die Cut Stickers</Link>
                     <Link href={"/runda-stickers"}>Runda stickers</Link>
@@ -17,7 +17,7 @@ const Header = () => {
                     <Link href={"/runda-stickers"}>Runda stickers</Link>
                 </div>
             </header>
-            <div className="bg-[#121212] text-white flex w-full justify-center items-center gap-10 h-10 text-sm drop-shadow-lg">
+            <div className="bg-so-black text-white flex w-full justify-center items-center gap-10 h-10 text-sm drop-shadow-lg">
                 <div className="flex gap-2 justify-center items-center">
                     <Image src="/homepage/truck.svg" alt="truck-icon" width={18} height={18} />
                     <span>Leverans  2-3 dagar</span>

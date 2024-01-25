@@ -11,7 +11,7 @@ const Hero = () => {
                 <Image src="/homepage/hero/thumbs.svg" alt="thumbs-icon" width={120} height={100} />
             </div>
 
-            <div className="relative w-[500px] flex flex-col justify-center items-center text-[#121212]">
+            <div className="relative w-[500px] flex flex-col justify-center items-center text-so-black">
                 <div className="absolute -top-20 -right-10">
                     <Image src="/homepage/hero/stars.svg" alt="star-icon" width={75} height={100} />
                 </div>
@@ -19,25 +19,25 @@ const Hero = () => {
                 <p className="text-sm">Du designar, vi trycker och skickar dina stickers på nolltid.</p>
 
                 <div className="py-20 flex gap-7">
-                    <div className="flex flex-col justify-around items-center border-2 border-[#121212]/50 border-dashed rounded w-40 h-40 px-1">
+                    <div className="flex flex-col justify-around items-center border-2 border-so-black/50 border-dashed rounded w-40 h-40 px-1">
                         <div className="flex items-center h-[60%]">
                             <Image src="/homepage/hero/cut.svg" alt="cut-icon" width={120} height={100} />
                         </div>
                         <span className="font-bold">Die cut stickers</span>
                     </div>
-                    <div className="flex flex-col justify-around items-center border-2 border-[#121212]/50 border-dashed rounded w-40 h-40 px-1">
+                    <div className="flex flex-col justify-around items-center border-2 border-so-black/50 border-dashed rounded w-40 h-40 px-1">
                         <div className="flex items-center h-[60%]">
                             <Image src="/homepage/hero/square.svg" alt="square-icon" width={100} height={100} />
                         </div>
                         <span className="font-bold">Fyrkantiga</span>
                     </div>
-                    <div className="flex flex-col justify-around items-center border-2 border-[#121212]/50 border-dashed rounded w-40 h-40 px-1">
+                    <div className="flex flex-col justify-around items-center border-2 border-so-black/50 border-dashed rounded w-40 h-40 px-1">
                         <div className="flex items-center h-[60%]">
                             <Image src="/homepage/hero/circle.svg" alt="circle-icon" width={100} height={100} />
                         </div>
                         <span className="font-bold">Runda</span>
                     </div>
-                    <div className="flex flex-col justify-around items-center border-2 border-[#121212]/50 border-dashed rounded w-40 h-40 px-1">
+                    <div className="flex flex-col justify-around items-center border-2 border-so-black/50 border-dashed rounded w-40 h-40 px-1">
                         <div className="flex items-center h-[60%]">
                             <Image src="/homepage/hero/square-2.svg" alt="squareTwoIcon" width={90} height={100} />
                         </div>
@@ -45,7 +45,7 @@ const Hero = () => {
                     </div>
                 </div>
                 <div>
-                    <Link href={"/editor"} className="bg-[#F98332] hover:bg-[#F98332]/90 text-white text-sm px-7 py-3 rounded shadow-md shadow-[#F98332]/50 hover:shadow-[#F98332]/70 transition-all duration-300">Börja designa</Link>
+                    <Link href={"/editor"} className="bg-so-orange hover:bg-so-orange/90 text-white text-sm px-7 py-3 rounded shadow-md shadow-so-orange/50 hover:shadow-so-orange/70 transition-all duration-300">Börja designa</Link>
                 </div>
             </div>
 
