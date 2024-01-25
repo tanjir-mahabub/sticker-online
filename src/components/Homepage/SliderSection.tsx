@@ -15,20 +15,20 @@ const SliderSection = () => {
         <>
             <section className="my-20 w-full">
                 <div ref={ref} className="keen-slider">
-                    <div className="keen-slider__slide">
-                        <Image src="/homepage/slider/1.png" alt="1" width={380} height={100} className="object-cover rounded-lg" />
+                    <div className="keen-slider__slide py-10">
+                        <Image src="/homepage/slider/1.png" alt="1" width={380} height={100} className="object-cover rounded-lg drop-shadow-lg" />
                     </div>
-                    <div className="keen-slider__slide">
-                        <Image src="/homepage/slider/2.png" alt="2" width={380} height={100} className="object-cover rounded-lg" />
+                    <div className="keen-slider__slide py-10">
+                        <Image src="/homepage/slider/2.png" alt="2" width={380} height={100} className="object-cover rounded-lg drop-shadow-lg" />
                     </div>
-                    <div className="keen-slider__slide">
-                        <Image src="/homepage/slider/3.png" alt="3" width={380} height={100} className="object-cover rounded-lg" />
+                    <div className="keen-slider__slide py-10">
+                        <Image src="/homepage/slider/3.png" alt="3" width={380} height={100} className="object-cover rounded-lg drop-shadow-lg" />
                     </div>
-                    <div className="keen-slider__slide">
-                        <Image src="/homepage/slider/4.png" alt="4" width={380} height={100} className="object-cover rounded-lg" />
+                    <div className="keen-slider__slide py-10">
+                        <Image src="/homepage/slider/4.png" alt="4" width={380} height={100} className="object-cover rounded-lg drop-shadow-lg" />
                     </div>
-                    <div className="keen-slider__slide">
-                        <Image src="/homepage/slider/5.png" alt="5" width={380} height={100} className="object-cover rounded-lg" />
+                    <div className="keen-slider__slide py-10">
+                        <Image src="/homepage/slider/5.png" alt="5" width={380} height={100} className="object-cover rounded-lg drop-shadow-lg" />
                     </div>
                 </div>
             </section>
