@@ -40,7 +40,7 @@ const EgnaStickers = () => {
             </div>
 
             <div className="py-4">
-                <Link href={"/editor"} className="bg-so-orange hover:bg-so-orange/90 text-white text-sm px-7 py-3 rounded shadow-md shadow-so-orange/50 hover:shadow-so-orange/70 transition-all duration-300">Börja designa nu</Link>
+                <Link href={"/editor"} className="bg-[#F15E59] hover:bg-[#F15E59]/90 text-white text-sm px-7 py-3 rounded shadow-md shadow-[#F15E59]/50 hover:shadow-[#F15E59]/70 transition-all duration-300">Börja designa nu</Link>
             </div>
 
         </section>
