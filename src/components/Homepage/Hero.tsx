@@ -3,11 +3,11 @@ import Image from "next/image"
 
 const Hero = () => {
     return (
-        <section className="relative flex w-full min-h-[90vh] justify-center items-center overflow-hidden">
+        <section className="relative flex w-full min-h-[90vh] justify-center items-center overflow-hidden py-28">
             <div className="absolute top-5 -left-20">
                 <Image src="/homepage/hero/victory.svg" alt="victory-icon" width={240} height={100} />
             </div>
-            <div className="absolute top-20 right-80">
+            <div className="absolute top-20 right-[15%]">
                 <Image src="/homepage/hero/thumbs.svg" alt="thumbs-icon" width={120} height={100} />
             </div>
 
@@ -49,10 +49,10 @@ const Hero = () => {
                 </div>
             </div>
 
-            <div className="absolute bottom-32 left-40">
+            <div className="absolute bottom-[7%] left-[7%]">
                 <Image src="/homepage/hero/toung.svg" alt="toung-icon" width={200} height={100} />
             </div>
-            <div className="absolute bottom-10 -right-20">
+            <div className="absolute bottom-0 -right-20">
                 <Image src="/homepage/hero/watermelon.svg" alt="watermelon-icon" width={385} height={100} />
             </div>
         </section>

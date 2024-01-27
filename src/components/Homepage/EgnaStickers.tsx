@@ -4,7 +4,7 @@ import Link from "next/link"
 
 const EgnaStickers = () => {
     return (
-        <section className="container mx-auto w-[60%] flex flex-col justify-center items-center gap-10 py-14">
+        <section className="container mx-auto w-[60%] flex flex-col justify-center items-center gap-10 pt-7 pb-14">
             <div className="flex flex-col gap-4 justify-center items-center">
                 <Image src="/homepage/hang-loose.svg" alt="hang-loose" width={120} height={100} />
                 <h2 className="text-5xl italic uppercase font-extrabold pt-3">Gör dina egna stickers</h2>

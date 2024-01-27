@@ -13,7 +13,7 @@ const SliderSection = () => {
 
     return (
         <>
-            <section className="my-20 w-full">
+            <section className="my-5 w-full">
                 <div ref={ref} className="keen-slider">
                     <div className="keen-slider__slide py-10">
                         <Image src="/homepage/slider/1.png" alt="1" width={380} height={100} className="object-cover rounded-lg drop-shadow-lg" />
