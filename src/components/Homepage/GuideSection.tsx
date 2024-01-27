@@ -2,7 +2,7 @@ import Image from "next/image"
 
 const GuideSection = () => {
     return (
-        <section className="my-20">
+        <section className="my-10">
             <div className="relative">
 
                 <Image src="/homepage/waterdrop.svg" alt="waterdrop" width={60} height={100} className="absolute -top-[18px] -right-[18px] z-20" />
