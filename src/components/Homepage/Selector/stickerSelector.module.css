@@ -1,0 +1,7 @@
+.stickerWrapper {
+    @apply flex flex-col justify-around items-center rounded w-40 h-40 px-1 border-2 border-so-black/50 border-dashed cursor-pointer transition-all;
+}
+
+.selected {
+    @apply bg-white border border-white drop-shadow-2xl;
+}

@@ -1,4 +1,4 @@
-import { sideNavs } from "@/store/sideNavs"
+import { sideNavs } from "@/store/sideNavStore"
 import Image from "next/image"
 
 const SidebarNav = () => {
