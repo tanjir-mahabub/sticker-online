@@ -16,7 +16,7 @@ const AntalDropdown: React.FC<AntalDropdownProps> = ({ selectedOption, onChange 
     const renderPercentageDisplay = (stValue: string) => {
         const percentage = antalOptions.find((opt) => opt.st === stValue)?.percentage;
         return (
-            <div className="absolute top-1 left-16 inset-y-0 flex flex-col justify-center items-center pl-2">
+            <div key={percentage} className="absolute top-1 left-16 inset-y-0 flex flex-col justify-center items-center pl-2">
                 <div className="bg-black text-white px-1.5 py-1 ml-2 rounded">{percentage}</div>
             </div>
         );
