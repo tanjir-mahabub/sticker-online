@@ -3,31 +3,26 @@ export const sideNavs = [
     {
         id: 1,
         name: "Bilder",
-        icon: "/editor/icon/upload-cloud.svg"
-    },
+        icon: "/editor/sidebar/insert-raster-image.svg"
+    },    
     {
         id: 2,
-        name: "Cutline",
-        icon: "/editor/icon/scalpel.svg"
+        name: "Text",
+        icon: "/editor/sidebar/text-box.svg"
     },
     {
         id: 3,
-        name: "Material",
-        icon: "/editor/icon/material.svg"
-    },
+        name: "Motiv",
+        icon: "/editor/sidebar/metamorphose.svg"
+    },    
     {
         id: 4,
-        name: "Text",
-        icon: "/editor/icon/text.svg"
+        name: "Färg",
+        icon: "/editor/sidebar/illustrator.svg"
     },
     {
         id: 5,
-        name: "Background",
-        icon: "/editor/icon/toolbar.svg"
-    },
-    {
-        id: 6,
-        name: "Cliparts",
-        icon: "/editor/icon/heart.svg"
+        name: "Form",
+        icon: "/editor/sidebar/starburst-shape.svg"
     }
 ]

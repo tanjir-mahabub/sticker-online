@@ -1,6 +1,6 @@
 "use client"
 
-import Customize from "@/components/Editor/Customize"
+import Customize from "@/components/Editor/Customize/Customize"
 import Dashboard from "@/components/Editor/Dashboard"
 import Header from "@/components/Editor/Header"
 import Footer from "@/components/Editor/Footer"

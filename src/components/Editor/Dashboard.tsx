@@ -11,7 +11,7 @@ const Canvas = dynamic(() => import('./Canvas'), {
 
 const Dashboard = () => {
     return (
-        <div className="w-[75vw] overflow-hidden border-l">
+        <div className="w-[75vw] overflow-hidden border-l bg-so-deep-gray">
             <Canvas />
         </div>
     )

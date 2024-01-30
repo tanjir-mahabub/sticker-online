@@ -7,10 +7,10 @@ const Header = () => {
     const [isDisabledRedo, setDisabledRedo] = useState(true);
 
     return (
-        <header className="flex items-center border-b-2 border-black/10 shadow-sm px-3 py-3">
+        <header className="flex items-center border-b border-black/10 shadow-sm px-3 py-3">
             <div className="flex w-40">
                 <Link href={"/"}>
-                    <Image src="/logo.svg" alt="logo" width={130} height={100} />
+                    <Image src="/logo.png" alt="logo" width={130} height={100} />
                 </Link>
             </div>
 
