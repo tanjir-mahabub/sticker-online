@@ -8,7 +8,7 @@ const BilderCustomize = () => {
 
     return (
         <div className="w-full h-[100%]">
-            <div className="px-3 py-5 space-y-5 h-[90%] overflow-y-auto">
+            <div className="p-3 space-y-5 h-[90%] overflow-y-auto">
                 <h2 className="text-sm sm:text-lg font-bold">Ladda upp bild</h2>
                 <ImageUpload onImageUpload={handleImageUpload} />
             </div>
