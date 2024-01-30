@@ -7,7 +7,7 @@ export interface Sticker {
     width: number;
   }
   
-export const stickerSelectorStore = [
+export const StickerSelectorStore = [
     {
         id: 1,
         title: "Die cut stickers",

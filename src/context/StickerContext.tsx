@@ -1,6 +1,6 @@
 "use client"
 
-import { stickerSelectorStore } from '@/store/StickerSelectorStore';
+import { StickerSelectorStore } from '@/store/stickerSelectorStore';
 import React, { createContext, FC, useContext, useState, ReactNode } from 'react';
 
 interface Sticker {
@@ -20,7 +20,7 @@ interface StickerProviderProps {
 }
 
 export const StickerProvider: FC<StickerProviderProps> = ({ children }) => {
-  const initialSticker = stickerSelectorStore[0];
+  const initialSticker = StickerSelectorStore[0];
 
   const [selectedSticker, setSelectedSticker] = useState<Sticker>({
     title: initialSticker.title,

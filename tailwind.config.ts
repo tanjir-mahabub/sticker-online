@@ -16,7 +16,8 @@ const config: Config = {
       colors: {
         "so-black": "#121212",
         "so-orange": "#F98332",
-        "so-gray": "#FAFAFA"
+        "so-gray": "#FAFAFA",
+        "so-deep-gray": "#EBEBEB"
       },
     },
   },

@@ -20,7 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={RedHatDisplay.className + ' font-normal text-[15px] bg-[#fafafa] text-so-black antialiased'}>
+      <body className={RedHatDisplay.className + ' font-normal text-[15px] bg-[#fafafa] text-so-black scroll-smooth overflow-x-hidden antialiased'}>
         <StickerProvider>
           {children}
         </StickerProvider>

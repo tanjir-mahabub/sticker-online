@@ -10,7 +10,7 @@ const Header = () => {
                     <Link href={"/runda-stickers"}>Runda stickers</Link>
                 </div>
                 <div className="w-[25%] flex justify-center">
-                    <Image src="/logo.svg" alt="logo" width={150} height={100} />
+                    <Image src="/logo.png" alt="logo" width={170} height={100} />
                 </div>
                 <div className="flex-auto flex justify-start gap-10">
                     <Link href={"/die-cut-stickers"}>Die Cut Stickers</Link>
