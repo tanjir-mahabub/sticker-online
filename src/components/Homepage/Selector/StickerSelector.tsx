@@ -3,7 +3,7 @@ import Image from "next/image";
 import selectorStyles from "./stickerSelector.module.css";
 import { useEffect, useState } from "react";
 import { useStickerContext } from "@/context/StickerContext";
-import { stickerSelectorStore } from "@/store/StickerSelectorStore";
+import { StickerSelectorStore } from "@/store/stickerSelectorStore";
 
 const StickerSelector = () => {
     const { selectedSticker, setSticker } = useStickerContext();
@@ -11,7 +11,7 @@ const StickerSelector = () => {
     const [selected, setSelected] = useState<number>(1);
 
     useEffect(() => {
-        const sticker = stickerSelectorStore.find(sticker => sticker.id === selected);
+        const sticker = StickerSelectorStore.find(sticker => sticker.id === selected);
 
         sticker && setSticker(sticker.title, sticker.price);
     }, [selected]);
@@ -19,7 +19,7 @@ const StickerSelector = () => {
     console.log(selectedSticker);
     return (
         <>
-            {stickerSelectorStore.map((sticker) => (
+            {StickerSelectorStore.map((sticker) => (
                 <div
                     key={sticker.id}
                     className={`${selectorStyles.stickerWrapper} ${selected === sticker.id && selectorStyles.selected
