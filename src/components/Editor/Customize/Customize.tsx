@@ -1,6 +1,8 @@
 import BilderCustomize from "./child/BilderCustomize"
 import FargCustomize from "./child/FargCustomize"
 import { useEditorContext } from "@/context/EditorContext"
+import MotivCustomize from "./child/MotivCustomize"
+import TextCustomize from "./child/TextCustomize"
 
 const SelectCustomizeSettings = [
     {
@@ -9,6 +11,14 @@ const SelectCustomizeSettings = [
     },
     {
         id: 2,
+        component: TextCustomize
+    },
+    {
+        id: 3,
+        component: MotivCustomize
+    },
+    {
+        id: 4,
         component: FargCustomize
     }
 ]
