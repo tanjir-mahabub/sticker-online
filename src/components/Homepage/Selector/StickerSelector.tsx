@@ -32,6 +32,7 @@ const StickerSelector = () => {
                             alt={sticker.altTxt}
                             width={sticker.width}
                             height={100}
+                            priority
                         />
                     </div>
                     <span className="font-bold">{sticker.title}</span>

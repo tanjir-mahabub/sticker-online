@@ -58,7 +58,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload }) => {
             <div className="flex flex-wrap flex-grow justify-center items-center gap-2">
                 {selectedImages.map((image, index) => (
                     <div key={index} className="flex-1 min-w-[100px] flex w-full justify-center items-center">
-                        <Image src={image} alt={`Selected ${index + 1}`} width={250} height={100} className="max-h-24 max-w-full" />
+                        <Image src={image} alt={`Selected ${index + 1}`} width={180} height={100} className="max-h-full max-w-full" />
                     </div>
                 ))}
             </div>
