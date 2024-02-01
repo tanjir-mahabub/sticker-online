@@ -13,7 +13,7 @@ const BilderCustomize = () => {
                 <ImageUpload onImageUpload={handleImageUpload} />
             </div>
 
-            <div className="flex justify-start items-center gap-1 border-t-2 h-[10%] px-3">
+            <div className="flex justify-start items-center gap-1 border-t-2 h-[10%] p-3">
                 <Image src="/editor/sidebar/trash.svg" alt="trash-icon" width={14} height={100} className="max-h-24 max-w-full" />
                 <p className="text-sm font-semibold">Ta bort  alla  bilder</p>
             </div>

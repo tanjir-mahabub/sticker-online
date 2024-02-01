@@ -1,3 +1,28 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+div.w-color-interactive:nth-child(1) {
+    height: 180px !important;
+    margin-bottom: 10px;
+} 
+
+/* div.w-color-alpha:nth-child(1) > div:nth-child(2) > div:nth-child(1) {
+    top: -3px !important;
+    left: -3px;
+    border-radius: 50% !important;
+    width: 15px !important;
+    height: 15px !important;
+} */
+
+.w-color-sketch > div:nth-child(1) {
+    padding-bottom: 12px !important;
+}
+
+.w-color-saturation-fill {
+    width: 20px !important;
+    height: 20px !important;    
+    border: 2px solid white !important;
+    box-shadow: 0px 0px 2px 1px rgba(0, 0, 0, 0.3) !important;
+    transform: translate(-10px, -10px) !important;
+}

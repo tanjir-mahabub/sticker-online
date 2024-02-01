@@ -3,6 +3,7 @@ import FargCustomize from "./child/FargCustomize"
 import { useEditorContext } from "@/context/EditorContext"
 import MotivCustomize from "./child/MotivCustomize"
 import TextCustomize from "./child/TextCustomize"
+import FormCustomize from "./child/FormCustomize"
 
 const SelectCustomizeSettings = [
     {
@@ -20,6 +21,10 @@ const SelectCustomizeSettings = [
     {
         id: 4,
         component: FargCustomize
+    },
+    {
+        id: 5,
+        component: FormCustomize
     }
 ]
 
