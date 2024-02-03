@@ -2,29 +2,34 @@
 import Image from "next/image";
 import selectorStyles from "./stickerSelector.module.css";
 import { useEffect, useState } from "react";
-import { useStickerContext } from "@/context/StickerContext";
 import { StickerSelectorStore } from "@/store/stickerSelectorStore";
+import { selectedSticker } from "@/redux/features/stickerSlice";
+import { AppDispatch, useAppSelector } from "@/redux/store";
+import { useDispatch } from "react-redux";
+import { StickerState } from "@/types/types";
 
 const StickerSelector = () => {
-    const { selectedSticker, setSticker } = useStickerContext();
 
-    const [selected, setSelected] = useState<number>(1);
+    const stickerDispatch = useDispatch<AppDispatch>();
+
+    const StickerSelected = useAppSelector(state => state.sticker);
+
+    const [selected, setSelected] = useState<StickerState>(StickerSelected);
 
     useEffect(() => {
-        const sticker = StickerSelectorStore.find(sticker => sticker.id === selected);
 
-        sticker && setSticker(sticker.title, sticker.price);
-    }, [selected]);
+        setSelected(StickerSelected)
 
-    console.log(selectedSticker);
+    }, [StickerSelected]);
+
     return (
         <>
             {StickerSelectorStore.map((sticker) => (
                 <div
                     key={sticker.id}
-                    className={`${selectorStyles.stickerWrapper} ${selected === sticker.id && selectorStyles.selected
+                    className={`${selectorStyles.stickerWrapper} ${selected.id === sticker.id && selectorStyles.selected
                         }`}
-                    onClick={() => setSelected(sticker.id)}
+                    onClick={() => stickerDispatch(selectedSticker({ id: sticker.id }))}
                 >
                     <div className="flex items-center h-[60%]">
                         <Image
