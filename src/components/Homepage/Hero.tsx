@@ -27,10 +27,10 @@ const Hero = () => {
                 </div>
             </div>
 
-            <div className="absolute bottom-[7%] left-[7%]">
+            <div className="absolute bottom-[10%] left-[7%]">
                 <Image src="/homepage/hero/toung.svg" alt="toung-icon" width={200} height={100} />
             </div>
-            <div className="absolute bottom-0 -right-20">
+            <div className="absolute bottom-[2%] -right-20">
                 <Image src="/homepage/hero/watermelon.svg" alt="watermelon-icon" width={385} height={100} />
             </div>
         </section>
