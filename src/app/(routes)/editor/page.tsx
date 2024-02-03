@@ -5,12 +5,8 @@ import Dashboard from "@/components/Editor/Dashboard"
 import Header from "@/components/Editor/Header"
 import Footer from "@/components/Editor/Footer"
 import Sidebar from "@/components/Editor/Sidebar"
-import { useStickerContext } from "@/context/StickerContext"
 
 const Editor = () => {
-    const { selectedSticker, setSticker } = useStickerContext();
-
-    console.log(selectedSticker);
 
     return (
         <section>

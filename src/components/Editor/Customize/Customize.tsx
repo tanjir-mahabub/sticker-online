@@ -1,9 +1,9 @@
 import BilderCustomize from "./child/BilderCustomize"
 import FargCustomize from "./child/FargCustomize"
-import { useEditorContext } from "@/context/EditorContext"
 import MotivCustomize from "./child/MotivCustomize"
 import TextCustomize from "./child/TextCustomize"
 import FormCustomize from "./child/FormCustomize"
+import { useAppSelector } from "@/redux/store"
 
 const SelectCustomizeSettings = [
     {
@@ -29,12 +29,12 @@ const SelectCustomizeSettings = [
 ]
 
 const Customize = () => {
-    const { selectedSideNav } = useEditorContext();
+    const SideNavSelected = useAppSelector(state => state.sideNav);
 
     return (
         <div className="w-[20vw]">
             {SelectCustomizeSettings.map(settings => {
-                if (settings.id === selectedSideNav) {
+                if (settings.id === SideNavSelected.id) {
                     return <settings.component key={settings.id} />;
                 }
                 return null;
