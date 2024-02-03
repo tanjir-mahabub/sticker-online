@@ -3,10 +3,10 @@ import { SideNavStore } from "@/store/sideNav";
 import { SideNavState } from "@/types/types";
 import { createSlice } from "@reduxjs/toolkit";
 
-const initialSticker = SideNavStore[0]
+const initialSideNav = SideNavStore[0]
 
 const initialState: SideNavState = {
-  id: initialSticker.id
+  id: initialSideNav.id
 };
 
 export const SideNavReducer = createSlice({
