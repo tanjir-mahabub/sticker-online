@@ -3,5 +3,5 @@
 }
 
 .stickerWrapper:hover, .selected {
-    @apply bg-white border border-white drop-shadow-lg;
+    @apply bg-white border-2 border-white drop-shadow-lg;
 }
