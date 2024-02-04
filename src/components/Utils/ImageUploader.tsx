@@ -1,13 +1,16 @@
 import Image from 'next/image';
 import React, { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
+import ImagePreview from './ImagePreview';
 
 interface ImageUploadProps {
     onImageUpload: (files: File[]) => void;
 }
 
 const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload }) => {
+
     const [selectedImages, setSelectedImages] = useState<string[]>([]);
+
     const acceptedFiles = {
         'image/png': ['.png'],
         'image/jpeg': ['.jpg', '.jpeg'],
@@ -55,13 +58,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload }) => {
                 <p><b>Max file size:</b> 10 MB</p>
             </div>
 
-            <div className="flex flex-wrap flex-grow justify-center items-center gap-2">
-                {selectedImages.map((image, index) => (
-                    <div key={index} className="flex-1 min-w-[100px] flex w-full justify-center items-center">
-                        <Image src={image} alt={`Selected ${index + 1}`} width={180} height={100} className="max-h-full max-w-full" />
-                    </div>
-                ))}
-            </div>
+            <ImagePreview files={selectedImages} />
         </div>
     );
 };
