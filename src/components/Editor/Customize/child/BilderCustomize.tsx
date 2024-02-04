@@ -1,31 +1,29 @@
 import ImageUpload from "@/components/Utils/ImageUploader";
-import { useLocalStorageImages } from "@/hooks/useLocalStorageImages";
-import { addedImage, serializeFile } from "@/redux/features/imageSlice";
-import { AppDispatch, useAppSelector } from "@/redux/store";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 import Image from "next/image";
-import { useDispatch } from "react-redux";
-
-interface SerializedFile {
-    identifier: string;
-    lastModified: number;
-    webkitRelativePath: string;
-    size: number;
-    type: string;
-}
 
 const BilderCustomize = () => {
-    const { setImages } = useLocalStorageImages();
-    const imageDispatch = useDispatch<AppDispatch>();
+
+    const { data: previewImages, updateData: updatePreviewImages } = useLocalStorage('imageStore');
 
     const handleImageUpload = (files: File[]) => {
-        const serializedFiles: (SerializedFile | null)[] = files.map((file) =>
-            serializeFile(file)
-        );
-        const filteredSerializedFiles: SerializedFile[] = serializedFiles.filter(
-            Boolean
-        ) as SerializedFile[];
-        imageDispatch(addedImage(filteredSerializedFiles));
-        setImages(filteredSerializedFiles);
+
+        const imagesData = files.map(file => {
+            return new Promise<string>((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const imageData = event.target?.result as string;
+                    resolve(imageData);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        Promise.all(imagesData).then((imageDataArray) => {
+            const newImageStore = [...previewImages, ...imageDataArray];
+            updatePreviewImages(newImageStore);
+        });
+
     };
 
     return (
