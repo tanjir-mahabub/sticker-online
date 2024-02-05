@@ -5,9 +5,10 @@ import ImagePreview from './ImagePreview';
 
 interface ImageUploadProps {
     onImageUpload: (files: File[]) => void;
+    isImageDeleted: boolean;
 }
 
-const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload }) => {
+const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload, isImageDeleted }) => {
 
     const [selectedImages, setSelectedImages] = useState<string[]>([]);
 
@@ -58,7 +59,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload }) => {
                 <p><b>Max file size:</b> 10 MB</p>
             </div>
 
-            <ImagePreview files={selectedImages} />
+            <ImagePreview files={selectedImages} isImageDeleted={isImageDeleted} />
         </div>
     );
 };

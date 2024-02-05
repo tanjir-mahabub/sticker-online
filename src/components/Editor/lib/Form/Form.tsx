@@ -31,35 +31,35 @@ const Form = () => {
     return (
         <form className="flex justify-start items-center gap-5">
             <div>
-                <label htmlFor="bredd" className="block text-sm font-bold text-gray-700">
+                <label htmlFor="bredd" className="block text-sm 3xl:text-sm font-bold text-gray-700">
                     Bredd
                 </label>
                 <BreddInput value={bredd} onChange={setBredd} onStepUp={handleBreddStepUp} onStepDown={handleBreddStepDown} />
             </div>
 
             <div>
-                <label htmlFor="hojd" className="block text-sm font-bold text-gray-700">
+                <label htmlFor="hojd" className="block text-sm 3xl:text-sm font-bold text-gray-700">
                     Höjd
                 </label>
                 <HojdInput value={hojd} onChange={setHojd} onStepUp={handleHojdStepUp} onStepDown={handleHojdStepDown} />
             </div>
 
             <div>
-                <label htmlFor="laminat" className="block text-sm font-bold text-gray-700">
+                <label htmlFor="laminat" className="block text-sm 3xl:text-sm font-bold text-gray-700">
                     Laminat
                 </label>
                 <LaminatDropdown selectedOption={selectedLaminat} onChange={setSelectedLaminat} />
             </div>
 
             <div>
-                <label htmlFor="material" className="block text-sm font-bold text-gray-700">
+                <label htmlFor="material" className="block text-sm 3xl:text-sm font-bold text-gray-700">
                     Material
                 </label>
                 <MaterialDropdown selectedOption={selectedMaterial} onChange={setSelectedMaterial} />
             </div>
 
             <div>
-                <label htmlFor="antal" className="block text-sm font-bold text-gray-700">
+                <label htmlFor="antal" className="block text-sm 3xl:text-sm font-bold text-gray-700">
                     Antal
                 </label>
                 <AntalDropdown selectedOption={selectedAntal} onChange={setSelectedAntal} />
