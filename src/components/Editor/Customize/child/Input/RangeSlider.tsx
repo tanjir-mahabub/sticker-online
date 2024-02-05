@@ -14,18 +14,23 @@ const RangeSlider: React.FC<RangeSliderProps> = ({ minValue, maxValue, step }) =
     };
 
     return (
-        <div className="flex flex-col gap-5 w-full">
+        <div className="flex flex-col gap-3 w-full">
+            <label htmlFor="range" className="block text-sm 3xl:text-sm font-bold text-so-black">
+                Border
+            </label>
             <input
                 type="range"
                 min={minValue}
                 max={maxValue}
                 step={step}
                 value={value}
+                id="range"
+                name="range"
                 className="w-full h-1.5 bg-orange-500 rounded border-none outline-none appearance-none"
                 onChange={handleRangeChange}
             />
 
-            <p className="text-2xl font-semibold font-open-sans text-black pl-8">Selected Value: {value}</p>
+            <p className="hidden text-2xl font-semibold font-open-sans text-black pl-8">Selected Value: {value}</p>
 
             <style jsx>{`
             input[type="range"]::-webkit-slider-thumb {
