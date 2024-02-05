@@ -254,7 +254,7 @@ const Canvas: React.FC<CanvasProps> = ({
                                 onTransform={() => { }}
                                 onClick={() => handleSelectImage(index)}
                             />
-                            {selectedImage === index && transformerRef.current && (
+                            {/* {selectedImage === index && transformerRef.current && (
                                 <Transformer
                                     ref={(node) => (transformerRef.current![index] = node as any)}
                                     node={image}
@@ -269,7 +269,7 @@ const Canvas: React.FC<CanvasProps> = ({
                                     anchorSize={6}
                                     borderDash={[6, 2]}
                                 />
-                            )}
+                            )} */}
 
                         </React.Fragment>
                     ))}
