@@ -219,13 +219,13 @@ const Canvas: React.FC<CanvasProps> = ({
                         <span className="text-black font-bold">5 cm</span>
                     </div>
                 </div>
-                <div className="absolute bottom-40 -right-40 w-full mx-auto h-3 flex justify-center items-center gap-5 z-50">
+                {/* <div className="absolute bottom-40 -right-40 w-full mx-auto h-3 flex justify-center items-center gap-5 z-50">
                     <button onClick={() => handleExport('png')}>Export as PNG</button>
                     <button onClick={() => handleExport('jpg')}>Export as JPG</button>
                     <button onClick={() => handleExport('svg')}>Export as SVG</button>
                     <button onClick={() => handleExport('pdf')}>Export as PDF</button>
                     <button onClick={handleAddImage}>Add Image</button>
-                </div>
+                </div> */}
             </div>
 
             <Stage width={width} height={height} ref={stageRef}>
@@ -237,7 +237,7 @@ const Canvas: React.FC<CanvasProps> = ({
                         y={centerY - frameHeight / 2}
                         fill="transparent"
                         stroke="black"
-                        strokeWidth={2}
+                        strokeWidth={0.2}
                         ref={frameRef} // Use frameRef directly
                     />
 

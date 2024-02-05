@@ -13,7 +13,7 @@ const MaterialDropdown: React.FC<MaterialDropdownProps> = ({ selectedOption, onC
             <select
                 id="material"
                 name="material"
-                className="mt-1 px-3.5 py-3 bg-so-gray border border-gray-300 rounded-md min-w-60 w-full focus:outline-none focus:ring focus:border-blue-300"
+                className="mt-1 px-3.5 py-3 bg-so-gray border border-gray-300 rounded-md min-w-52 3xl:min-w-60 w-full focus:outline-none focus:ring focus:border-blue-300"
                 value={selectedOption}
                 onChange={(e) => onChange(e.target.value)}
             >

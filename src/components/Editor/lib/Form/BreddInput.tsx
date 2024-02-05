@@ -15,7 +15,7 @@ const BreddInput: React.FC<BreddInputProps> = ({ value, onChange, onStepUp, onSt
                 id="bredd"
                 name="bredd"
                 placeholder="6,5 cm"
-                className="mt-1 px-3.5 py-3 bg-so-gray border border-gray-300 rounded-md w-36 focus:outline-none focus:ring focus:border-blue-300"
+                className="mt-1 px-3.5 py-3 bg-so-gray border border-gray-300 rounded-md w-28 3xl:w-36 focus:outline-none focus:ring focus:border-blue-300"
                 value={`${value.toFixed(1).replace('.', ',')} cm`}
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                     onChange(parseFloat(e.target.value.replace(',', '.')))

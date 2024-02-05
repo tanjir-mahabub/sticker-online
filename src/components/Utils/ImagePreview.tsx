@@ -4,16 +4,18 @@ import { useLocalStorage } from "@/hooks/useLocalStorage"; // Update the import 
 
 interface ImagePreviewProps {
     files: string[];
+    isImageDeleted: boolean;
 }
 
-const ImagePreview: React.FC<ImagePreviewProps> = ({ files }) => {
+const ImagePreview: React.FC<ImagePreviewProps> = ({ files, isImageDeleted }) => {
     const { data: previewImages } = useLocalStorage('imageStore');
     const [images, setImages] = useState<string[]>([]);
 
     useEffect(() => {
         setImages(previewImages)
         files && setImages(prevImg => [...prevImg, ...files])
-    }, [previewImages, files]);
+        isImageDeleted && setImages([])
+    }, [previewImages, files, isImageDeleted]);
 
     return (
         <div className="flex flex-wrap flex-grow justify-center items-center gap-2">
