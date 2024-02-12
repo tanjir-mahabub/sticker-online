@@ -31,6 +31,9 @@ const config: Config = {
       '3xl': '1537px',
       '4xl': '1920px'
     },
+    fontFamily:{
+      'primary': ['Reenie Beanie']
+    }
   },
   plugins: [],
 };

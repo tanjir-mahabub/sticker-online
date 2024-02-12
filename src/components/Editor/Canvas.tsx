@@ -2,6 +2,7 @@ import Konva from 'konva';
 import React, { useState, useEffect, useRef } from 'react';
 import { Stage, Layer, Rect, Image as KonvaImage, Transformer } from 'react-konva';
 import jsPDF from 'jspdf';
+import ImageTools from './CanvasTools/ImageTools';
 
 interface CanvasProps {
     width?: number;
@@ -241,38 +242,8 @@ const Canvas: React.FC<CanvasProps> = ({
                         ref={frameRef} // Use frameRef directly
                     />
 
-                    {images.map((image, index) => (
-                        <React.Fragment key={index}>
-                            <KonvaImage
-                                image={image.image()}
-                                x={image.x()}
-                                y={image.y()}
-                                width={image.width()}
-                                height={image.height()}
-                                draggable
-                                onDragMove={(e) => handleDragMove(index, e)}
-                                onTransform={() => { }}
-                                onClick={() => handleSelectImage(index)}
-                            />
-                            {/* {selectedImage === index && transformerRef.current && (
-                                <Transformer
-                                    ref={(node) => (transformerRef.current![index] = node as any)}
-                                    node={image}
-                                    boundBoxFunc={(oldBox, newBox) => {
-                                        if (newBox.width !== oldBox.width || newBox.height !== oldBox.height) {
-                                            return oldBox;
-                                        }
-                                        return newBox;
-                                    }}
-                                    keepRatio={true}
-                                    enabledAnchors={['top-left', 'top-right', 'bottom-left', 'bottom-right']}
-                                    anchorSize={6}
-                                    borderDash={[6, 2]}
-                                />
-                            )} */}
+                    <ImageTools />
 
-                        </React.Fragment>
-                    ))}
                 </Layer>
             </Stage>
         </>

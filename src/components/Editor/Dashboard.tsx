@@ -2,7 +2,7 @@ import dynamic from 'next/dynamic';
 import { useRef, useEffect, useState } from 'react';
 import Loading from '../Utils/Loading';
 
-const Canvas = dynamic(() => import('./Canvas'), {
+const Canvas = dynamic(() => import('./CanvasTools/Canvas'), {
     loading: () => <Loading />,
     ssr: false,
 });
@@ -31,6 +31,7 @@ const Dashboard = () => {
 
     return (
         <div ref={divRef} className="relative top-0 left-0 w-[75vw] overflow-hidden border-l bg-so-deep-gray">
+            {/* <Canvas width={innerWidth} height={innerHeight} /> */}
             <Canvas width={innerWidth} height={innerHeight} />
         </div>
     );
