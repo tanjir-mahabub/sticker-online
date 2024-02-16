@@ -59,7 +59,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload, isImageDeleted
                 <p><b>Max file size:</b> 10 MB</p>
             </div>
 
-            <ImagePreview files={selectedImages} isImageDeleted={isImageDeleted} />
+            <ImagePreview />
         </div>
     );
 };

@@ -4,13 +4,17 @@ import { TypedUseSelectorHook, useSelector } from 'react-redux';
 import SideNavReducer from './features/sideNavSlice';
 import canvasReducer from './features/canvasSlice';
 import textReducer from './features/textSlice';
+import fileReducer from './features/fileUploadSlice';
+import motivReducer from './features/motivSlice';
 
 const store = configureStore({
   reducer: {
     sticker: StickerReducer,
     sideNav: SideNavReducer,
     canvas: canvasReducer,
-    text: textReducer
+    text: textReducer,
+    file: fileReducer,
+    motiv: motivReducer
   },
 });
 
