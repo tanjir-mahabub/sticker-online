@@ -5,7 +5,6 @@ import { drawImage } from '@/components/Utils/functions';
 import { useSelector } from 'react-redux';
 import { RootState, useAppSelector } from '@/redux/store';
 import CustomTransformer from '@/components/Utils/CustomTransformer';
-import { useImageStorage } from '@/hooks/useImageStorage';
 
 export interface ImageProps {
     imageProps: {
@@ -32,8 +31,6 @@ const ImageComponent: React.FC<ImageProps> = ({ imageProps, isSelected, onSelect
     const imagePosition = imageRef.current?.getClientRect();
 
     const StickerSelected = useAppSelector(state => state.sticker);
-
-    const { data: previewImages } = useImageStorage('imageStore');
 
     useEffect(() => {
         if (isSelected && imageRef.current && trRef.current) {
@@ -110,7 +107,6 @@ const ImageComponent: React.FC<ImageProps> = ({ imageProps, isSelected, onSelect
         };
 
         loadImage();
-
     }, [imageProps.src, centerX, centerY, frameWidth, frameHeight, StickerSelected]);
 
     const isOutsideFrame = (node: Konva.Node, frameWidth: number, frameHeight: number) => {

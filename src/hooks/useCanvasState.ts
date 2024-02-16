@@ -65,7 +65,6 @@ export const useCanvasState = () => {
             }));
             
             setImages(imagesArray);  
-            previewImages && setImages(imagesArray);  
             setDieCutImages(imagesArray);
         }
     }, [previewImages, centerX, centerY, frameWidth, frameHeight]);

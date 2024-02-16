@@ -1,20 +1,11 @@
 import ImageUpload from "@/components/Utils/ImageUploader";
 import { useImageStorage } from "@/hooks/useImageStorage";
-import { fileUploaded } from "@/redux/features/stickerSlice";
-import { useAppSelector } from "@/redux/store";
 import Image from "next/image";
-import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useState } from "react";
 
 const BilderCustomize = () => {
     const [ImageDeleted, setImageDeleted] = useState(false);
     const { data: previewImages, updateData: updatePreviewImages } = useImageStorage('imageStore');
-
-    const [imageArr, setImageArr] = useState<string[]>([]);
-
-    const dispatch = useDispatch();
-    const isFileUploaded = useAppSelector(state => state.sticker.isNewFileUploaded);
-
 
     const handleImageUpload = (files: File[]) => {
 
@@ -31,7 +22,7 @@ const BilderCustomize = () => {
 
         Promise.all(imagesData).then((imageDataArray) => {
             const newImageStore = [...previewImages, ...imageDataArray];
-            setImageArr(newImageStore);
+            updatePreviewImages(newImageStore);
         });
 
     };
@@ -41,19 +32,16 @@ const BilderCustomize = () => {
         setImageDeleted(true);
     }
 
+    // useEffect(() => {
 
-    useEffect(() => {
-        updatePreviewImages(imageArr)
-        dispatch(fileUploaded(true))
+    //     dispatch(setCanvasProperties({ canvasUpdated: true }))
+    //     // console.log('uploaded');
 
-        return () => {
-            dispatch(fileUploaded(false))
-        }
-    }, [imageArr, dispatch, updatePreviewImages])
-
-    useEffect(() => {
-        console.log(previewImages);
-    })
+    //     return () => {
+    //         dispatch(setCanvasProperties({ canvasUpdated: false }))
+    //         // console.log('uploaded return');
+    //     };
+    // });
 
     return (
         <div className="w-full h-[100%]">
