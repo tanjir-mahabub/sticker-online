@@ -2,11 +2,15 @@ import StickerReducer from '@/redux/features/stickerSlice';
 import { configureStore } from '@reduxjs/toolkit';
 import { TypedUseSelectorHook, useSelector } from 'react-redux';
 import SideNavReducer from './features/sideNavSlice';
+import canvasReducer from './features/canvasSlice';
+import textReducer from './features/textSlice';
 
 const store = configureStore({
   reducer: {
     sticker: StickerReducer,
-    sideNav: SideNavReducer    
+    sideNav: SideNavReducer,
+    canvas: canvasReducer,
+    text: textReducer
   },
 });
 

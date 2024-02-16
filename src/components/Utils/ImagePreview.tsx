@@ -1,6 +1,8 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { useLocalStorage } from "@/hooks/useLocalStorage"; // Update the import path
+import { useImageStorage } from "@/hooks/useImageStorage"; // Update the import path
+import { useDispatch } from "react-redux";
+import { setCanvasProperties } from "@/redux/features/canvasSlice";
 
 interface ImagePreviewProps {
     files: string[];
@@ -8,14 +10,17 @@ interface ImagePreviewProps {
 }
 
 const ImagePreview: React.FC<ImagePreviewProps> = ({ files, isImageDeleted }) => {
-    const { data: previewImages } = useLocalStorage('imageStore');
+    const { data: previewImages } = useImageStorage('imageStore');
     const [images, setImages] = useState<string[]>([]);
+
+    const dispatch = useDispatch();
+
 
     useEffect(() => {
         setImages(previewImages)
         files && setImages(prevImg => [...prevImg, ...files])
         isImageDeleted && setImages([])
-    }, [previewImages, files, isImageDeleted]);
+    }, [previewImages, files, isImageDeleted, dispatch]);
 
     return (
         <div className="flex flex-wrap flex-grow justify-center items-center gap-2">

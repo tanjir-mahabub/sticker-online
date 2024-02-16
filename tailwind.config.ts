@@ -30,7 +30,7 @@ const config: Config = {
       '2xl': '1480px',
       '3xl': '1537px',
       '4xl': '1920px'
-    },
+    }
   },
   plugins: [],
 };

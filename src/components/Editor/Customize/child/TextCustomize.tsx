@@ -1,6 +1,28 @@
+import { useImageStorage } from "@/hooks/useImageStorage";
+import { setText } from "@/redux/features/textSlice";
 import { customizeFonts } from "@/store/customizeFontStore";
+import { useState } from "react";
+import { useDispatch } from "react-redux";
 
 const TextCustomize = () => {
+
+    const { data: textSelected, updateData: updatedTextSelected } = useImageStorage('textStore');
+
+    const dispatch = useDispatch()
+
+    const handleSelectText = (id: number, name: string) => {
+
+        const updatedLocalStorageData = {
+            ...textSelected,
+            id: id,
+            name: name
+        };
+
+        dispatch(setText({ id, name }));
+        updatedTextSelected(updatedLocalStorageData);
+    };
+
+
     return (
         <div className="w-full">
             <div className="p-4 space-y-5 overflow-y-auto">
@@ -9,7 +31,9 @@ const TextCustomize = () => {
 
             <div className="flex flex-wrap flex-grow justify-start items-center gap-3 p-3">
                 {customizeFonts.map(customFonts => (
-                    <div key={customFonts.id} className="bg-so-deep-gray flex justify-center items-center w-20 h-20 rounded cursor-pointer hover:shadow-md border border-gray-300/70">
+                    <div key={customFonts.id} className="bg-so-deep-gray flex justify-center items-center w-20 h-20 rounded cursor-pointer hover:shadow-md border border-gray-300/70"
+                        onClick={() => handleSelectText(customFonts.id, customFonts.fontName)}
+                    >
                         <p className={`${customFonts.font.className} text-lg`}>
                             Text
                         </p>

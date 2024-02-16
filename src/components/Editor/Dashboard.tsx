@@ -2,7 +2,7 @@ import dynamic from 'next/dynamic';
 import { useRef, useEffect, useState } from 'react';
 import Loading from '../Utils/Loading';
 
-const Canvas = dynamic(() => import('./Canvas'), {
+const Canvas = dynamic(() => import('./CanvasTools/Canvas'), {
     loading: () => <Loading />,
     ssr: false,
 });
