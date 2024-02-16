@@ -17,11 +17,11 @@ export const useCanvasState = () => {
 
     const [textUpdated, setTextUpdated] = useState(false);
 
-    const { data: previewImages } = useImageStorage('imageStore');   
+    const { data: previewImages, updateData: updatedPreviewImages } = useImageStorage('imageStore');   
     
-    const { data: previewMotives } = useImageStorage('motivStore');   
+    const { data: previewMotives, updateData: updatedPreviewMotivs  } = useImageStorage('motivStore');   
 
-    const { data: previewTexts } = useTextStorage('textStore'); 
+    const { data: previewTexts, updateData: updatedPreviewTexts } = useTextStorage('textStore'); 
 
     const [rectangles, setRectangles] = useState<RectangleProps['shapeProps'][]>(initialRectangles);
     const [images, setImages] = useState<ImageProps['imageProps'][]>([]);
@@ -52,32 +52,34 @@ export const useCanvasState = () => {
     const xPosition = centerX - newWidth / 2;
     const yPosition = centerY - newHeight / 2;
     }
-
+    
+    const FileState = useAppSelector(state => state.file)    
+    
     useEffect(() => {
-        if (typeof window !== 'undefined' && previewImages.length > 0) {
-            const imagesArray = previewImages.map((imageSrc, index) => ({
-                x: centerX - frameWidth / 2, // Adjust x position for each image
-                y: centerY - frameHeight / 2,
-                // width: frameWidth * .8,
-                // height: frameHeight,
-                src: imageSrc,
-                id: `img${index + 1}`, // Generate unique ID for each image
-            }));
-            
-            setImages(imagesArray);  
-            setDieCutImages(imagesArray);
-        }
-    }, [previewImages, centerX, centerY, frameWidth, frameHeight]);
+       
+        const imagesArray = FileState?.map((img, index) => ({
+            x: centerX - frameWidth / 2, // Adjust x position for each image
+            y: centerY - frameHeight / 2,
+            // width: frameWidth * .8,
+            // height: frameHeight,
+            src: img.file,
+            id: img.id
+        }));
+        
+        setImages(imagesArray);  
+        setDieCutImages(imagesArray);
+       
+    }, [previewImages, centerX, centerY, frameWidth, frameHeight, FileState]);
 
     useEffect(() => {
         if (typeof window !== 'undefined' && previewMotives.length > 0) {
-            const MotivesArray = previewMotives.map((motivesSrc, index) => ({
+            const MotivesArray = previewMotives.map((motiv, index) => ({
                 x: centerX - frameWidth / 2, // Adjust x position for each image
                 y: centerY - frameHeight / 2,
                 // width: frameWidth * .8,
                 // height: frameHeight,
-                src: motivesSrc,
-                id: `motiv${index + 1}`, // Generate unique ID for each image
+                src: motiv.file,
+                id: motiv.id
             }));
             
             setMotives(MotivesArray);            
@@ -114,8 +116,7 @@ export const useCanvasState = () => {
     
     useEffect(() => {        
         selectedText && setTextUpdated(true);
-    }, [selectedText])
-    
+    }, [selectedText])     
 
     return {
         rectangles,

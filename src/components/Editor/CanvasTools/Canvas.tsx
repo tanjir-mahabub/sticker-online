@@ -16,6 +16,7 @@ import DieCutImage, { DieCutImageProps } from './DieCutImageBG';
 import CustomTransformer from '@/components/Utils/CustomTransformer';
 import { Node, NodeConfig } from 'konva/lib/Node';
 import { Shape, ShapeConfig } from 'konva/lib/Shape';
+import { addFiles } from '@/redux/features/fileUploadSlice';
 
 
 interface CanvasProps {
@@ -68,6 +69,7 @@ const NewCanvas: React.FC<CanvasProps> = ({
 
 
     const { data: previewImages } = useImageStorage('imageStore');
+    const FileState = useAppSelector(state => state.file)
 
     const [selectedShapes, setSelectedShapes] = useState<Konva.Shape[]>([]);
 
@@ -76,6 +78,8 @@ const NewCanvas: React.FC<CanvasProps> = ({
     const [isCircleSelected, setIsCircleSelected] = useState(false);
     const [imageAttrs, setImageAttrs] = useState<DieCutImageProps>();
     const [dieCutKey, setDieCutKey] = useState(0);
+
+    const [imageUpdated, setImageUpdated] = useState([])
 
     const handleClickOnStage = () => {
         if (selectedShapes.length > 0) {
@@ -91,15 +95,14 @@ const NewCanvas: React.FC<CanvasProps> = ({
 
 
 
-    useEffect(() => {
-        setImageAttrs({
-            imageUrl: previewImages[0],
-            isSelected: selected,
-            onSelect: () => setSelected(true),
-            onChange: (newAttrs) => console.log('Image attributes changed:', newAttrs),
-        })
-    }, [previewImages, selected]);
-
+    // useEffect(() => {
+    //     setImageAttrs({
+    //         imageUrl: previewImages[0],
+    //         isSelected: selected,
+    //         onSelect: () => setSelected(true),
+    //         onChange: (newAttrs) => console.log('Image attributes changed:', newAttrs),
+    //     })
+    // }, [previewImages, selected]);
 
 
     // useEffect(() => {
@@ -137,7 +140,6 @@ const NewCanvas: React.FC<CanvasProps> = ({
     //     };
     // }, [stageRef, frameRef]);
 
-    // const [img, setImg] = useState<HTMLImageElement | null>(null);
 
     // useEffect(() => {
     //     const frame = frameRef.current;
@@ -185,7 +187,7 @@ const NewCanvas: React.FC<CanvasProps> = ({
     //     // Convert the canvas to an image
     //     const image = new Image();
     //     image.src = canvas.toDataURL();
-    //     setImg(image);
+    //     console.log(image);
     //     localStorage.setItem('canvasImage', image.src);
     //     // Optionally, save or display the image
     //     // For example:
@@ -217,9 +219,13 @@ const NewCanvas: React.FC<CanvasProps> = ({
     //             groupRef.current.current = null; // Use .current to mutate the ref's value
     //         }
     //     }
-    // }, [selectedShapes]);
+    // }, [selectedShapes]);  
 
-
+    useEffect(() => {
+        // Convert each ImageData object to its corresponding file string
+        const filesToAdd = previewImages.map(imageData => imageData.file);
+        dispatch(addFiles(filesToAdd));
+    }, [dispatch, previewImages]);
 
     return (
         <>
