@@ -1,41 +1,36 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Rectangle from './Rectangle';
 import ImageComponent from './Image';
 import Text from './Text';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/redux/store';
-import { useCanvasState } from '@/hooks/useCanvasState';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
+import DieCutImage from './DieCutImageBG';
 
 interface CanvasElementsRendererProps {
     rectangles: any[];
     images: any[];
+    motives: any[];
     texts: any[];
     selectedId: string | null;
     setSelectedId: React.Dispatch<React.SetStateAction<string | null>>; // Define setSelectedId prop
     handleRectChange: (index: number, newAttrs: any) => void;
     handleImageChange: (index: number, newAttrs: any) => void;
+    handleDieCutImageChange: (index: number, newAttrs: any) => void;
+    handleMotiveChange: (index: number, newAttrs: any) => void;
     handleTextChange: (index: number, newAttrs: any) => void;
 }
 
 const CanvasElementsRenderer: React.FC<CanvasElementsRendererProps> = ({
     rectangles,
     images,
+    motives,
     texts,
     selectedId,
     setSelectedId,
     handleRectChange,
     handleImageChange,
+    handleDieCutImageChange,
+    handleMotiveChange,
     handleTextChange,
 }) => {
-
-    const { data: textSelected } = useLocalStorage('selectedTextData');
-    const canvasProperties = useSelector((state: RootState) => state.canvas);
-    const { centerX, centerY, frameWidth, frameHeight } = canvasProperties;
-
-    useEffect(() => {
-
-    }, [centerX, centerY, frameWidth, frameHeight, textSelected])
 
     return (
         <>
@@ -48,6 +43,8 @@ const CanvasElementsRenderer: React.FC<CanvasElementsRendererProps> = ({
                     onChange={(newAttrs) => handleRectChange(i, newAttrs)}
                 />
             ))} */}
+
+
             {images.map((imgProps, i) => (
                 <ImageComponent
                     key={i}
@@ -57,6 +54,17 @@ const CanvasElementsRenderer: React.FC<CanvasElementsRendererProps> = ({
                     onChange={(newAttrs) => handleImageChange(i, newAttrs)}
                 />
             ))}
+
+            {motives.map((motive, i) => (
+                <ImageComponent
+                    key={i}
+                    imageProps={motive}
+                    isSelected={motive.id === selectedId}
+                    onSelect={() => setSelectedId(motive.id)} // Use setSelectedId here
+                    onChange={(newAttrs) => handleMotiveChange(i, newAttrs)}
+                />
+            ))}
+
             {texts.length > 0 &&
                 texts.map((textProps, i) => (
                     <Text

@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import BreddInput from './BreddInput';
 import HojdInput from './HojdInput';
 import LaminatDropdown from './LaminatDropdown';
 import MaterialDropdown from './MaterialDropdown';
 import AntalDropdown from './AntalDropdown';
+import { useDispatch } from 'react-redux';
+import { setCanvasProperties } from '@/redux/features/canvasSlice';
 
 const Form = () => {
+    const dispatch = useDispatch();
     const [bredd, setBredd] = useState(6.5);
     const [hojd, setHojd] = useState(5);
     const [selectedLaminat, setSelectedLaminat] = useState('Glansig');
@@ -27,6 +30,10 @@ const Form = () => {
     const handleHojdStepDown = () => {
         setHojd((prevValue) => prevValue - 0.1);
     };
+
+    // useEffect(() => {
+    //     dispatch(setCanvasProperties({ frameWidth: bredd, frameHeight: hojd }));
+    // }, [bredd, hojd, dispatch])
 
     return (
         <form className="flex justify-start items-center gap-5">

@@ -1,16 +1,18 @@
 import Konva from 'konva';
 import { Image as KonvaImage, Transformer } from 'react-konva';
 import React, { useEffect, useRef } from 'react';
-import { drawImage, drawImageCircle, drawImageRectangle, drawImageRounded } from '@/components/Utils/functions';
+import { drawImage } from '@/components/Utils/functions';
 import { useSelector } from 'react-redux';
-import { RootState } from '@/redux/store';
+import { RootState, useAppSelector } from '@/redux/store';
+import CustomTransformer from '@/components/Utils/CustomTransformer';
+import { useImageStorage } from '@/hooks/useImageStorage';
 
 export interface ImageProps {
     imageProps: {
         x: number;
         y: number;
-        width: number;
-        height: number;
+        width?: number;
+        height?: number;
         src: string;
         id: string;
     };
@@ -24,6 +26,14 @@ const ImageComponent: React.FC<ImageProps> = ({ imageProps, isSelected, onSelect
     const trRef = useRef<Konva.Transformer>(null);
 
     const canvasProperties = useSelector((state: RootState) => state.canvas);
+
+    const { centerX, centerY, frameWidth, frameHeight } = canvasProperties;
+
+    const imagePosition = imageRef.current?.getClientRect();
+
+    const StickerSelected = useAppSelector(state => state.sticker);
+
+    const { data: previewImages } = useImageStorage('imageStore');
 
     useEffect(() => {
         if (isSelected && imageRef.current && trRef.current) {
@@ -42,19 +52,35 @@ const ImageComponent: React.FC<ImageProps> = ({ imageProps, isSelected, onSelect
                     img.onload = resolve;
                 });
 
-                if (imageRef.current) {
-                    const { centerX, centerY, frameWidth, frameHeight } = canvasProperties;
-                    const scaleFactorX = frameWidth / img.width;
-                    const scaleFactorY = frameHeight / img.height;
-                    const scaleFactor = Math.min(scaleFactorX, scaleFactorY);
+                if (imageRef.current && StickerSelected) {
 
-                    // const imageWithDieCutEffect = await drawImage(img, 70, 'white');
-                    // const imageWithDieCutEffect = await drawImageRectangle(img, 70, 'white');
-                    // const imageWithDieCutEffect = await drawImageRounded(img, 70, 'white');
-                    const imageWithDieCutEffect = await drawImageCircle(img, 70, 'white');
-                    const finaleImage = imageWithDieCutEffect && await drawImage(imageWithDieCutEffect, 3, 'magenta');
 
-                    if (finaleImage) {
+                    // Calculate the new width and height
+                    const scaleFactor = 0.8; // 20% smaller
+                    const scaledWidth = frameWidth * scaleFactor;
+                    const scaledHeight = frameHeight * scaleFactor;
+
+                    // Determine the scaling factor for maintaining aspect ratio
+                    const widthScaleFactor = scaledWidth / img.width;
+                    const heightScaleFactor = scaledHeight / img.height;
+                    const minScaleFactor = Math.min(widthScaleFactor, heightScaleFactor);
+
+                    // Calculate the scaled dimensions while maintaining aspect ratio
+                    const newWidth = img.width * minScaleFactor;
+                    const newHeight = img.height * minScaleFactor;
+
+                    // Calculate the position for centering the image
+                    const xPosition = centerX - newWidth / 2;
+                    const yPosition = centerY - newHeight / 2;
+
+                    // console.log('from image', StickerSelected);
+                    // Set the image dimensions and position
+                    if (StickerSelected.id === 1) {
+
+                        const imageWithDieCutEffect = await drawImage(img, 100, 'white');
+
+                        const finaleImage = imageWithDieCutEffect && await drawImage(imageWithDieCutEffect, 5, 'magenta');
+
                         imageRef.current.image(finaleImage);
                         imageRef.current.width(img.width * scaleFactor);
                         imageRef.current.height(img.height * scaleFactor);
@@ -63,17 +89,68 @@ const ImageComponent: React.FC<ImageProps> = ({ imageProps, isSelected, onSelect
                         imageRef.current.getLayer()?.batchDraw();
                         // console.log(canvasProperties);
                     }
+
+                    if (StickerSelected.id !== 1) {
+                        imageRef.current.image(img);
+                        imageRef.current.width(newWidth);
+                        imageRef.current.height(newHeight);
+                        imageRef.current.x(xPosition);
+                        imageRef.current.y(yPosition);
+                        imageRef.current.getLayer()?.batchDraw();
+                    }
+
+                    // imageRef.current.image(img);
+                    // imageRef.current.width(newWidth);
+                    // imageRef.current.height(newHeight);
+                    // imageRef.current.x(xPosition);
+                    // imageRef.current.y(yPosition);
+                    // imageRef.current.getLayer()?.batchDraw();
                 }
             }
         };
 
         loadImage();
-    }, [imageProps.src, canvasProperties]);
 
+    }, [imageProps.src, centerX, centerY, frameWidth, frameHeight, StickerSelected]);
+
+    const isOutsideFrame = (node: Konva.Node, frameWidth: number, frameHeight: number) => {
+        const x = node.x();
+        const y = node.y();
+        const width = node.width();
+        const height = node.height();
+
+        return x < 0 || y < 0 || x + width > frameWidth || y + height > frameHeight;
+    };
+
+    // useEffect(() => {
+    //     if (imagePosition) {
+    //         const { x, y, width, height } = imagePosition;
+    //         const imageStartX = x - width / 2;
+    //         const imageStartY = y - width / 2;
+    //         const imageEndX = x + width / 2;
+    //         const imageEndY = y + height / 2;
+    //         const frameStartX = centerX - frameWidth / 2;
+    //         const frameStartY = centerY - frameHeight / 2;
+    //         const frameEndX = centerX + frameWidth / 2;
+    //         const frameEndY = centerY + frameHeight / 2;
+    //         console.log('Image xPosition', imageStartX, imageEndX, width, 'imgX', x);
+    //         console.log('Image yPosition', imageStartY, imageEndY, height, 'imgY', y);
+    //         console.log('xPosition', frameStartX, frameEndX, frameWidth, 'imgX', x);
+    //         console.log('yPosition', frameStartY, frameEndY, frameHeight, 'imgY', y);
+
+    //         if (imageStartX >= frameStartX && imageEndX <= frameEndX) {
+    //             console.log('inside');
+    //         } else {
+    //             console.log('outside');
+    //         }
+    //     }
+
+    // }, [centerX, centerY, frameWidth, frameHeight, imagePosition])
 
     return (
         <>
             <KonvaImage
+                name="image"
                 image={undefined}
                 draggable
                 {...imageProps}
@@ -101,22 +178,13 @@ const ImageComponent: React.FC<ImageProps> = ({ imageProps, isSelected, onSelect
                         });
                     }
                 }}
-                onClick={onSelect} // Ensure onSelect is called when the image is clicked
-                onTap={onSelect} // Ensure onSelect is called when the image is tapped
-                alt="" // Add alt prop with an empty string for decorative images
+                onClick={onSelect}
+                onTap={onSelect}
+                alt=""
+                aspectRatio={true}
             />
             {isSelected && (
-                <Transformer
-                    ref={trRef}
-                    rotateEnabled={true}
-                    keepRatio={true} // Set keepRatio to false to always show the anchors
-                    boundBoxFunc={(oldBox, newBox) => {
-                        if (Math.abs(newBox.width) < 5 || Math.abs(newBox.height) < 5) {
-                            return oldBox;
-                        }
-                        return newBox;
-                    }}
-                />
+                <CustomTransformer shapeRef={imageRef} isSelected={isSelected} />
             )}
         </>
     );

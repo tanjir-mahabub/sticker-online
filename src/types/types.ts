@@ -2,6 +2,7 @@ import Konva from "konva";
 
 export interface StickerState {    
   id: number
+  isNewFileUploaded: boolean
 }
 
 export interface SideNavState {    

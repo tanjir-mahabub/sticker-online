@@ -56,6 +56,11 @@
 // };
 
 
+export const ConvertCMTOPX = (cm: number, dpi = 300) => {    
+    const cmToPx = (cm: number, dpi: number) => (cm / 2.54) * dpi;
+    return cmToPx;
+}
+
 export const drawImage = async (img: HTMLImageElement, grow: number, color: string): Promise<HTMLImageElement> => {
   return new Promise<HTMLImageElement>((resolve, reject) => {
       const canvas1 = document.createElement("canvas");
@@ -68,8 +73,14 @@ export const drawImage = async (img: HTMLImageElement, grow: number, color: stri
 
       if (ctx1 && ctx2) {
           ctx1.drawImage(img, grow, grow);
+         if(color == "gray") {
+          ctx2.shadowColor = color;          
+          ctx2.shadowBlur = 0.7;     
+
+         } else {
           ctx2.shadowColor = color;
-          ctx2.shadowBlur = 1;          
+          ctx2.shadowBlur = 1;     
+         }
 
           for (let i = 0; i < grow; i++) {
               ctx2.drawImage(canvas1, 0, 0);
@@ -90,164 +101,160 @@ export const drawImage = async (img: HTMLImageElement, grow: number, color: stri
 };
 
 
-export const drawImageRectangle = async (img: HTMLImageElement, grow: number, color: string): Promise<HTMLImageElement> => {
-  return new Promise<HTMLImageElement>((resolve, reject) => {
-      const canvas1 = document.createElement("canvas");
-      const ctx1 = canvas1.getContext("2d");
-      const canvas2 = document.createElement("canvas");
-      const ctx2 = canvas2.getContext("2d");
+// export const drawImageRectangle = async (img: HTMLImageElement, grow: number, color: string): Promise<HTMLImageElement> => {
+//   return new Promise<HTMLImageElement>((resolve, reject) => {
+//       const canvas1 = document.createElement("canvas");
+//       const ctx1 = canvas1.getContext("2d");
+//       const canvas2 = document.createElement("canvas");
+//       const ctx2 = canvas2.getContext("2d");
 
-      canvas1.width = canvas2.width = img.width + grow * 2;
-      canvas1.height = canvas2.height = img.height + grow * 2;
+//       canvas1.width = canvas2.width = img.width + grow * 2;
+//       canvas1.height = canvas2.height = img.height + grow * 2;
 
-      if (ctx1 && ctx2) {
-          // Draw the background rectangle
-          ctx1.fillStyle = color;
-          ctx1.fillRect(0, 0, canvas1.width, canvas1.height);
+//       if (ctx1 && ctx2) {
+//           // Draw the background rectangle
+//           ctx1.fillStyle = color;
+//           ctx1.fillRect(0, 0, canvas1.width, canvas1.height);
 
-          // Draw the image on top of the background rectangle
-          ctx1.drawImage(img, grow, grow);
+//           // Draw the image on top of the background rectangle
+//           ctx1.drawImage(img, grow, grow);
 
-          // Apply shadow effect
-          ctx2.shadowColor = color;
-          ctx2.shadowBlur = 1;
+//           // Apply shadow effect
+//           ctx2.shadowColor = color;
+//           ctx2.shadowBlur = 1;
 
-          // Draw the image with shadow multiple times to create a stronger shadow effect
-          for (let i = 0; i < grow; i++) {
-              ctx2.drawImage(canvas1, 0, 0);
-              ctx1.drawImage(canvas2, 0, 0);
-          }
+//           // Draw the image with shadow multiple times to create a stronger shadow effect
+//           for (let i = 0; i < grow; i++) {
+//               ctx2.drawImage(canvas1, 0, 0);
+//               ctx1.drawImage(canvas2, 0, 0);
+//           }
 
-          // Reset shadow and draw the image without shadow
-          ctx2.shadowColor = 'rgba(0,0,0,0)';
-          ctx2.drawImage(img, grow, grow);
+//           // Reset shadow and draw the image without shadow
+//           ctx2.shadowColor = 'rgba(0,0,0,0)';
+//           ctx2.drawImage(img, grow, grow);
 
-          // Create a new image element and set its source to the canvas data URL
-          const image = new Image();
-          image.onload = () => resolve(image);
-          image.onerror = reject;
-          image.src = canvas2.toDataURL();
-      } else {
-          reject(new Error("Failed to get canvas context"));
-      }
-  });
-};
-
-
-export const drawImageRounded = async (img: HTMLImageElement, grow: number, color: string, cornerRadius = 20): Promise<HTMLImageElement> => {
-  return new Promise<HTMLImageElement>((resolve, reject) => {
-      const canvas1 = document.createElement("canvas");
-      const ctx1 = canvas1.getContext("2d");
-      const canvas2 = document.createElement("canvas");
-      const ctx2 = canvas2.getContext("2d");
-
-      canvas1.width = canvas2.width = img.width + grow * 2;
-      canvas1.height = canvas2.height = img.height + grow * 2;
-
-      if (ctx1 && ctx2) {
-          // Define roundRect method for ctx1
-          ctx1.roundRect = function (x: number, y: number, width: number, height: number, radius: number) {
-              if (width < 2 * radius) radius = width / 2;
-              if (height < 2 * radius) radius = height / 2;
-              this.beginPath();
-              this.moveTo(x + radius, y);
-              this.arcTo(x + width, y, x + width, y + height, radius);
-              this.arcTo(x + width, y + height, x, y + height, radius);
-              this.arcTo(x, y + height, x, y, radius);
-              this.arcTo(x, y, x + width, y, radius);
-              this.closePath();
-              return this;
-          };
-
-          // Define roundRect method for ctx2
-          ctx2.roundRect = function (x: number, y: number, width: number, height: number, radius: number) {
-              if (width < 2 * radius) radius = width / 2;
-              if (height < 2 * radius) radius = height / 2;
-              this.beginPath();
-              this.moveTo(x + radius, y);
-              this.arcTo(x + width, y, x + width, y + height, radius);
-              this.arcTo(x + width, y + height, x, y + height, radius);
-              this.arcTo(x, y + height, x, y, radius);
-              this.arcTo(x, y, x + width, y, radius);
-              this.closePath();
-              return this;
-          };
-
-          // Draw the rounded rectangle on ctx1
-          ctx1.fillStyle = color;
-          ctx1.roundRect(0, 0, canvas1.width, canvas1.height, cornerRadius);
-          ctx1.fill();
-
-          // Draw the image on top of the background rectangle on ctx1
-          ctx1.drawImage(img, grow, grow);
-
-          // Apply shadow effect on ctx2
-          // ctx2.shadowColor = color;
-          // ctx2.shadowBlur = 1;
-
-          // Draw the image with shadow multiple times to create a stronger shadow effect on ctx2
-          for (let i = 0; i < grow; i++) {
-              ctx2.drawImage(canvas1, 0, 0);
-              ctx1.drawImage(canvas2, 0, 0);
-          }
-
-          // Reset shadow and draw the image without shadow on ctx2
-          ctx2.shadowColor = 'rgba(0,0,0,0)';
-          ctx2.drawImage(img, grow, grow);
-
-          // Create a new image element and set its source to the canvas data URL
-          const image = new Image();
-          image.onload = () => resolve(image);
-          image.onerror = reject;
-          image.src = canvas2.toDataURL();
-      } else {
-          reject(new Error("Failed to get canvas context"));
-      }
-  });
-};
-
-export const drawImageCircle = async (img: HTMLImageElement, grow: number, color: string): Promise<HTMLImageElement> => {
-  return new Promise<HTMLImageElement>((resolve, reject) => {
-    const canvas1 = document.createElement("canvas");
-    const ctx1 = canvas1.getContext("2d");
-    const canvas2 = document.createElement("canvas");
-    const ctx2 = canvas2.getContext("2d");
-
-    // Calculate the total size of the canvas
-    const totalWidth = img.width + grow * 2;
-    const totalHeight = img.height + grow * 2;
-
-    // Set the size of the canvases
-    canvas1.width = canvas2.width = totalWidth;
-    canvas1.height = canvas2.height = totalHeight;
-
-    if (ctx1 && ctx2) {
-      // Draw white circle background
-      ctx1.fillStyle = "white";
-      ctx1.beginPath();
-      ctx1.arc(totalWidth / 2, totalHeight / 2, totalWidth / 2.2, 0, Math.PI * 2);
-      ctx1.closePath();
-      ctx1.fill();
-
-      // Draw image on top of the white circle background
-      ctx1.drawImage(img, grow, grow);      
-
-      // Create a new image element and set its source to the canvas data URL
-      const image = new Image();
-      image.onload = () => resolve(image);
-      image.onerror = reject;
-      image.src = canvas1.toDataURL();
-    } else {
-      reject(new Error("Failed to get canvas context"));
-    }
-  });
-};
+//           // Create a new image element and set its source to the canvas data URL
+//           const image = new Image();
+//           image.onload = () => resolve(image);
+//           image.onerror = reject;
+//           image.src = canvas2.toDataURL();
+//       } else {
+//           reject(new Error("Failed to get canvas context"));
+//       }
+//   });
+// };
 
 
+// export const drawImageRounded = async (img: HTMLImageElement, grow: number, color: string, cornerRadius = 20): Promise<HTMLImageElement> => {
+//   return new Promise<HTMLImageElement>((resolve, reject) => {
+//       const canvas1 = document.createElement("canvas");
+//       const ctx1 = canvas1.getContext("2d");
+//       const canvas2 = document.createElement("canvas");
+//       const ctx2 = canvas2.getContext("2d");
+
+//       canvas1.width = canvas2.width = img.width + grow * 2;
+//       canvas1.height = canvas2.height = img.height + grow * 2;
+
+//       if (ctx1 && ctx2) {
+//           // Define roundRect method for ctx1
+//           ctx1.roundRect = function (x: number, y: number, width: number, height: number, radius: number) {
+//               if (width < 2 * radius) radius = width / 2;
+//               if (height < 2 * radius) radius = height / 2;
+//               this.beginPath();
+//               this.moveTo(x + radius, y);
+//               this.arcTo(x + width, y, x + width, y + height, radius);
+//               this.arcTo(x + width, y + height, x, y + height, radius);
+//               this.arcTo(x, y + height, x, y, radius);
+//               this.arcTo(x, y, x + width, y, radius);
+//               this.closePath();
+//               return this;
+//           };
+
+//           // Define roundRect method for ctx2
+//           ctx2.roundRect = function (x: number, y: number, width: number, height: number, radius: number) {
+//               if (width < 2 * radius) radius = width / 2;
+//               if (height < 2 * radius) radius = height / 2;
+//               this.beginPath();
+//               this.moveTo(x + radius, y);
+//               this.arcTo(x + width, y, x + width, y + height, radius);
+//               this.arcTo(x + width, y + height, x, y + height, radius);
+//               this.arcTo(x, y + height, x, y, radius);
+//               this.arcTo(x, y, x + width, y, radius);
+//               this.closePath();
+//               return this;
+//           };
+
+//           // Draw the rounded rectangle on ctx1
+//           ctx1.fillStyle = color;
+//           ctx1.roundRect(0, 0, canvas1.width, canvas1.height, cornerRadius);
+//           ctx1.fill();
+
+//           // Draw the image on top of the background rectangle on ctx1
+//           ctx1.drawImage(img, grow, grow);
+
+//           // Apply shadow effect on ctx2
+//           // ctx2.shadowColor = color;
+//           // ctx2.shadowBlur = 1;
+
+//           // Draw the image with shadow multiple times to create a stronger shadow effect on ctx2
+//           for (let i = 0; i < grow; i++) {
+//               ctx2.drawImage(canvas1, 0, 0);
+//               ctx1.drawImage(canvas2, 0, 0);
+//           }
+
+//           // Reset shadow and draw the image without shadow on ctx2
+//           ctx2.shadowColor = 'rgba(0,0,0,0)';
+//           ctx2.drawImage(img, grow, grow);
+
+//           // Create a new image element and set its source to the canvas data URL
+//           const image = new Image();
+//           image.onload = () => resolve(image);
+//           image.onerror = reject;
+//           image.src = canvas2.toDataURL();
+//       } else {
+//           reject(new Error("Failed to get canvas context"));
+//       }
+//   });
+// };
+
+// export const drawImageCircle = async (img: HTMLImageElement, grow: number, color: string, canvasProperties: any): Promise<HTMLImageElement> => {
+//   return new Promise<HTMLImageElement>((resolve, reject) => {
+//      // Calculate the dimensions of the white arc
+//      const arcWidth = canvasProperties.frameWidth * 0.95; // 5% less
+//      const arcHeight = canvasProperties.frameHeight * 0.95; // 5% less
+
+//      // Create a canvas to draw the white arc
+//      const canvas = document.createElement('canvas');
+//      canvas.width = canvasProperties.frameWidth;
+//      canvas.height = canvasProperties.frameHeight;
+//      const ctx = canvas.getContext('2d');
+
+//      if (ctx) {
+//          // Draw the white arc
+//          ctx.fillStyle = 'white';
+//          ctx.beginPath();
+//          ctx.arc(canvasProperties.centerX, canvasProperties.centerY, arcWidth / 2, 0, Math.PI * 2);
+//          ctx.closePath();
+//          ctx.fill();
+
+    
+
+//       // Draw image on top of the white circle background
+//       ctx.drawImage(img, 0, 0);      
+
+//       // Create a new image element and set its source to the canvas data URL
+//       const image = new Image();
+//       image.onload = () => resolve(image);
+//       image.onerror = reject;
+//       image.src = canvas.toDataURL();
+//     } else {
+//       reject(new Error("Failed to get canvas context"));
+//     }
+//   });
+// };
 
 
-
-// export const  drawImage = (img: HTMLImageElement, grow: number, color: string) => {
+// export const drawCustomImage = (img: HTMLImageElement, grow: number, color: string) => {
 //   const canvas = document.createElement("canvas");
 //   const ctx = canvas.getContext("2d");
 
@@ -268,6 +275,87 @@ export const drawImageCircle = async (img: HTMLImageElement, grow: number, color
    
 //   return canvas
 // }
+
+
+
+// export const drawCustomImage = async (img: HTMLImageElement, centerX: number, centerY: number, width: number, height: number, grow: number, color: string): Promise<HTMLImageElement> => {
+//   return new Promise<HTMLImageElement>((resolve, reject) => {
+//       const canvas1 = document.createElement("canvas");
+//       const ctx1 = canvas1.getContext("2d");
+//       const canvas2 = document.createElement("canvas");
+//       const ctx2 = canvas2.getContext("2d");
+
+//       canvas1.width = canvas2.width = width + grow * 2;
+//       canvas1.height = canvas2.height = height + grow * 2;
+
+//       if (ctx1 && ctx2) {
+//           const offsetX = (canvas2.width - img.width) / 2;
+//           const offsetY = (canvas2.height - img.height) / 2;
+
+//           ctx1.drawImage(img, grow, grow);
+//           ctx2.shadowColor = color;
+//           ctx2.shadowBlur = 1;
+
+//           for (let i = 0; i < grow; i++) {
+//               ctx2.drawImage(canvas1, centerX - offsetX, centerY - offsetY);
+//               ctx1.drawImage(canvas2, centerX - offsetX, centerY - offsetY);
+//           }
+
+//           ctx2.shadowColor = 'rgba(0,0,0,0)';
+//           ctx2.drawImage(img, grow, grow);
+
+//           const imageData = ctx2.getImageData(centerX - offsetX, centerY - offsetY, canvas2.width, canvas2.height);
+//           contrastImage(imageData, 200);
+//           processCanvas(canvas2, ctx2, toFullWhite);
+
+//           const image = new Image();
+//           image.onload = () => resolve(image);
+//           image.onerror = reject;
+//           image.src = canvas2.toDataURL();
+//       } else {
+//           reject(new Error("Failed to get canvas context"));
+//       }
+//   });
+// };
+
+
+
+export const drawCustomImage = async (img: HTMLImageElement, grow: number, color: string): Promise<HTMLImageElement> => {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    const canvas1 = document.createElement("canvas");
+    const ctx1 = canvas1.getContext("2d");
+    const canvas2 = document.createElement("canvas");
+    const ctx2 = canvas2.getContext("2d");
+
+    canvas1.width = canvas2.width = img.width + grow * 2;
+    canvas1.height = canvas2.height = img.height + grow * 2;
+
+    if (ctx1 && ctx2) {
+        ctx1.drawImage(img, grow, grow);
+        ctx2.shadowColor = color;
+        ctx2.shadowBlur = 1;          
+
+        for (let i = 0; i < grow; i++) {
+            ctx2.drawImage(canvas1, 0, 0);
+            ctx1.drawImage(canvas2, 0, 0);
+        }
+
+        ctx2.shadowColor = 'rgba(0,0,0,0)';
+        ctx2.drawImage(img, grow, grow);
+
+        const imageData = ctx2.getImageData(0, 0, canvas2.width, canvas2.height);
+        contrastImage(imageData, 200);
+        processCanvas(canvas2, ctx2, toFullWhite);
+
+        const image = new Image();
+        image.onload = () => resolve(image);
+        image.onerror = reject;
+        image.src = canvas2.toDataURL();
+    } else {
+        reject(new Error("Failed to get canvas context"));
+    }
+});
+};
 
 
 const drawCanvas = (id: string, pFunction: (red: number, green: number, blue: number) => number) => {

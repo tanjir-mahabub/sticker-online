@@ -40,12 +40,12 @@ const CanvasFrame: React.FC<FrameProps> = ({ stage, centerX, centerY, frameWidth
                     <span className="text-black font-bold">5 cm</span>
                 </div>
             </div>
-            <div className="absolute bottom-40 -right-40 w-full mx-auto h-3 flex justify-center items-center gap-5 z-50">
+            {/* <div className="absolute bottom-40 -right-40 w-full mx-auto h-3 flex justify-center items-center gap-5 z-50">
                 <button onClick={() => stage && handleExport('png', stage)}>Export as PNG</button>
                 <button onClick={() => stage && handleExport('jpg', stage)}>Export as JPG</button>
                 <button onClick={() => stage && handleExport('svg', stage)}>Export as SVG</button>
                 <button onClick={() => stage && handleExport('pdf', stage)}>Export as PDF</button>
-            </div>
+            </div> */}
         </div>
     )
 }

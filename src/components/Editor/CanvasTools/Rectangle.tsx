@@ -1,3 +1,4 @@
+import CustomTransformer from '@/components/Utils/CustomTransformer';
 import Konva from 'konva';
 import React, { useEffect, useRef } from 'react';
 import { Rect, Transformer } from 'react-konva';
@@ -60,16 +61,7 @@ const Rectangle: React.FC<RectangleProps> = ({ shapeProps, isSelected, onSelect,
                 }}
             />
             {isSelected && (
-                <Transformer
-                    ref={trRef}
-                    rotateEnabled={true}
-                    boundBoxFunc={(oldBox, newBox) => {
-                        if (Math.abs(newBox.width) < 5 || Math.abs(newBox.height) < 5) {
-                            return oldBox;
-                        }
-                        return newBox;
-                    }}
-                />
+                <CustomTransformer shapeRef={shapeRef} />
             )}
         </>
     );

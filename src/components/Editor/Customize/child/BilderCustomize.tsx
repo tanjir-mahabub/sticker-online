@@ -1,15 +1,20 @@
 import ImageUpload from "@/components/Utils/ImageUploader";
-import { useLocalStorage } from "@/hooks/useLocalStorage";
-import { setCanvasProperties } from "@/redux/features/canvasSlice";
+import { useImageStorage } from "@/hooks/useImageStorage";
+import { fileUploaded } from "@/redux/features/stickerSlice";
+import { useAppSelector } from "@/redux/store";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 
 const BilderCustomize = () => {
     const [ImageDeleted, setImageDeleted] = useState(false);
-    const { data: previewImages, updateData: updatePreviewImages } = useLocalStorage('imageStore');
+    const { data: previewImages, updateData: updatePreviewImages } = useImageStorage('imageStore');
+
+    const [imageArr, setImageArr] = useState<string[]>([]);
 
     const dispatch = useDispatch();
+    const isFileUploaded = useAppSelector(state => state.sticker.isNewFileUploaded);
+
 
     const handleImageUpload = (files: File[]) => {
 
@@ -26,7 +31,7 @@ const BilderCustomize = () => {
 
         Promise.all(imagesData).then((imageDataArray) => {
             const newImageStore = [...previewImages, ...imageDataArray];
-            updatePreviewImages(newImageStore);
+            setImageArr(newImageStore);
         });
 
     };
@@ -36,16 +41,19 @@ const BilderCustomize = () => {
         setImageDeleted(true);
     }
 
-    useEffect(() => {
 
-        dispatch(setCanvasProperties({ canvasUpdated: true }))
-        // console.log('uploaded');
+    useEffect(() => {
+        updatePreviewImages(imageArr)
+        dispatch(fileUploaded(true))
 
         return () => {
-            dispatch(setCanvasProperties({ canvasUpdated: false }))
-            // console.log('uploaded return');
-        };
-    });
+            dispatch(fileUploaded(false))
+        }
+    }, [imageArr, dispatch, updatePreviewImages])
+
+    useEffect(() => {
+        console.log(previewImages);
+    })
 
     return (
         <div className="w-full h-[100%]">

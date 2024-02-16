@@ -31,7 +31,6 @@ const Dashboard = () => {
 
     return (
         <div ref={divRef} className="relative top-0 left-0 w-[75vw] overflow-hidden border-l bg-so-deep-gray">
-            {/* <Canvas width={innerWidth} height={innerHeight} /> */}
             <Canvas width={innerWidth} height={innerHeight} />
         </div>
     );

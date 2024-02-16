@@ -1,7 +1,10 @@
+import CustomTransformer from '@/components/Utils/CustomTransformer';
+import { useTextStorage } from '@/hooks/useTextStorage';
 import { setCanvasProperties } from '@/redux/features/canvasSlice';
+import { RootState, useAppSelector } from '@/redux/store';
 import { customizeFonts } from '@/store/customizeFontStore';
 import Konva from 'konva';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Transformer, Text as KonvaText } from 'react-konva';
 import { useDispatch } from 'react-redux';
 
@@ -11,9 +14,9 @@ export interface TextProps {
         y: number;
         text: string;
         fontSize: number;
-        fontFamily: string;
-        width: number;
-        height: number;
+        fontFamily?: string;
+        width?: number;
+        height?: number;
         padding: number;
         fill: string;
         id: string;
@@ -25,10 +28,11 @@ export interface TextProps {
 
 
 const Text: React.FC<TextProps> = ({ textProps, isSelected, onSelect, onChange }) => {
+
+    const selectedText = useAppSelector((state: RootState) => state.text.selectedText);
+
     const textRef = useRef<Konva.Text>(null);
     const trRef = useRef<Konva.Transformer>(null);
-
-    const dispatch = useDispatch();
 
     const onDoubleClickHandle = (e: Konva.KonvaEventObject<MouseEvent> | Konva.KonvaEventObject<TouchEvent>) => {
         const stage = e.target.getStage();
@@ -48,8 +52,8 @@ const Text: React.FC<TextProps> = ({ textProps, isSelected, onSelect, onChange }
             textarea.style.position = 'absolute';
             textarea.style.left = stageBox.left + textPosition.x + 'px';
             textarea.style.top = stageBox.top + textPosition.y + 'px';
-            textarea.style.width = trRef.current?.width + 'px';
-            textarea.style.height = trRef.current?.height + 'px'; // Ensure textarea covers entire text height
+            textarea.style.width = textNode.width() + 'px';
+            textarea.style.height = "auto"; // Ensure textarea covers entire text height
             textarea.style.fontSize = textNode.fontSize() + 'px';
             textarea.style.fontFamily = textNode.fontFamily();
             textarea.style.color = textNode.fill();
@@ -100,7 +104,6 @@ const Text: React.FC<TextProps> = ({ textProps, isSelected, onSelect, onChange }
             textNode.width(textarea.scrollWidth)
             textNode.height(textarea.scrollHeight)
         }
-        console.log('test');
     }
 
 
@@ -112,22 +115,14 @@ const Text: React.FC<TextProps> = ({ textProps, isSelected, onSelect, onChange }
         }
     }, [isSelected]);
 
-    useEffect(() => {
-
-        dispatch(setCanvasProperties({ canvasUpdated: true }))
-        console.log('text', textProps);
-
-        return () => {
-            dispatch(setCanvasProperties({ canvasUpdated: false }))
-            // console.log('uploaded return');
-        };
-    }, [textProps, dispatch])
-
-
     return (
         <>
             <KonvaText
+                name='text'
                 {...textProps}
+                fontFamily={selectedText?.name}
+                fontVariant='bold'
+                fill={'black'}
                 ref={textRef}
                 draggable
                 lineHeight={1.5}
@@ -165,17 +160,7 @@ const Text: React.FC<TextProps> = ({ textProps, isSelected, onSelect, onChange }
 
             />
             {isSelected && (
-                <Transformer
-                    ref={trRef}
-                    rotateEnabled={true}
-                    boundBoxFunc={(oldBox, newBox) => {
-                        if (Math.abs(newBox.width) < 5 || Math.abs(newBox.height) < 5) {
-                            return oldBox;
-                        }
-                        return newBox;
-                    }}
-                    keepRatio={true}
-                />
+                <CustomTransformer shapeRef={textRef} isSelected={isSelected} />
             )}
         </>
     );
