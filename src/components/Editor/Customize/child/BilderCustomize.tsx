@@ -42,8 +42,8 @@ const BilderCustomize = () => {
 
     useEffect(() => {
         FileState.length > 0 && updatePreviewImages(FileState)
-        console.log('previewImages', previewImages);
-    }, [FileState, updatePreviewImages, previewImages])
+        ImageDeleted && updatePreviewImages([])
+    }, [FileState, updatePreviewImages, previewImages, ImageDeleted])
 
     return (
         <div className="w-full h-[100%]">
