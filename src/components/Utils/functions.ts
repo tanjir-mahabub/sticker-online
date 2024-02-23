@@ -82,12 +82,16 @@ export const drawImage = async (img: HTMLImageElement, grow: number, color: stri
           ctx2.shadowBlur = 1;     
          }
 
-          for (let i = 0; i < grow; i++) {
-              ctx2.drawImage(canvas1, 0, 0);
+          for (let i = 0; i < grow *.75 ; i++) {
+              ctx2.drawImage(canvas1, 0, 0);              
+              ctx2.drawImage(canvas2, 0, 0);              
+              ctx1.drawImage(canvas2, 0, 0);              
               ctx1.drawImage(canvas2, 0, 0);
           }
 
           ctx2.shadowColor = 'rgba(0,0,0,0)';
+          ctx2.imageSmoothingEnabled = true;
+          ctx2.imageSmoothingQuality= "high";
           ctx2.drawImage(img, grow, grow);
 
           const image = new Image();
@@ -429,3 +433,7 @@ function contrastImage(imageData: ImageData, contrast: number) {  // contrast as
   }
   return imageData;  //optional (e.g. for filter function chaining)
 }
+
+export const generateUniqueId = (): string => {
+  return Math.random().toString(36).substring(2, 12);
+};

@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState, useAppSelector } from "@/redux/store";
 import { useTextStorage } from "./useTextStorage";
 import { setText } from "@/redux/features/textSlice";
+import { addedToHistory } from "@/redux/features/historySlice";
 
 export const useCanvasState = () => {
 
@@ -69,7 +70,7 @@ export const useCanvasState = () => {
         setImages(imagesArray);  
         setDieCutImages(imagesArray);
        
-    }, [previewImages, centerX, centerY, frameWidth, frameHeight, FileState]);
+    }, [previewImages, centerX, centerY, frameWidth, frameHeight, FileState, dispatch]);
 
     useEffect(() => {
         if (typeof window !== 'undefined' && previewMotives.length > 0) {
@@ -130,7 +131,6 @@ export const useCanvasState = () => {
         selectedTexts,
         setSelectedTexts,
         selectedId,
-        setSelectedId,
-        canvasState: canvasProperties.canvasUpdated
+        setSelectedId
     };
 };

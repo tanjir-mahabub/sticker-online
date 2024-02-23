@@ -20,9 +20,9 @@ export const StickerSelectorStore = [
         id: 2,
         title: "Fyrkantiga",
         price: 8.00,
-        img: "/homepage/hero/square.svg",
+        img: "/homepage/hero/square-2.svg",
         altTxt: "square-icon",
-        width: 100  
+        width: 90  
     },
     {
         id: 3,
@@ -36,8 +36,8 @@ export const StickerSelectorStore = [
         id: 4,
         title: "Runda hörn",
         price: 6.00,
-        img: "/homepage/hero/square-2.svg",
+        img: "/homepage/hero/square.svg",
         altTxt: "squareTwoIcon",
-        width: 90
+        width: 100
     }
 ]

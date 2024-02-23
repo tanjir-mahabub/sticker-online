@@ -17,6 +17,7 @@ import CustomTransformer from '@/components/Utils/CustomTransformer';
 import { Node, NodeConfig } from 'konva/lib/Node';
 import { Shape, ShapeConfig } from 'konva/lib/Shape';
 import { addFiles } from '@/redux/features/fileUploadSlice';
+import { addedToHistory } from '@/redux/features/historySlice';
 
 
 interface CanvasProps {
@@ -37,7 +38,7 @@ const NewCanvas: React.FC<CanvasProps> = ({
 
     const dispatch = useDispatch();
     const [readyState, setReadyState] = useState(false);
-    const { rectangles, setRectangles, images, setImages, dieCutImages, setDieCutImages, motives, setMotives, selectedTexts, setSelectedTexts, selectedId, setSelectedId, canvasState } = useCanvasState();
+    const { rectangles, setRectangles, images, setImages, dieCutImages, setDieCutImages, motives, setMotives, selectedTexts, setSelectedTexts, selectedId, setSelectedId } = useCanvasState();
 
     const stageRef = useRef<Konva.Stage>(null);
     const frameRef = useRef<Konva.Rect>(null);
@@ -227,6 +228,11 @@ const NewCanvas: React.FC<CanvasProps> = ({
         dispatch(addFiles(filesToAdd));
     }, [dispatch, previewImages]);
 
+    // const addToHistory = (newAttrs: any) => {
+    //     dispatch(addedToHistory(newAttrs));
+    // }
+
+
     return (
         <>
 
@@ -257,9 +263,12 @@ const NewCanvas: React.FC<CanvasProps> = ({
                                 x={centerX - frameWidth / 2}
                                 y={centerY - frameHeight / 2}
                                 fill="white"
+                                shadowEnabled
+                                shadowBlur={15}
+                                shadowColor='gray'
                                 stroke={(isRectHovered && !isRectSelected) ? "black" : (!isRectHovered && !isRectSelected) ? "gray" : "magenta"}
                                 strokeWidth={1}
-                                cornerRadius={(StickerSelected.id === 2) ? 20 : 0}
+                                cornerRadius={(StickerSelected.id === 4) ? 20 : 0}
                                 ref={frameRef}
                                 onMouseEnter={() => setIsRectHovered(true)}
                                 onMouseLeave={() => setIsRectHovered(false)}
@@ -298,6 +307,9 @@ const NewCanvas: React.FC<CanvasProps> = ({
                                 y={centerY}
                                 radius={frameWidth / 2.5}
                                 fill="white"
+                                shadowEnabled
+                                shadowBlur={15}
+                                shadowColor='gray'
                                 stroke={(isCircleHovered && !isCircleSelected) ? "black" : (!isCircleHovered && !isCircleSelected) ? "gray" : "magenta"}
                                 strokeWidth={1}
                                 ref={circleRef}

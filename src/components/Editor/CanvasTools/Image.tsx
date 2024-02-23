@@ -2,10 +2,11 @@ import Konva from 'konva';
 import { Image as KonvaImage, Transformer } from 'react-konva';
 import React, { useEffect, useRef } from 'react';
 import { drawImage } from '@/components/Utils/functions';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState, useAppSelector } from '@/redux/store';
 import CustomTransformer from '@/components/Utils/CustomTransformer';
 import { useImageStorage } from '@/hooks/useImageStorage';
+import { addedToHistory } from '@/redux/features/historySlice';
 
 export interface ImageProps {
     imageProps: {
@@ -24,6 +25,8 @@ export interface ImageProps {
 const ImageComponent: React.FC<ImageProps> = ({ imageProps, isSelected, onSelect, onChange }) => {
     const imageRef = useRef<Konva.Image>(null);
     const trRef = useRef<Konva.Transformer>(null);
+
+    const dispatch = useDispatch();
 
     const canvasProperties = useSelector((state: RootState) => state.canvas);
 
@@ -54,7 +57,7 @@ const ImageComponent: React.FC<ImageProps> = ({ imageProps, isSelected, onSelect
 
 
                     // Calculate the new width and height
-                    const scaleFactor = 0.8; // 20% smaller
+                    const scaleFactor = 0.9; // 20% smaller
                     const scaledWidth = frameWidth * scaleFactor;
                     const scaledHeight = frameHeight * scaleFactor;
 
@@ -75,15 +78,26 @@ const ImageComponent: React.FC<ImageProps> = ({ imageProps, isSelected, onSelect
                     // Set the image dimensions and position
                     if (StickerSelected.id === 1) {
 
-                        const imageWithDieCutEffect = await drawImage(img, 100, 'white');
+                        const imageWithDieCutEffect = await drawImage(img, 50, 'white');
 
-                        const finaleImage = imageWithDieCutEffect && await drawImage(imageWithDieCutEffect, 5, 'magenta');
+                        const finaleImage = imageWithDieCutEffect && await drawImage(imageWithDieCutEffect, 1.3, 'magenta');
 
                         imageRef.current.image(finaleImage);
                         imageRef.current.width(img.width * scaleFactor);
                         imageRef.current.height(img.height * scaleFactor);
                         imageRef.current.x(centerX - (img.width * scaleFactor) / 2);
                         imageRef.current.y(centerY - (img.height * scaleFactor) / 2);
+
+                        const updatePosition = {
+                            x: imageRef.current.x(),
+                            y: imageRef.current.y(),
+                            width: imageRef.current.width(),
+                            height: imageRef.current.height(),
+                            scaleX: 1,
+                            scaleY: 1
+                        }
+
+                        dispatch(addedToHistory({ objectId: imageProps.id, position: updatePosition }))
                         imageRef.current.getLayer()?.batchDraw();
                         // console.log(canvasProperties);
                     }
@@ -109,7 +123,7 @@ const ImageComponent: React.FC<ImageProps> = ({ imageProps, isSelected, onSelect
 
         loadImage();
 
-    }, [imageProps.src, centerX, centerY, frameWidth, frameHeight, StickerSelected]);
+    }, [imageProps, centerX, centerY, frameWidth, frameHeight, StickerSelected, dispatch]);
 
     const isOutsideFrame = (node: Konva.Node, frameWidth: number, frameHeight: number) => {
         const x = node.x();
@@ -145,37 +159,90 @@ const ImageComponent: React.FC<ImageProps> = ({ imageProps, isSelected, onSelect
 
     // }, [centerX, centerY, frameWidth, frameHeight, imagePosition])  
 
+
+    // const { history, historyStep } = useAppSelector((state: RootState) => state.history);
+    // const position = history[historyStep];
+
+    const handleDragEnd = (e: Konva.KonvaEventObject<Event>) => {
+        const node = e.currentTarget;
+        const updatePosition = {
+            x: node.attrs.x,
+            y: node.attrs.y,
+            width: node.attrs.width,
+            height: node.attrs.height,
+            scaleX: node.attrs.scaleX,
+            scaleY: node.attrs.scaleY
+        }
+        console.log('update posititon', updatePosition);
+
+        dispatch(addedToHistory({ objectId: node.id(), position: updatePosition }))
+    }
+
+    // console.log(position);
+
+    const objectHistories = useAppSelector((state: RootState) => state.history.objectHistories);
+    const objectId = imageProps.id; // The objectId you want to find the historyStep for
+    const objectHistory = objectHistories.find(history => history.objectId === objectId);
+
+    // Check if the objectHistory is found and if so, get its historyStep
+    const historyStep = objectHistory ? objectHistory.historyStep : 0;
+
+
+    console.log('XXXX', objectHistories.find(history => history.objectId === imageProps.id)?.history[historyStep]?.x);
+    console.log('Width', objectHistories.find(history => history.objectId === imageProps.id)?.history[historyStep]?.width);
+    console.log('ScaleX', objectHistories.find(history => history.objectId === imageProps.id)?.history[historyStep]?.scaleX);
     return (
         <>
             <KonvaImage
                 name="image"
                 image={undefined}
                 draggable
-                {...imageProps}
+                shadowEnabled={(StickerSelected.id === 1) && true}
+                shadowBlur={15}
+                shadowColor='gray'
+                // {...imageProps}
+                // x={position?.x}
+                // y={position?.y}
+                // width={position?.width}
+                // height={position?.height}           
+                id={imageProps.id}
+                x={objectHistories.find(history => history.objectId === imageProps.id)?.history[historyStep]?.x}
+                y={objectHistories.find(history => history.objectId === imageProps.id)?.history[historyStep]?.y}
+                width={objectHistories.find(history => history.objectId === imageProps.id)?.history[historyStep]?.width}
+                height={objectHistories.find(history => history.objectId === imageProps.id)?.history[historyStep]?.height}
+                scaleX={objectHistories.find(history => history.objectId === imageProps.id)?.history[historyStep]?.scaleX || 1}
+                scaleY={objectHistories.find(history => history.objectId === imageProps.id)?.history[historyStep]?.scaleY || 1}
                 ref={imageRef}
-                onDragEnd={(e) => {
-                    onChange({
-                        ...imageProps,
-                        x: e.target.x(),
-                        y: e.target.y(),
-                    });
-                }}
+
+                key={imageProps.id}
+                // onDragEnd={(e) => {
+                //     onChange({
+                //         ...imageProps,
+                //         x: e.target.x(),
+                //         y: e.target.y(),
+                //     });
+                // }}
                 onTransformEnd={(e) => {
                     const node = imageRef.current;
                     if (node) {
-                        const scaleX = node.scaleX();
-                        const scaleY = node.scaleY();
-                        node.scaleX(1);
-                        node.scaleY(1);
-                        onChange({
-                            ...imageProps,
-                            x: node.x(),
-                            y: node.y(),
-                            width: Math.max(5, node.width() * scaleX),
-                            height: Math.max(5, node.height() * scaleY),
-                        });
+                        console.log('node from transform', node);
+
+                        const updatePosition = {
+                            x: node.attrs.x,
+                            y: node.attrs.y,
+                            width: node.attrs.width,
+                            height: node.attrs.height,
+                            scaleX: node.attrs.scaleX,
+                            scaleY: node.attrs.scaleY
+                        }
+
+                        dispatch(
+                            addedToHistory({ objectId: node.id(), position: updatePosition })
+                        )
                     }
                 }}
+                onDragEnd={handleDragEnd}
+                // onTransformEnd={handleObject}
                 onClick={onSelect}
                 onTap={onSelect}
                 alt=""

@@ -6,6 +6,7 @@ import canvasReducer from './features/canvasSlice';
 import textReducer from './features/textSlice';
 import fileReducer from './features/fileUploadSlice';
 import motivReducer from './features/motivSlice';
+import historyReducer from './features/historySlice';
 
 const store = configureStore({
   reducer: {
@@ -14,7 +15,8 @@ const store = configureStore({
     canvas: canvasReducer,
     text: textReducer,
     file: fileReducer,
-    motiv: motivReducer
+    motiv: motivReducer,
+    history: historyReducer
   },
 });
 

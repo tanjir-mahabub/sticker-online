@@ -2,6 +2,8 @@ import Konva from 'konva';
 import { FC, RefObject, useEffect, useRef } from 'react';
 import { Transformer } from 'react-konva';
 
+import RotationIcon from '/public/rotateIcon.svg'
+
 const CustomTransformer: FC<{
     shapeRef: RefObject<Konva.Shape>;
     rotateEnabled?: boolean;
@@ -23,6 +25,10 @@ const CustomTransformer: FC<{
         }
     }, [shapeRef, isSelected]);
 
+    useEffect(() => {
+        // console.log(trRef.current?.rotateAnchorCursor.prototype);
+    }, [trRef])
+
     return (
         <Transformer
             ref={trRef}
@@ -34,7 +40,7 @@ const CustomTransformer: FC<{
             anchorStroke={'black'}
             anchorSize={15}
             enabledAnchors={enabledAnchors}
-            // rotateAnchorCursor={''}                    
+            // rotateAnchorCursor={"move"}
             borderDash={[2, 2]}
             borderStroke={'gray'}
         />);

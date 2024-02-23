@@ -1,5 +1,4 @@
 import ImageUpload from "@/components/Utils/ImageUploader";
-import { useCanvasState } from "@/hooks/useCanvasState";
 import { useImageStorage } from "@/hooks/useImageStorage";
 import { addFiles, deleteAllFiles } from "@/redux/features/fileUploadSlice";
 import { useAppSelector } from "@/redux/store";
@@ -8,6 +7,7 @@ import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 
 const BilderCustomize = () => {
+    const [isImageUploaded, setIsImageUploaded] = useState(false);
     const [ImageDeleted, setImageDeleted] = useState(false);
     const { data: previewImages, updateData: updatePreviewImages } = useImageStorage('imageStore');
 
@@ -30,20 +30,22 @@ const BilderCustomize = () => {
 
         Promise.all(imagesData).then((imageDataArray) => {
             const newImageStore = [...imageDataArray];
-            dispatch(addFiles(newImageStore))
+            dispatch(addFiles(newImageStore));
+            setIsImageUploaded(true);
         });
 
     };
 
     const handleDeleteBTN = () => {
         setImageDeleted(true);
-        dispatch(deleteAllFiles())
+        dispatch(deleteAllFiles());
+        updatePreviewImages([]);
     }
 
     useEffect(() => {
-        FileState.length > 0 && updatePreviewImages(FileState)
-        ImageDeleted && updatePreviewImages([])
-    }, [FileState, updatePreviewImages, previewImages, ImageDeleted])
+        FileState.length > 0 && isImageUploaded && updatePreviewImages(FileState);
+    }, [FileState, updatePreviewImages, isImageUploaded]);
+
 
     return (
         <div className="w-full h-[100%]">
