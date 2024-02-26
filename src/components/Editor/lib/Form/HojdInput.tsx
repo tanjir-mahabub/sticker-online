@@ -1,4 +1,4 @@
-import React, { ChangeEvent } from 'react';
+import React, { ChangeEvent, KeyboardEvent } from 'react';
 
 interface HojdInputProps {
     value: number;
@@ -8,6 +8,15 @@ interface HojdInputProps {
 }
 
 const HojdInput: React.FC<HojdInputProps> = ({ value, onChange, onStepUp, onStepDown }) => {
+
+    const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'ArrowUp') {
+            onStepUp();
+        } else if (e.key === 'ArrowDown') {
+            onStepDown();
+        }
+    };
+
     return (
         <div className="relative w-full">
             <input
@@ -20,6 +29,7 @@ const HojdInput: React.FC<HojdInputProps> = ({ value, onChange, onStepUp, onStep
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                     onChange(parseFloat(e.target.value.replace(',', '.')))
                 }
+                onKeyDown={handleKeyDown}
             />
             <div className="absolute top-1 right-3 inset-y-0 flex flex-col justify-center items-center pl-2">
                 <button

@@ -4,9 +4,10 @@ import Konva from 'konva';
 import { drawCustomImage, drawImage } from '@/components/Utils/functions';
 import { useAppSelector } from '@/redux/store';
 import RotationIcon from '/public/rotateIcon.svg';
+import { useImageStorage } from '@/hooks/useImageStorage';
 
 export interface DieCutImageProps {
-    imageUrl: string;
+    imagesId: string[];
     isSelected: boolean;
     onSelect: () => void;
     onChange: (newAttrs: Konva.ImageConfig) => void;
@@ -14,13 +15,19 @@ export interface DieCutImageProps {
 }
 
 const DieCutImage: React.FC<DieCutImageProps> = ({
-    imageUrl,
+    imagesId,
     isSelected,
     onSelect,
     onChange,
     onClick // Receive onClick prop
 }) => {
     const canvasProperties = useAppSelector(state => state.canvas);
+
+    const { data: previewImages } = useImageStorage('imageStore');
+
+    const layerRef = useRef<Konva.Layer>(null);
+
+
 
     const { centerX, centerY, frameWidth, frameHeight } = canvasProperties;
 
@@ -54,32 +61,79 @@ const DieCutImage: React.FC<DieCutImageProps> = ({
         onSelect();
     };
 
-
     useEffect(() => {
         const loadImage = async () => {
-            const svgImageData = await imageUrl;
+            const imagesInsideFrame = previewImages.filter(image => imagesId.includes(image.id));
+            console.log('Filtered Images: ', imagesInsideFrame); // Check filtered images
 
-            if (svgImageData) {
-                const img = new window.Image();
-                img.src = svgImageData;
+            const loadedImages = await Promise.all(
+                imagesInsideFrame.map(image =>
+                    new Promise<HTMLImageElement>((resolve, reject) => {
+                        const img = new window.Image();
+                        img.crossOrigin = "anonymous"; // Handle CORS
+                        img.src = image.file;
+                        img.onload = () => resolve(img);
+                        img.onerror = reject; // Handle loading errors
+                    })
+                )
+            );
 
+            const offscreenCanvas = document.createElement('canvas');
+            offscreenCanvas.width = frameWidth;
+            offscreenCanvas.height = frameHeight;
+            const ctx = offscreenCanvas.getContext('2d');
 
-                await new Promise((resolve) => {
-                    img.onload = () => resolve(img);
-                });
+            loadedImages.forEach((img, index) => {
+                console.log('Drawing Image: ', img.src); // Verify image is ready to draw
+                ctx?.drawImage(img, 0, 0); // Simplified for demonstration
+            });
 
-                const newImg = await drawCustomImage(img, 20, 'white');
+            const dataURL = offscreenCanvas.toDataURL();
+            console.log('Data URL: ', dataURL); // Check the data URL
 
-                let finaleImage = await drawImage(newImg, 3, isSelected ? 'magenta' : 'gray');
-
-                finaleImage && setImageObj(finaleImage);
-            }
-
+            const imageObj = new window.Image();
+            imageObj.src = dataURL;
+            imageObj.onload = () => {
+                console.log('Image Object Loaded'); // Verify image object is loaded
+                setImageObj(imageObj);
+            };
         };
 
         loadImage();
+    }, [imagesId, centerX, centerY, frameWidth, frameHeight, previewImages]);
 
-    }, [imageUrl, centerX, centerY, frameWidth, frameHeight, isSelected]);
+
+
+
+    console.log(imageObj);
+
+    // useEffect(() => {
+    //     const loadImage = async () => {
+    //         const imagesInsideFrame = previewImages.filter(image => imagesId.includes(image.id))
+    //         // const svgImageData = await imageUrl;
+
+    //         // if (svgImageData) {
+    //         //     const img = new window.Image();
+    //         //     img.src = svgImageData;
+
+
+    //         //     await new Promise((resolve) => {
+    //         //         img.onload = () => resolve(img);
+    //         //     });
+
+    //         //     const newImg = await drawCustomImage(img, 20, 'white');
+
+    //         //     let finaleImage = await drawImage(newImg, 3, isSelected ? 'magenta' : 'gray');
+
+    //         //     finaleImage && setImageObj(finaleImage);
+    //         // }
+
+
+    //     };
+
+    //     loadImage();
+
+    // }, [centerX, centerY, frameWidth, frameHeight, isSelected, imagesId, previewImages]);
 
     useEffect(() => {
         if (isSelected && trRef.current && imageRef.current && imageObj) {
@@ -96,7 +150,7 @@ const DieCutImage: React.FC<DieCutImageProps> = ({
                     height={frameHeight}
                     x={centerX - frameWidth / 2}
                     y={centerY - frameHeight / 2}
-                    image={imageObj}
+                    image={imageObj && imageObj}
                     draggable={false}
                     ref={imageRef}
                     onClick={handleSelect} // Pass onClick prop here
@@ -110,7 +164,7 @@ const DieCutImage: React.FC<DieCutImageProps> = ({
                         };
                         onChange(newAttrs);
                     }}
-                    alt=""
+                    alt="die-cut"
                     aspectRatio={true}
                 />
             )}

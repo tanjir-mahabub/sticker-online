@@ -1,10 +1,39 @@
+import { redo, undo } from "@/redux/features/historySlice";
+import { RootState, useAppSelector } from "@/redux/store";
 import Image from "next/image"
 import Link from "next/link"
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useDispatch } from "react-redux";
 
 const Header = () => {
     const [isDisabledUndo, setDisabledUndo] = useState(false);
-    const [isDisabledRedo, setDisabledRedo] = useState(true);
+    const [isDisabledRedo, setDisabledRedo] = useState(false);
+
+    const dispatch = useDispatch();
+    const objectHistories = useAppSelector((state: RootState) => state.history.objectHistories);
+
+    const handleUndo = () => {
+        objectHistories.forEach((objectHistory) => {
+            dispatch(undo(objectHistory.objectId));
+        });
+    };
+
+    const handleRedo = () => {
+        objectHistories.forEach((objectHistory) => {
+            dispatch(redo(objectHistory.objectId));
+        });
+    };
+
+
+    useEffect(() => {
+
+        const canUndo = objectHistories.some((objectHistory) => objectHistory.historyStep > 0);
+        setDisabledUndo(!canUndo);
+
+
+        const canRedo = objectHistories.some((objectHistory) => objectHistory.historyStep < objectHistory.history.length - 1);
+        setDisabledRedo(!canRedo);
+    }, [objectHistories]);
 
     return (
         <header className="flex items-center border-b border-black/10 shadow-sm px-3 py-3">
@@ -15,7 +44,7 @@ const Header = () => {
             </div>
 
             <div className="flex-auto flex justify-center items-center gap-2">
-                <div className={`group flex flex-col justify-center items-center gap-2 p-2 rounded-md ${isDisabledUndo ? 'opacity-50 pointer-events-none' : ''}`}>
+                <div onClick={handleUndo} className={`group flex flex-col justify-center items-center gap-2 p-2 rounded-md cursor-pointer select-none ${isDisabledUndo ? 'opacity-50 pointer-events-none' : ''}`}>
                     <Image
                         src="/editor/icon/undo.svg"
                         alt="undo-icon"
@@ -25,7 +54,7 @@ const Header = () => {
                     />
                     <span className={`text-xs ${isDisabledUndo ? 'text-gray-500' : 'group-hover:text-so-black'}`}>Undo</span>
                 </div>
-                <div className={`group flex flex-col justify-center items-center gap-2 p-2 rounded-md ${isDisabledRedo ? 'opacity-50 pointer-events-none' : ''}`}>
+                <div onClick={handleRedo} className={`group flex flex-col justify-center items-center gap-2 p-2 rounded-md cursor-pointer select-none ${isDisabledRedo ? 'opacity-50 pointer-events-none' : ''}`}>
                     <Image
                         src="/editor/icon/redo.svg"
                         alt="redo-icon"

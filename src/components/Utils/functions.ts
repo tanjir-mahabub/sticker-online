@@ -4,6 +4,8 @@
 //         const canvas = document.createElement('canvas');
 //         const ctx = canvas.getContext('2d');
 
+import { Frame, ObjectPosition } from "@/types/types";
+
 //         if (!ctx) {
 //             reject(new Error("Canvas context is not supported."));
 //             return;
@@ -82,12 +84,16 @@ export const drawImage = async (img: HTMLImageElement, grow: number, color: stri
           ctx2.shadowBlur = 1;     
          }
 
-          for (let i = 0; i < grow; i++) {
-              ctx2.drawImage(canvas1, 0, 0);
+          for (let i = 0; i < grow *.75 ; i++) {
+              ctx2.drawImage(canvas1, 0, 0);              
+              ctx2.drawImage(canvas2, 0, 0);              
+              ctx1.drawImage(canvas2, 0, 0);              
               ctx1.drawImage(canvas2, 0, 0);
           }
 
           ctx2.shadowColor = 'rgba(0,0,0,0)';
+          ctx2.imageSmoothingEnabled = true;
+          ctx2.imageSmoothingQuality= "high";
           ctx2.drawImage(img, grow, grow);
 
           const image = new Image();
@@ -429,3 +435,65 @@ function contrastImage(imageData: ImageData, contrast: number) {  // contrast as
   }
   return imageData;  //optional (e.g. for filter function chaining)
 }
+
+export const generateUniqueId = (): string => {
+  return Math.random().toString(36).substring(2, 12);
+};
+
+
+export const cmToPixel = (cm: number, dpi = 96) => {  
+  const inches = cm / 2.54;
+  const pixels = inches * dpi;    
+  return Math.round(pixels);
+}
+
+
+export const pixelToCm = (pixels: number, dpi = 96) => {  
+  const inches = pixels / dpi;  
+  const cm = inches * 2.54;  
+  return cm.toFixed(1).replace('.', ',');
+}
+
+export const calculateFrameEdges = (frame: Frame) => {
+  return {
+      startX: frame.centerX - (frame.frameWidth / 2),
+      startY: frame.centerY - (frame.frameHeight / 2),
+      endX: frame.centerX + (frame.frameWidth / 2),
+      endY: frame.centerY + (frame.frameHeight / 2),
+  };
+};
+
+// export const isObjectInsideFrame = (objectPosition: ObjectPosition, frameEdges: ReturnType<typeof calculateFrameEdges>) => {
+//   // Calculate object edges
+//   const objectLeft = objectPosition.x;
+//   const objectRight = objectPosition.x + objectPosition.width;
+//   const objectTop = objectPosition.y;
+//   const objectBottom = objectPosition.y + objectPosition.height;
+
+//   // Check if the object is within the frame
+//   return (
+//       objectLeft >= frameEdges.startX &&
+//       objectRight <= frameEdges.endX &&
+//       objectTop >= frameEdges.startY &&
+//       objectBottom <= frameEdges.endY
+//   );
+// };
+
+
+export const isObjectInsideFrame = (objectPosition: ObjectPosition, frameEdges: ReturnType<typeof calculateFrameEdges>) => {
+  // Calculate object edges
+  const objectLeft = objectPosition.x;
+  const objectRight = objectPosition.x + objectPosition.width;
+  const objectTop = objectPosition.y;
+  const objectBottom = objectPosition.y + objectPosition.height;
+
+  // Check if the object intersects with the frame
+  const intersects = !(
+    objectRight < frameEdges.startX ||
+    objectLeft > frameEdges.endX ||
+    objectBottom < frameEdges.startY ||
+    objectTop > frameEdges.endY
+  );
+
+  return intersects;
+};

@@ -12,27 +12,27 @@ export const checkDeselect = (e: Konva.KonvaEventObject<MouseEvent> | Konva.Konv
 
 export const handleRectChange = (index: number, newAttrs: Partial<RectangleProps['shapeProps']>, rectangles: RectangleProps['shapeProps'][], setRectangles: React.Dispatch<React.SetStateAction<RectangleProps['shapeProps'][]>>) => {
     const updatedRectangles = rectangles.map((rect, i) => (i === index ? { ...rect, ...newAttrs } : rect));
-    setRectangles(updatedRectangles);
+    setRectangles(updatedRectangles);    
 };
 
 export const handleImageChange = (index: number, newAttrs: Partial<ImageProps['imageProps']>, images: ImageProps['imageProps'][], setImages: React.Dispatch<React.SetStateAction<ImageProps['imageProps'][]>>) => {
     const updatedImages = images.map((img, i) => (i === index ? { ...img, ...newAttrs } : img));
-    setImages(updatedImages);
+    setImages(updatedImages);    
 };
 
 export const handleDieCutImageChange = (index: number, newAttrs: Partial<ImageProps['imageProps']>, images: ImageProps['imageProps'][], setDieCutImages: React.Dispatch<React.SetStateAction<ImageProps['imageProps'][]>>) => {
     const updatedDieCutImages = images.map((img, i) => (i === index ? { ...img, ...newAttrs } : img));
-    setDieCutImages(updatedDieCutImages);
+    setDieCutImages(updatedDieCutImages);    
 };
 
 export const handleMotiveChange = (index: number, newAttrs: Partial<ImageProps['imageProps']>, motives: ImageProps['imageProps'][], setMotives: React.Dispatch<React.SetStateAction<ImageProps['imageProps'][]>>) => {
     const updatedMotives = motives.map((img, i) => (i === index ? { ...img, ...newAttrs } : img));
-    setMotives(updatedMotives);
+    setMotives(updatedMotives);    
 };
 
 export const handleTextChange = (index: number, newAttrs: Partial<TextProps['textProps']>, texts: TextProps['textProps'][], setTexts: React.Dispatch<React.SetStateAction<TextProps['textProps'][]>>) => {
     const updatedTexts = texts.map((text, i) => (i === index ? { ...text, ...newAttrs } : text));
-    setTexts(updatedTexts);
+    setTexts(updatedTexts);    
 };
 
 

@@ -1,3 +1,4 @@
+import { generateUniqueId } from '@/components/Utils/functions';
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
 interface MotivState {
@@ -10,7 +11,7 @@ const motivSlice = createSlice({
   initialState: [] as MotivState[],
   reducers: {
     addMotiv: (state, action: PayloadAction<string[]>) => {
-      state.push(...action.payload.map(file => ({ id: Date.now().toString(), file })));
+      state.push(...action.payload.map(file => ({ id: generateUniqueId(), file })));
     },
     deleteMotiv: (state, action: PayloadAction<string>) => {
       return state.filter(file => file.id !== action.payload);
