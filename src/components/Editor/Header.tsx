@@ -2,7 +2,7 @@ import { redo, undo } from "@/redux/features/historySlice";
 import { RootState, useAppSelector } from "@/redux/store";
 import Image from "next/image"
 import Link from "next/link"
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch } from "react-redux";
 
 const Header = () => {
@@ -13,26 +13,24 @@ const Header = () => {
     const objectHistories = useAppSelector((state: RootState) => state.history.objectHistories);
 
     const handleUndo = () => {
-        // Dispatch undo action for each object
         objectHistories.forEach((objectHistory) => {
             dispatch(undo(objectHistory.objectId));
         });
     };
 
     const handleRedo = () => {
-        // Dispatch redo action for each object
         objectHistories.forEach((objectHistory) => {
             dispatch(redo(objectHistory.objectId));
         });
     };
 
-    // Use useEffect to update the disabled state of undo and redo buttons
+
     useEffect(() => {
-        // Check if there are any actions to undo
+
         const canUndo = objectHistories.some((objectHistory) => objectHistory.historyStep > 0);
         setDisabledUndo(!canUndo);
 
-        // Check if there are any actions to redo
+
         const canRedo = objectHistories.some((objectHistory) => objectHistory.historyStep < objectHistory.history.length - 1);
         setDisabledRedo(!canRedo);
     }, [objectHistories]);

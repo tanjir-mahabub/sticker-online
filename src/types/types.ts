@@ -12,14 +12,34 @@ export interface SideNavState {
 
 
 export interface CanvasState {  
+  width: number;
+  height: number;
   centerX: number;
   centerY: number;
   frameWidth: number;
-  frameHeight: number;  
-  canvasUpdated: boolean;
+  frameHeight: number;    
+  bredd: number;
+  hojd: number;
+  scale: number;
+  grow: number;
 }
 
 
 type HistoryAction = Partial<RectangleProps['shapeProps'][]> | Partial<ImageProps['imageProps'][]> | Partial<TextProps['textProps'][]>;
 
 export type AddToHistory= (action: HistoryAction) => void;
+
+
+export interface Frame {
+  centerX: number;
+  centerY: number;
+  frameWidth: number;
+  frameHeight: number;
+}
+
+export interface ObjectPosition {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}

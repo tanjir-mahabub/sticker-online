@@ -1,5 +1,4 @@
 import ColorInput from "./Input/ColorInput";
-import RangeSlider from "./Input/RangeSlider";
 
 const FargCustomize = () => {
     return (
@@ -10,7 +9,7 @@ const FargCustomize = () => {
 
             <div className="flex flex-col gap-7 p-4 space-y-3">
                 <ColorInput />
-                <RangeSlider minValue={0} maxValue={100} step={1} />
+                {/* <RangeSlider minValue={0} maxValue={100} step={1} /> */}
             </div>
         </div>
     );

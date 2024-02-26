@@ -1,55 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import BreddInput from './BreddInput';
-import HojdInput from './HojdInput';
+import React, { useState } from 'react';
 import LaminatDropdown from './LaminatDropdown';
 import MaterialDropdown from './MaterialDropdown';
 import AntalDropdown from './AntalDropdown';
-import { useDispatch } from 'react-redux';
-import { setCanvasProperties } from '@/redux/features/canvasSlice';
+import DimensionInput from './DimensionInput';
 
 const Form = () => {
-    const dispatch = useDispatch();
-    const [bredd, setBredd] = useState(6.5);
-    const [hojd, setHojd] = useState(5);
     const [selectedLaminat, setSelectedLaminat] = useState('Glansig');
     const [selectedMaterial, setSelectedMaterial] = useState('Vinyl');
     const [selectedAntal, setSelectedAntal] = useState('100 st');
 
-    const handleBreddStepUp = () => {
-        setBredd((prevValue) => prevValue + 0.1);
-    };
-
-    const handleBreddStepDown = () => {
-        setBredd((prevValue) => prevValue - 0.1);
-    };
-
-    const handleHojdStepUp = () => {
-        setHojd((prevValue) => prevValue + 0.1);
-    };
-
-    const handleHojdStepDown = () => {
-        setHojd((prevValue) => prevValue - 0.1);
-    };
-
-    // useEffect(() => {
-    //     dispatch(setCanvasProperties({ frameWidth: bredd, frameHeight: hojd }));
-    // }, [bredd, hojd, dispatch])
-
     return (
         <form className="flex justify-start items-center gap-5">
-            <div>
-                <label htmlFor="bredd" className="block text-sm 3xl:text-sm font-bold text-gray-700">
-                    Bredd
-                </label>
-                <BreddInput value={bredd} onChange={setBredd} onStepUp={handleBreddStepUp} onStepDown={handleBreddStepDown} />
-            </div>
 
-            <div>
-                <label htmlFor="hojd" className="block text-sm 3xl:text-sm font-bold text-gray-700">
-                    Höjd
-                </label>
-                <HojdInput value={hojd} onChange={setHojd} onStepUp={handleHojdStepUp} onStepDown={handleHojdStepDown} />
-            </div>
+            <DimensionInput />
 
             <div>
                 <label htmlFor="laminat" className="block text-sm 3xl:text-sm font-bold text-gray-700">
