@@ -2,10 +2,9 @@ import Konva from 'konva';
 import { Image as KonvaImage, Transformer } from 'react-konva';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { calculateFrameEdges, drawImage, isObjectInsideFrame } from '@/components/Utils/functions';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { RootState, useAppSelector } from '@/redux/store';
 import CustomTransformer from '@/components/Utils/CustomTransformer';
-import { useImageStorage } from '@/hooks/useImageStorage';
 import { addedToHistory } from '@/redux/features/historySlice';
 import { Frame } from '@/types/types';
 import { addOrUpdateImage, removeImage, calculateTotalDimensions } from '@/redux/features/insideFrameSlice';
@@ -39,8 +38,6 @@ const ImageComponent: React.FC<ImageProps> = ({ imageProps, isSelected, onSelect
 
     const StickerSelected = useAppSelector(state => state.sticker);
 
-
-
     const checkInsideAndUpdate = useCallback((node: Konva.Node) => {
         const frame: Frame = { centerX, centerY, frameWidth, frameHeight };
         const frameEdges = calculateFrameEdges(frame);
@@ -49,10 +46,12 @@ const ImageComponent: React.FC<ImageProps> = ({ imageProps, isSelected, onSelect
         if (inside) {
             dispatch(addOrUpdateImage({
                 id: imageProps.id,
-                x: imagePosition.x,
-                y: imagePosition.y,
-                width: imagePosition.width,
-                height: imagePosition.height,
+                x: imagePosition?.x,
+                y: imagePosition?.y,
+                width: imagePosition?.width,
+                height: imagePosition?.height,
+                scaleX: node?.scaleX(),
+                scaleY: node?.scaleY(),
                 insideFrame: inside,
             }));
             setIsInside(true);
@@ -87,72 +86,40 @@ const ImageComponent: React.FC<ImageProps> = ({ imageProps, isSelected, onSelect
 
                 if (imageRef.current && StickerSelected) {
 
-                    // Calculate the new width and height
-                    const scaleFactor = 1; // 20% smaller
-                    const scaledWidth = frameWidth * scaleFactor;
-                    const scaledHeight = frameHeight * scaleFactor;
-
-                    // Determine the scaling factor for maintaining aspect ratio
-                    const widthScaleFactor = scaledWidth / img.width;
-                    const heightScaleFactor = scaledHeight / img.height;
-                    const minScaleFactor = Math.min(widthScaleFactor, heightScaleFactor);
-
-                    // Calculate the scaled dimensions while maintaining aspect ratio
-                    const newWidth = img.width * minScaleFactor;
-                    const newHeight = img.height * minScaleFactor;
-
-                    // Calculate the position for centering the image
-                    const xPosition = centerX - newWidth / 2;
-                    const yPosition = centerY - newHeight / 2;
-
                     if (StickerSelected.id === 1) {
 
                         const imageWithDieCutEffect = await drawImage(img, grow * 2, '');
-
                         // const finaleImage = imageWithDieCutEffect && await drawImage(imageWithDieCutEffect, 1.3, 'magenta');
 
-                        imageRef.current.image(imageWithDieCutEffect);
-                        // imageRef.current.width(img.width * scaleFactor);
-                        // imageRef.current.height(img.height * scaleFactor);
-                        // imageRef.current.x(centerX - (img.width * scaleFactor) / 2);
-                        // imageRef.current.y(centerY - (img.height * scaleFactor) / 2);
+                        imageWithDieCutEffect && imageRef.current?.image(imageWithDieCutEffect);
 
                         const updatePosition = {
-                            x: imageRef.current.x(),
-                            y: imageRef.current.y(),
-                            width: imageRef.current.width(),
-                            height: imageRef.current.height(),
+                            x: imageRef.current?.x(),
+                            y: imageRef.current?.y(),
+                            width: imageRef.current?.width(),
+                            height: imageRef.current?.height(),
                             scaleX: 1,
                             scaleY: 1
                         }
 
                         dispatch(addedToHistory({ objectId: imageProps.id, position: updatePosition }))
-                        imageRef.current.getLayer()?.batchDraw();
+
+                        imageRef.current?.getLayer()?.batchDraw();
                     }
 
                     if (StickerSelected.id !== 1) {
-                        imageRef.current.image(img);
-                        // imageRef.current.width(newWidth);
-                        // imageRef.current.height(newHeight);
-                        // imageRef.current.x(xPosition);
-                        // imageRef.current.y(yPosition);
-                        imageRef.current.getLayer()?.batchDraw();
+                        imageRef.current?.image(img);
+                        imageRef.current?.getLayer()?.batchDraw();
                     }
 
                     checkInsideAndUpdate(imageRef.current)
-                    // imageRef.current.image(img);
-                    // imageRef.current.width(newWidth);
-                    // imageRef.current.height(newHeight);
-                    // imageRef.current.x(xPosition);
-                    // imageRef.current.y(yPosition);
-                    // imageRef.current.getLayer()?.batchDraw();
                 }
             }
         };
 
         loadImage();
 
-    }, [imageProps, centerX, centerY, frameWidth, frameHeight, grow, StickerSelected, dispatch, checkInsideAndUpdate]);
+    }, [imageProps, grow, StickerSelected, dispatch, checkInsideAndUpdate]);
 
 
 
@@ -163,12 +130,12 @@ const ImageComponent: React.FC<ImageProps> = ({ imageProps, isSelected, onSelect
         checkInsideAndUpdate(node);
 
         const updatePosition = {
-            x: node.attrs.x,
-            y: node.attrs.y,
-            width: node.attrs.width,
-            height: node.attrs.height,
-            scaleX: node.attrs.scaleX,
-            scaleY: node.attrs.scaleY
+            x: node.attrs?.x,
+            y: node.attrs?.y,
+            width: node.attrs?.width,
+            height: node.attrs?.height,
+            scaleX: node.attrs?.scaleX,
+            scaleY: node.attrs?.scaleY
         }
         // console.log('update posititon', updatePosition);
 
@@ -214,6 +181,7 @@ const ImageComponent: React.FC<ImageProps> = ({ imageProps, isSelected, onSelect
                         )
 
                         dispatch(calculateTotalDimensions());
+
                     }
                 }}
                 onDragEnd={handleDragEnd}

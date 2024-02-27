@@ -31,8 +31,14 @@ const Editor = () => {
     useEffect(() => {
         if (previewImages && previewImages.length > 0) {
             const imagesToDispatch: ImageInfo[] = previewImages.map(image => ({
-                id: image.id,
-                src: image.src,
+                id: image?.id,
+                src: image?.src,
+                x: image?.x,
+                y: image?.y,
+                width: image?.width,
+                height: image?.height,
+                scaleX: image?.scaleX,
+                scaleY: image?.scaleY
             }));
             dispatch(addImages(imagesToDispatch));
         }

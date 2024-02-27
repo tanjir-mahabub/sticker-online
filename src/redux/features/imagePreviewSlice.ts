@@ -26,6 +26,13 @@ export const imagePreviewSlice = createSlice({
         !state.images.some(existingImage => existingImage.id === newImage.id));
       state.images.push(...uniqueImages);
     },
+    updateImages: (state, action: PayloadAction<{id: string; attrs: Partial<ImageInfo>}>) => {
+      const { id, attrs } = action.payload;
+      const imageIndex = state.images.findIndex(image => image.id === id);
+      if (imageIndex !== -1) {
+        state.images[imageIndex] = { ...state.images[imageIndex], ...attrs };
+      }
+    },
     // Action to remove an image by id
     removeImage: (state, action: PayloadAction<string>) => {
       state.images = state.images.filter(image => image.id !== action.payload);
@@ -37,6 +44,6 @@ export const imagePreviewSlice = createSlice({
   },
 });
 
-export const { addImage, addImages, removeImage, clearImages } = imagePreviewSlice.actions;
+export const { addImage, addImages, updateImages, removeImage, clearImages } = imagePreviewSlice.actions;
 
 export default imagePreviewSlice.reducer;

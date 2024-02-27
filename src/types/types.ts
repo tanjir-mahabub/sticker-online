@@ -19,6 +19,12 @@ export interface ImageData {
 export interface ImageInfo {
   id: string;
   src: string;
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+  scaleX?: number;
+  scaleY?: number;
 }
 
 

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Rectangle from './Rectangle';
 import ImageComponent from './Image';
 import Text from './Text';
+import Loading from '@/components/Utils/Loading';
 
 interface CanvasElementsRendererProps {
     rectangles: any[];
@@ -42,15 +43,21 @@ const CanvasElementsRenderer: React.FC<CanvasElementsRendererProps> = ({
             ))} */}
 
 
-            {images.map((imgProps, i) => (
-                <ImageComponent
-                    key={i}
-                    imageProps={imgProps}
-                    isSelected={imgProps.id === selectedId}
-                    onSelect={() => setSelectedId(imgProps.id)} // Use setSelectedId here
-                    onChange={(newAttrs) => handleImageChange(i, newAttrs)}
-                />
-            ))}
+            {!images ? (
+                <Loading />
+            ) : (
+                <>
+                    {images.map((imgProps, i) => (
+                        <ImageComponent
+                            key={i}
+                            imageProps={imgProps}
+                            isSelected={imgProps.id === selectedId}
+                            onSelect={() => setSelectedId(imgProps.id)} // Use setSelectedId here
+                            onChange={(newAttrs) => handleImageChange(i, newAttrs)}
+                        />
+                    ))}
+                </>
+            )}
 
             {motives.map((motive, i) => (
                 <ImageComponent

@@ -69,7 +69,7 @@ const CanvasFrame: React.FC<FrameProps> = ({ stage }) => {
             {(StickerSelected.id === 1) && (
                 <div className="absolute bottom-10 left-[120px] w-full mx-auto h-3 flex justify-center items-center gap-5 z-50">
                     <div className="flex flex-col gap-7 p-4 space-y-3 w-60">
-                        <RangeSlider minValue={0} maxValue={50} step={1} defaultValue={0} label="Kantlinje" />
+                        <RangeSlider minValue={0} maxValue={100} step={1} defaultValue={0} label="Kantlinje" />
                     </div>
                 </div>
             )}

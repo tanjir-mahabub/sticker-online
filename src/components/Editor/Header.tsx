@@ -39,7 +39,9 @@ const Header = () => {
         <header className="flex items-center border-b border-black/10 shadow-sm px-3 py-3">
             <div className="flex w-40">
                 <Link href={"/"}>
-                    <Image src="/logo.png" alt="logo" width={130} height={100} />
+                    <div className="w-full h-auto">
+                        <Image className="w-full h-auto" src="/logo.png" alt="logo" width={130} height={100} />
+                    </div>
                 </Link>
             </div>
 
@@ -50,7 +52,7 @@ const Header = () => {
                         alt="undo-icon"
                         width={18}
                         height={100}
-                        className={`group-hover:filter group-hover:contrast-0 ${isDisabledUndo ? 'filter-contrast-0' : ''}`}
+                        className={`w-auto h-auto group-hover:filter group-hover:contrast-0 ${isDisabledUndo ? 'filter-contrast-0' : ''}`}
                     />
                     <span className={`text-xs ${isDisabledUndo ? 'text-gray-500' : 'group-hover:text-so-black'}`}>Undo</span>
                 </div>
@@ -60,7 +62,7 @@ const Header = () => {
                         alt="redo-icon"
                         width={18}
                         height={100}
-                        className={`group-hover:filter group-hover:contrast-0 ${isDisabledRedo ? 'filter-contrast-0' : ''}`}
+                        className={`w-auto h-auto group-hover:filter group-hover:contrast-0 ${isDisabledRedo ? 'filter-contrast-0' : ''}`}
                     />
                     <span className={`text-xs ${isDisabledRedo ? 'text-gray-500' : 'group-hover:text-so-black'}`}>Redo</span>
                 </div>

@@ -67,7 +67,7 @@ const BilderCustomize = () => {
                         alt="trash-icon"
                         width={18}
                         height={100}
-                        className="max-h-24 max-w-full"
+                        className="max-h-24 max-w-full w-full h-auto"
                     />
                 </div>
                 <p className="text-sm font-semibold">Ta bort  alla  bilder</p>
