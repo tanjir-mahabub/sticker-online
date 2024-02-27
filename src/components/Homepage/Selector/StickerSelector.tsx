@@ -22,6 +22,7 @@ const StickerSelector = () => {
 
     }, [StickerSelected]);
 
+    console.log(StickerSelected);
     return (
         <>
             {StickerSelectorStore.map((sticker) => (

@@ -1,14 +1,12 @@
 import Image from 'next/image';
 import React, { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import ImagePreview from './ImagePreview';
 
 interface ImageUploadProps {
     onImageUpload: (files: File[]) => void;
-    isImageDeleted: boolean;
 }
 
-const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload, isImageDeleted }) => {
+const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload }) => {
 
     const [selectedImages, setSelectedImages] = useState<string[]>([]);
 
@@ -59,7 +57,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload, isImageDeleted
                 <p><b>Max file size:</b> 10 MB</p>
             </div>
 
-            <ImagePreview />
         </div>
     );
 };

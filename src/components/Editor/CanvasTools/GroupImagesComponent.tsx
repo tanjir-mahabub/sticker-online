@@ -2,15 +2,11 @@ import CustomTransformer from '@/components/Utils/CustomTransformer';
 import { drawCustomImage } from '@/components/Utils/functions';
 import { setCanvasProperties } from '@/redux/features/canvasSlice';
 import { useAppSelector } from '@/redux/store';
+import { ImageInfo } from '@/types/types';
 import Konva from 'konva';
 import React, { useEffect, useRef, useState } from 'react';
 import { Image as KonvaImage } from 'react-konva';
 import { useDispatch } from 'react-redux';
-
-interface ImageInfo {
-    id: string;
-    file: string;
-}
 
 export interface GroupImagesComponentProps {
     imagesInsideFrame?: ImageInfo[];
@@ -62,7 +58,7 @@ const GroupImagesComponent: React.FC<GroupImagesComponentProps> = ({ imagesInsid
             if (!imagesInsideFrame) return;
             for (const imageInfo of imagesInsideFrame) {
                 try {
-                    const img = await loadImage(imageInfo.file);
+                    const img = await loadImage(imageInfo.src);
                     const image = await drawCustomImage(img, grow, 'white')
 
                     const info = insideFrameCheck.images.filter(item => item.id === imageInfo.id)
@@ -122,9 +118,6 @@ const GroupImagesComponent: React.FC<GroupImagesComponentProps> = ({ imagesInsid
 
     const handleSelect = (e: Konva.KonvaEventObject<MouseEvent> | Konva.KonvaEventObject<TouchEvent>) => {
         onSelect();
-
-        const stage = e.currentTarget.getStage();
-        console.log('object', stage);
     };
 
 

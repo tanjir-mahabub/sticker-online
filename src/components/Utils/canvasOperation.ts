@@ -20,11 +20,6 @@ export const handleImageChange = (index: number, newAttrs: Partial<ImageProps['i
     setImages(updatedImages);    
 };
 
-export const handleDieCutImageChange = (index: number, newAttrs: Partial<ImageProps['imageProps']>, images: ImageProps['imageProps'][], setDieCutImages: React.Dispatch<React.SetStateAction<ImageProps['imageProps'][]>>) => {
-    const updatedDieCutImages = images.map((img, i) => (i === index ? { ...img, ...newAttrs } : img));
-    setDieCutImages(updatedDieCutImages);    
-};
-
 export const handleMotiveChange = (index: number, newAttrs: Partial<ImageProps['imageProps']>, motives: ImageProps['imageProps'][], setMotives: React.Dispatch<React.SetStateAction<ImageProps['imageProps'][]>>) => {
     const updatedMotives = motives.map((img, i) => (i === index ? { ...img, ...newAttrs } : img));
     setMotives(updatedMotives);    

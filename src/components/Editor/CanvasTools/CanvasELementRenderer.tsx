@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import Rectangle from './Rectangle';
 import ImageComponent from './Image';
 import Text from './Text';
-import DieCutImage from './DieCutImageBG';
 
 interface CanvasElementsRendererProps {
     rectangles: any[];
@@ -13,7 +12,6 @@ interface CanvasElementsRendererProps {
     setSelectedId: React.Dispatch<React.SetStateAction<string | null>>; // Define setSelectedId prop
     handleRectChange: (index: number, newAttrs: any) => void;
     handleImageChange: (index: number, newAttrs: any) => void;
-    handleDieCutImageChange: (index: number, newAttrs: any) => void;
     handleMotiveChange: (index: number, newAttrs: any) => void;
     handleTextChange: (index: number, newAttrs: any) => void;
 }
@@ -27,7 +25,6 @@ const CanvasElementsRenderer: React.FC<CanvasElementsRendererProps> = ({
     setSelectedId,
     handleRectChange,
     handleImageChange,
-    handleDieCutImageChange,
     handleMotiveChange,
     handleTextChange,
 }) => {

@@ -22,6 +22,8 @@ const Dashboard = () => {
 
     const { centerX, centerY, frameWidth, frameHeight } = CanvasProperties;
 
+    const FileState = useAppSelector(state => state.file)
+
     useEffect(() => {
         const handleResize = () => {
             if (divRef.current) {
@@ -91,8 +93,6 @@ const Dashboard = () => {
         }))
     }, [innerWidth, innerHeight, frameWidth, frameHeight, dispatch]);
 
-
-    // console.log(CanvasProps, CanvasProperties);
 
     return (
         <div ref={divRef} className="relative top-0 left-0 w-[75vw] overflow-hidden border-l bg-so-deep-gray">

@@ -8,6 +8,7 @@ import fileReducer from './features/fileUploadSlice';
 import motivReducer from './features/motivSlice';
 import historyReducer from './features/historySlice';
 import insideFrameReducer from './features/insideFrameSlice';
+import imagePreviewReducer from './features/imagePreviewSlice';
 
 const store = configureStore({
   reducer: {
@@ -18,7 +19,8 @@ const store = configureStore({
     file: fileReducer,
     motiv: motivReducer,
     history: historyReducer,
-    insideFrame: insideFrameReducer
+    insideFrame: insideFrameReducer,
+    imagePreview: imagePreviewReducer
   },
 });
 

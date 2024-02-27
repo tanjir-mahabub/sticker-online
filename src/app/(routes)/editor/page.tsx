@@ -5,8 +5,38 @@ import Dashboard from "@/components/Editor/Dashboard"
 import Header from "@/components/Editor/Header"
 import Footer from "@/components/Editor/Footer"
 import Sidebar from "@/components/Editor/Sidebar"
+import { useImageStorage } from "@/hooks/useImageStorage"
+import { useEffect } from "react"
+import { useAppSelector } from "@/redux/store"
+import { useDispatch } from "react-redux"
+import { addImages } from "@/redux/features/imagePreviewSlice"
+import { ImageInfo } from "@/types/types"
 
 const Editor = () => {
+    const { data: previewImages, updateData: updatePreviewImages } = useImageStorage('imageStore');
+    const imagePreviews = useAppSelector(state => state.imagePreview)
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        // Only update local storage if imagePreviews.images is not empty.
+        if (imagePreviews.images && imagePreviews.images.length > 0) {
+            console.log("Updating previewImages with:", imagePreviews.images);
+            updatePreviewImages(imagePreviews.images);
+        } else {
+            console.log("No images to update in localStorage.");
+        }
+    }, [imagePreviews, updatePreviewImages]);
+
+
+    useEffect(() => {
+        if (previewImages && previewImages.length > 0) {
+            const imagesToDispatch: ImageInfo[] = previewImages.map(image => ({
+                id: image.id,
+                src: image.src,
+            }));
+            dispatch(addImages(imagesToDispatch));
+        }
+    }, [dispatch, previewImages]);
 
     return (
         <section>

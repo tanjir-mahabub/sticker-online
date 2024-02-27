@@ -1,18 +1,19 @@
+import ImagePreview from "@/components/Utils/ImagePreview";
 import ImageUpload from "@/components/Utils/ImageUploader";
 import { useImageStorage } from "@/hooks/useImageStorage";
 import { addFiles, deleteAllFiles } from "@/redux/features/fileUploadSlice";
+import { addImage, clearImages } from "@/redux/features/imagePreviewSlice";
 import { useAppSelector } from "@/redux/store";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 
 const BilderCustomize = () => {
-    const [isImageUploaded, setIsImageUploaded] = useState(false);
-    const [ImageDeleted, setImageDeleted] = useState(false);
     const { data: previewImages, updateData: updatePreviewImages } = useImageStorage('imageStore');
 
     const dispatch = useDispatch();
 
+    const imagePreviews = useAppSelector(state => state.imagePreview);
     const FileState = useAppSelector(state => state.file)
 
     const handleImageUpload = (files: File[]) => {
@@ -31,27 +32,32 @@ const BilderCustomize = () => {
         Promise.all(imagesData).then((imageDataArray) => {
             const newImageStore = [...imageDataArray];
             dispatch(addFiles(newImageStore));
-            setIsImageUploaded(true);
         });
 
     };
 
     const handleDeleteBTN = () => {
-        setImageDeleted(true);
         dispatch(deleteAllFiles());
         updatePreviewImages([]);
+        dispatch(clearImages())
     }
 
     useEffect(() => {
-        FileState.length > 0 && isImageUploaded && updatePreviewImages(FileState);
-    }, [FileState, updatePreviewImages, isImageUploaded]);
+        FileState?.map(image => {
+            dispatch(addImage({
+                id: image.id,
+                src: image.src
+            }))
+        });
+    })
 
 
     return (
         <div className="w-full h-[100%]">
             <div className="p-4 space-y-5 h-[90%] overflow-y-auto">
                 <h2 className="text-sm sm:text-lg font-bold">Ladda upp bild</h2>
-                <ImageUpload onImageUpload={handleImageUpload} isImageDeleted={ImageDeleted} />
+                <ImageUpload onImageUpload={handleImageUpload} />
+                {previewImages && <ImagePreview images={imagePreviews.images} />}
             </div>
 
             <div className="flex justify-start items-center gap-1 border-t-2 h-[10%] p-3">
