@@ -1,25 +1,30 @@
+import { ImageData, ImageInfo } from "@/types/types";
 import { useEffect, useState } from "react";
 
-interface ImageData {
-  id: string;
-  file: string;
-}
-
 export const useImageStorage = (key: string) => {
-  const [data, setData] = useState<ImageData[]>([]);
+  const [data, setData] = useState<ImageInfo[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    setIsLoading(true);
     const storedDataString = localStorage.getItem(key);
     if (storedDataString) {
-      const storedData = JSON.parse(storedDataString) as ImageData[];
+      const storedData = JSON.parse(storedDataString) as ImageInfo[];
       setData(storedData);
     }
+    setIsLoading(false);
   }, [key]);
 
-  const updateData = (newData: ImageData[]) => {
+  const updateData = (newData: ImageInfo[]) => {
+    setIsLoading(true);
     localStorage.setItem(key, JSON.stringify(newData));
     setData(newData);
+    setIsLoading(false);
   };
 
-  return { data, updateData };
+  // useEffect(() => {
+  //   console.log("Data updated:", data);
+  // }, [data]);
+
+  return { data, updateData, isLoading };
 };

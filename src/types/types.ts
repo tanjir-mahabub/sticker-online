@@ -10,6 +10,17 @@ export interface SideNavState {
   id: number
 }
 
+export interface ImageData {
+  id: string;
+  file: string;
+}
+
+
+export interface ImageInfo {
+  id: string;
+  src: string;
+}
+
 
 export interface CanvasState {  
   width: number;

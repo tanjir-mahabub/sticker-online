@@ -12,8 +12,8 @@ import { addOrUpdateImage, removeImage, calculateTotalDimensions } from '@/redux
 
 export interface ImageProps {
     imageProps: {
-        x: number;
-        y: number;
+        x?: number;
+        y?: number;
         width?: number;
         height?: number;
         src: string;
