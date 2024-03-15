@@ -8,7 +8,7 @@ const FargCustomize = () => {
             </div>
 
             <div className="flex flex-col gap-7 p-4 space-y-3">
-                <ColorInput />
+                <ColorInput sketch showValue />
                 {/* <RangeSlider minValue={0} maxValue={100} step={1} /> */}
             </div>
         </div>

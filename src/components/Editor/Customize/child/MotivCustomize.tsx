@@ -1,19 +1,26 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MotiveCategoryDropdown from "./Input/MotiveCategoryDropdown";
 import { motiveStore } from "@/store/motiveStore";
 import Image from "next/image";
 import { useImageStorage } from "@/hooks/useImageStorage";
 import { useDispatch } from "react-redux";
 import { addMotiv, deleteAllMotiv } from "@/redux/features/motivSlice";
+import { addFiles } from "@/redux/features/fileUploadSlice";
+import { useAppSelector } from "@/redux/store";
+import { addImage } from "@/redux/features/imagePreviewSlice";
+import { generateUniqueId } from "@/components/Utils/functions";
 
 const MotivCustomize = () => {
     const [MotivDeleted, setMotivDeleted] = useState(false);
 
-    const { data: previewMotives, updateData: updatePreviewMotives } = useImageStorage('motivStore');
+    const { data: previewImages, updateData: updatePreviewImages } = useImageStorage('motivStore');
 
     const [selectedMotiveCategory, setSelectedMotiveCategory] = useState('Populära');
 
     const dispatch = useDispatch();
+
+    const imagePreviews = useAppSelector(state => state.imagePreview);
+    const FileState = useAppSelector(state => state.file)
 
     // Function to convert image URL to data URL
     const imageUrlToDataURL = async (imageUrl: string) => {
@@ -39,9 +46,13 @@ const MotivCustomize = () => {
         // Example usage
         imageUrlToDataURL(icon)
             .then((dataUrl) => {
-                console.log('Data URL:', dataUrl);
-                const newImageStore: any = [...previewMotives, dataUrl];
-                dispatch(addMotiv(newImageStore));
+                // console.log('Data URL:', dataUrl);
+                const newImageStore: any = [...previewImages, dataUrl];
+                dispatch(addImage({
+                    id: generateUniqueId(),
+                    src: newImageStore,
+                    category: 'motiv',
+                }))
             })
             .catch((error) => {
                 console.error('Error converting image to data URL:', error);
@@ -49,8 +60,11 @@ const MotivCustomize = () => {
     }
 
     const handleDeleteBTN = () => {
-        dispatch(deleteAllMotiv());
+        // dispatch(deleteAllMotiv());
         setMotivDeleted(true);
+
+        updatePreviewImages([])
+
     }
 
     return (

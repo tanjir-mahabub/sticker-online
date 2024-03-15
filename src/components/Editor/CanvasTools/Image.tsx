@@ -8,6 +8,7 @@ import CustomTransformer from '@/components/Utils/CustomTransformer';
 import { addedToHistory } from '@/redux/features/historySlice';
 import { Frame } from '@/types/types';
 import { addOrUpdateImage, removeImage, calculateTotalDimensions } from '@/redux/features/insideFrameSlice';
+import { updateImages } from '@/redux/features/imagePreviewSlice';
 
 export interface ImageProps {
     imageProps: {
@@ -52,6 +53,7 @@ const ImageComponent: React.FC<ImageProps> = ({ imageProps, isSelected, onSelect
                 height: imagePosition?.height,
                 scaleX: node?.scaleX(),
                 scaleY: node?.scaleY(),
+                rotation: node?.rotation(),
                 insideFrame: inside,
             }));
             setIsInside(true);
@@ -93,16 +95,17 @@ const ImageComponent: React.FC<ImageProps> = ({ imageProps, isSelected, onSelect
 
                         imageWithDieCutEffect && imageRef.current?.image(imageWithDieCutEffect);
 
-                        const updatePosition = {
-                            x: imageRef.current?.x(),
-                            y: imageRef.current?.y(),
-                            width: imageRef.current?.width(),
-                            height: imageRef.current?.height(),
-                            scaleX: 1,
-                            scaleY: 1
-                        }
+                        // const updatePosition = {
+                        //     x: imageRef.current?.x(),
+                        //     y: imageRef.current?.y(),
+                        //     width: imageRef.current?.width(),
+                        //     height: imageRef.current?.height(),
+                        //     scaleX: 1,
+                        //     scaleY: 1,
+                        //     rotation: 0
+                        // }
 
-                        dispatch(addedToHistory({ objectId: imageProps.id, position: updatePosition }))
+                        // dispatch(addedToHistory({ objectId: imageProps.id, position: updatePosition }))
 
                         imageRef.current?.getLayer()?.batchDraw();
                     }
@@ -130,23 +133,38 @@ const ImageComponent: React.FC<ImageProps> = ({ imageProps, isSelected, onSelect
         checkInsideAndUpdate(node);
 
         const updatePosition = {
-            x: node.attrs?.x,
-            y: node.attrs?.y,
-            width: node.attrs?.width,
-            height: node.attrs?.height,
-            scaleX: node.attrs?.scaleX,
-            scaleY: node.attrs?.scaleY
+            x: node.attrs.x,
+            y: node.attrs.y,
+            width: node.attrs.width,
+            height: node.attrs.height,
+            scaleX: node.attrs.scaleX,
+            scaleY: node.attrs.scaleY,
+            skewX: node.attrs.skewX,
+            skewY: node.attrs.skewY,
+            rotation: node.attrs.rotation
         }
         // console.log('update posititon', updatePosition);
 
         dispatch(addedToHistory({ objectId: node.id(), position: updatePosition }))
         dispatch(calculateTotalDimensions());
+        dispatch(updateImages({ id: node.id(), attrs: updatePosition }))
     }
 
     const objectHistories = useAppSelector((state: RootState) => state.history.objectHistories);
     const objectId = imageProps.id;
     const objectHistory = objectHistories.find(history => history.objectId === objectId);
     const historyStep = objectHistory ? objectHistory.historyStep : 0;
+
+
+    const handleSelection = () => {
+        onSelect();
+
+        if (imageRef.current) {
+            imageRef.current.moveToTop();
+            imageRef.current.getLayer()?.batchDraw();
+        }
+
+    }
 
     return (
         <>
@@ -156,7 +174,7 @@ const ImageComponent: React.FC<ImageProps> = ({ imageProps, isSelected, onSelect
                 ref={imageRef}
                 name="image"
                 image={undefined}
-                draggable
+                draggable={isSelected && true}
                 opacity={isInside ? 1 : 0.5}
                 x={objectHistories.find(history => history.objectId === imageProps.id)?.history[historyStep]?.x}
                 y={objectHistories.find(history => history.objectId === imageProps.id)?.history[historyStep]?.y}
@@ -164,6 +182,7 @@ const ImageComponent: React.FC<ImageProps> = ({ imageProps, isSelected, onSelect
                 height={objectHistories.find(history => history.objectId === imageProps.id)?.history[historyStep]?.height}
                 scaleX={objectHistories.find(history => history.objectId === imageProps.id)?.history[historyStep]?.scaleX || 1}
                 scaleY={objectHistories.find(history => history.objectId === imageProps.id)?.history[historyStep]?.scaleY || 1}
+                rotation={objectHistories.find(history => history.objectId === imageProps.id)?.history[historyStep]?.rotation || 0}
                 onTransformEnd={(e) => {
                     const node = imageRef.current;
                     if (node) {
@@ -173,7 +192,10 @@ const ImageComponent: React.FC<ImageProps> = ({ imageProps, isSelected, onSelect
                             width: node.attrs.width,
                             height: node.attrs.height,
                             scaleX: node.attrs.scaleX,
-                            scaleY: node.attrs.scaleY
+                            scaleY: node.attrs.scaleY,
+                            skewX: node.attrs.skewX,
+                            skewY: node.attrs.skewY,
+                            rotation: node.attrs.rotation
                         }
 
                         dispatch(
@@ -182,11 +204,17 @@ const ImageComponent: React.FC<ImageProps> = ({ imageProps, isSelected, onSelect
 
                         dispatch(calculateTotalDimensions());
 
+                        dispatch(updateImages({ id: node.id(), attrs: updatePosition }))
+
+
+                        console.log(node.attrs);
+
                     }
                 }}
                 onDragEnd={handleDragEnd}
-                onClick={onSelect}
-                onTap={onSelect}
+                onClick={handleSelection}
+                // onDblClick={handleSelection}
+                onTap={handleSelection}
                 aspectRatio={true}
             />
             {isSelected && (

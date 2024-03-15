@@ -1,22 +1,31 @@
+import { TextData } from '@/hooks/useTextStorage';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface TextState {
-  selectedText: { id: number; name: string } | null;
+  selectedTexts: TextData[];
 }
 
 const initialState: TextState = {
-  selectedText: null,
+  selectedTexts: [],
 };
 
 const textSlice = createSlice({
   name: 'text',
   initialState,
   reducers: {
-    setText(state, action: PayloadAction<{ id: number; name: string }>) {
-      state.selectedText = action.payload;
+    setTextValue: (state, action: PayloadAction<TextData>) => {
+      const index = state.selectedTexts.findIndex(text => text.id === action.payload.id);
+      if (index !== -1) {
+        state.selectedTexts[index] = action.payload;
+      } else {
+        state.selectedTexts.push(action.payload);
+      }
     },
+    removeTextValue: (state, action: PayloadAction<string>) => {
+      state.selectedTexts = state.selectedTexts.filter(text => text.id !== action.payload);
+    }
   },
 });
 
-export const { setText } = textSlice.actions;
+export const { setTextValue, removeTextValue } = textSlice.actions;
 export default textSlice.reducer;

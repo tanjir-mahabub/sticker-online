@@ -2,19 +2,24 @@ import { useEffect, useState } from "react";
 import { useImageStorage } from "./useImageStorage";
 import { RectangleProps } from "@/components/Editor/CanvasTools/Rectangle";
 import { ImageProps } from "@/components/Editor/CanvasTools/Image";
-import { TextProps } from "@/components/Editor/CanvasTools/Text";
+
 import { initialRectangles } from "@/store/canvasStore";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState, useAppSelector } from "@/redux/store";
+import { useDispatch } from "react-redux";
+import { useAppSelector } from "@/redux/store";
 import { useTextStorage } from "./useTextStorage";
-import { setText } from "@/redux/features/textSlice";
 import { addedToHistory } from "@/redux/features/historySlice";
+import { TextProps } from "@/components/Editor/CanvasTools/TextComponent";
 
 export const useCanvasState = () => {
 
     const dispatch = useDispatch()
 
-    const selectedText = useAppSelector((state) => state.text.selectedText);
+    const FileState = useAppSelector(state => state.file)    
+    const selectedText = useAppSelector((state) => state.text);
+    
+    const canvasProperties = useAppSelector((state) => state.canvas);
+
+    const { centerX, centerY, frameWidth, frameHeight } = canvasProperties;
 
     const [textUpdated, setTextUpdated] = useState(false);
 
@@ -25,36 +30,30 @@ export const useCanvasState = () => {
     const { data: previewTexts, updateData: updatedPreviewTexts } = useTextStorage('textStore'); 
 
     const [rectangles, setRectangles] = useState<RectangleProps['shapeProps'][]>(initialRectangles);
-    const [images, setImages] = useState<ImageProps['imageProps'][]>([]);
-    
+    const [images, setImages] = useState<ImageProps['imageProps'][]>([]);    
     const [motives, setMotives] = useState<ImageProps['imageProps'][]>([]);
     const [selectedTexts, setSelectedTexts] = useState<TextProps['textProps'][]>([]);
     const [selectedId, setSelectedId] = useState<string | null>(null);
-
-    const canvasProperties = useAppSelector((state) => state.canvas);
-
-    const { centerX, centerY, frameWidth, frameHeight } = canvasProperties;
-    const canvasDiemensionSet = (img: HTMLImageElement) => {
-    // Calculate the new width and height
-    const scaleFactor = 0.8; // 20% smaller
-    const scaledWidth = frameWidth * scaleFactor;
-    const scaledHeight = frameHeight * scaleFactor;
-
-    // Determine the scaling factor for maintaining aspect ratio
-    const widthScaleFactor = scaledWidth / img.width;
-    const heightScaleFactor = scaledHeight / img.height;
-    const minScaleFactor = Math.min(widthScaleFactor, heightScaleFactor);
-
-    // Calculate the scaled dimensions while maintaining aspect ratio
-    const newWidth = img.width * minScaleFactor;
-    const newHeight = img.height * minScaleFactor;
-
-    // Calculate the position for centering the image
-    const xPosition = centerX - newWidth / 2;
-    const yPosition = centerY - newHeight / 2;
-    }
     
-    const FileState = useAppSelector(state => state.file)    
+    const canvasDiemensionSet = (img: HTMLImageElement) => {
+        // Calculate the new width and height
+        const scaleFactor = 0.8; // 20% smaller
+        const scaledWidth = frameWidth * scaleFactor;
+        const scaledHeight = frameHeight * scaleFactor;
+
+        // Determine the scaling factor for maintaining aspect ratio
+        const widthScaleFactor = scaledWidth / img.width;
+        const heightScaleFactor = scaledHeight / img.height;
+        const minScaleFactor = Math.min(widthScaleFactor, heightScaleFactor);
+
+        // Calculate the scaled dimensions while maintaining aspect ratio
+        const newWidth = img.width * minScaleFactor;
+        const newHeight = img.height * minScaleFactor;
+
+        // Calculate the position for centering the image
+        const xPosition = centerX - newWidth / 2;
+        const yPosition = centerY - newHeight / 2;
+    }    
     
     // useEffect(() => {
        
@@ -87,36 +86,38 @@ export const useCanvasState = () => {
     // }, [previewMotives, centerX, centerY, frameWidth, frameHeight]);
     
 
-    useEffect(() => {
-        if (previewTexts && typeof previewTexts === 'object') {
-            const { id, name } = previewTexts;            
-            if (name) {
-                const textArray = [
-                    {
-                        x: centerX - frameWidth / 2, 
-                        y: centerY - frameHeight / 2,
-                        text: "Sample Text",
-                        fontSize: 36,                        
-                        fill: 'blue',
-                        id: `text${id}`,
-                        // width: 350,
-                        // height: 80,
-                        padding: 20
-                    }
-                ];
+    
+    // useEffect(() => {
+    //     if (previewTexts && typeof previewTexts === 'object') {
+    //         const { id, name } = previewTexts;            
+    //         if (name) {
+    //             const textArray = [
+    //                 {
+    //                     x: centerX - frameWidth / 2, 
+    //                     y: centerY - frameHeight / 2,
+    //                     text: "Sample Text",
+    //                     fontSize: 36,                        
+    //                     fill: 'blue',
+    //                     id: `text${id}`,
+    //                     // width: 350,
+    //                     // height: 80,
+    //                     padding: 20
+    //                 }
+    //             ];
                 
-                setSelectedTexts(textArray);
+    //             setSelectedTexts(textArray);
 
-                dispatch(setText({ id, name }));
+    //             // dispatch(setText({ id, name }));
                                 
-            }
-        }
-    }, [previewTexts, centerX, centerY, frameWidth, frameHeight, dispatch, textUpdated]);
+    //         }
+    //     }
+    // }, [previewTexts, centerX, centerY, frameWidth, frameHeight, dispatch, textUpdated]);
     
     
-    useEffect(() => {        
-        selectedText && setTextUpdated(true);
-    }, [selectedText])     
+    
+    // useEffect(() => {        
+    //     selectedText && setTextUpdated(true);
+    // }, [selectedText])     
 
     return {
         rectangles,

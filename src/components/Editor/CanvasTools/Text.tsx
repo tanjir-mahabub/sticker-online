@@ -8,7 +8,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Transformer, Text as KonvaText } from 'react-konva';
 import { useDispatch } from 'react-redux';
 
-export interface TextProps {
+interface TextProps {
     textProps: {
         x: number;
         y: number;
@@ -29,7 +29,7 @@ export interface TextProps {
 
 const Text: React.FC<TextProps> = ({ textProps, isSelected, onSelect, onChange }) => {
 
-    const selectedText = useAppSelector((state: RootState) => state.text.selectedText);
+    const selectedText = useAppSelector((state: RootState) => state.text);
 
     const textRef = useRef<Konva.Text>(null);
     const trRef = useRef<Konva.Transformer>(null);
@@ -112,6 +112,8 @@ const Text: React.FC<TextProps> = ({ textProps, isSelected, onSelect, onChange }
         if (isSelected && textRef.current && trRef.current) {
             trRef.current.nodes([textRef.current]);
             trRef.current.getLayer()?.batchDraw();
+
+            console.log(textRef.current);
         }
     }, [isSelected]);
 

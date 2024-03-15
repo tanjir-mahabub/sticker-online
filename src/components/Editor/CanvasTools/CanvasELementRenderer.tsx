@@ -3,6 +3,10 @@ import Rectangle from './Rectangle';
 import ImageComponent from './Image';
 import Text from './Text';
 import Loading from '@/components/Utils/Loading';
+import { useAppSelector } from '@/redux/store';
+import { useDispatch } from 'react-redux';
+import { setCanvasProperties } from '@/redux/features/canvasSlice';
+import TextComponent from './TextComponent';
 
 interface CanvasElementsRendererProps {
     rectangles: any[];
@@ -29,6 +33,18 @@ const CanvasElementsRenderer: React.FC<CanvasElementsRendererProps> = ({
     handleMotiveChange,
     handleTextChange,
 }) => {
+
+    const canvasProperties = useAppSelector(state => state.canvas);
+
+    const { selectionCancel } = canvasProperties;
+
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        selectionCancel && setSelectedId(null);
+        dispatch(setCanvasProperties({ selectionCancel: false }))
+    }, [selectionCancel, setSelectedId, dispatch]);
+
 
     return (
         <>
@@ -59,7 +75,7 @@ const CanvasElementsRenderer: React.FC<CanvasElementsRendererProps> = ({
                 </>
             )}
 
-            {motives.map((motive, i) => (
+            {/* {motives.map((motive, i) => (
                 <ImageComponent
                     key={i}
                     imageProps={motive}
@@ -67,11 +83,11 @@ const CanvasElementsRenderer: React.FC<CanvasElementsRendererProps> = ({
                     onSelect={() => setSelectedId(motive.id)} // Use setSelectedId here
                     onChange={(newAttrs) => handleMotiveChange(i, newAttrs)}
                 />
-            ))}
+            ))} */}
 
             {texts.length > 0 &&
                 texts.map((textProps, i) => (
-                    <Text
+                    <TextComponent
                         key={i}
                         textProps={textProps}
                         isSelected={textProps.id === selectedId}

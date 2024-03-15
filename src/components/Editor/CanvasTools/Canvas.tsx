@@ -3,7 +3,6 @@ import Konva from 'konva';
 import { Stage, Layer, Rect, Circle, Group } from 'react-konva';
 import { RectangleProps } from './Rectangle';
 import { ImageProps } from './Image';
-import { TextProps } from './Text';
 import CanvasElementsRenderer from './CanvasELementRenderer';
 import { checkDeselect, handleRectChange, handleImageChange, handleTextChange, handleMotiveChange } from '@/components/Utils/canvasOperation';
 import CanvasFrame from './CanvasFrame';
@@ -15,6 +14,8 @@ import CustomTransformer from '@/components/Utils/CustomTransformer';
 import { addFiles } from '@/redux/features/fileUploadSlice';
 import GroupImagesComponent, { GroupImagesComponentProps } from './GroupImagesComponent';
 import { ImageInfo } from '@/types/types';
+import { setCanvasProperties } from '@/redux/features/canvasSlice';
+import { TextProps } from './TextComponent';
 
 
 interface CanvasProps {
@@ -44,6 +45,7 @@ const NewCanvas: React.FC<CanvasProps> = ({
     const { rectangles, setRectangles, images, setImages, motives, setMotives, selectedTexts, setSelectedTexts, selectedId, setSelectedId } = useCanvasState();
 
     const stageRef = useRef<Konva.Stage>(null);
+    const layerRef = useRef<Konva.Layer>(null);
     const frameRef = useRef<Konva.Rect>(null);
     const rectFrameRef = useRef<Konva.Rect>(null);
     const circleRef = useRef<Konva.Circle>(null);
@@ -58,12 +60,15 @@ const NewCanvas: React.FC<CanvasProps> = ({
 
 
     const { data: previewImages } = useImageStorage('imageStore');
+    const { data: previewTexts } = useImageStorage('textStore');
 
     const [imagesInsideFrame, setImagesInsideFrame] = useState<ImageInfo[]>()
 
     const insideFrameCheck = useAppSelector(state => state.insideFrame)
 
-    const imagePreviews = useAppSelector(state => state.imagePreview)
+    const imageState = useAppSelector(state => state.imagePreview)
+
+    const textState = useAppSelector(state => state.text)
 
     const [selectedShapes, setSelectedShapes] = useState<Konva.Shape[]>([]);
 
@@ -86,12 +91,12 @@ const NewCanvas: React.FC<CanvasProps> = ({
     useEffect(() => {
         if (insideFrameCheck.images) {
 
-            const filteredStates = imagePreviews.images.filter((prevImage) =>
+            const filteredStates = imageState.images.filter((prevImage) =>
                 insideFrameCheck.images.some((image) => image.id === prevImage.id)
             );
             setImagesInsideFrame(filteredStates);
         }
-    }, [insideFrameCheck.images, imagePreviews.images]);
+    }, [insideFrameCheck.images, imageState.images]);
 
     useEffect(() => {
         setImageAttrs({
@@ -109,7 +114,26 @@ const NewCanvas: React.FC<CanvasProps> = ({
 
     }, [StickerSelected.id]);
 
+    useEffect(() => {
+        const group = new Konva.Group();
+        const layer = layerRef.current;
+        const dieCutImgs = layer?.find('.image');
 
+        if (dieCutImgs) {
+            dieCutImgs.map((img: any) => {
+                group.add(img);
+            });
+        }
+
+        // Assuming you want to add the group to the layer
+        layer?.add(group);
+        layer?.batchDraw();
+
+        // console.log('group width', group.children.map(child => child.attrs));
+    })
+
+    // console.log(frameWidth, frameHeight);    
+    console.log('canvas', previewTexts);
 
     return (
         <>
@@ -125,7 +149,7 @@ const NewCanvas: React.FC<CanvasProps> = ({
                 onMouseDown={(e: Konva.KonvaEventObject<MouseEvent>) => checkDeselect(e, setSelectedId)}
                 onTouchStart={(e: Konva.KonvaEventObject<TouchEvent>) => checkDeselect(e, setSelectedId)}
             >
-                <Layer>
+                <Layer ref={layerRef}>
                     {(StickerSelected.id === 2 || StickerSelected.id === 4) ? (
                         <>
                             <Rect
@@ -205,9 +229,9 @@ const NewCanvas: React.FC<CanvasProps> = ({
 
                     <CanvasElementsRenderer
                         rectangles={rectangles}
-                        images={imagePreviews.images}
+                        images={imageState.images}
                         motives={motives}
-                        texts={selectedTexts}
+                        texts={textState.selectedTexts}
                         selectedId={selectedId}
                         setSelectedId={setSelectedId} // Pass setSelectedId here
                         handleRectChange={(index: number, newAttrs: Partial<RectangleProps['shapeProps']>) => handleRectChange(index, newAttrs, rectangles, setRectangles)}

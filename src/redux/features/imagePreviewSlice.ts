@@ -33,6 +33,10 @@ export const imagePreviewSlice = createSlice({
         state.images[imageIndex] = { ...state.images[imageIndex], ...attrs };
       }
     },
+    removeImagesByCategory: (state, action: PayloadAction<string>) => {
+      const categoryToRemove = action.payload;
+      state.images = state.images.filter(image => image.category !== categoryToRemove);
+    },
     // Action to remove an image by id
     removeImage: (state, action: PayloadAction<string>) => {
       state.images = state.images.filter(image => image.id !== action.payload);

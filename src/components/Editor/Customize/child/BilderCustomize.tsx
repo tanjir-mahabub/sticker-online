@@ -46,7 +46,8 @@ const BilderCustomize = () => {
         FileState?.map(image => {
             dispatch(addImage({
                 id: image.id,
-                src: image.src
+                src: image.src,
+                category: 'image'
             }))
         });
     })

@@ -10,6 +10,7 @@ interface ImageState {
   height: number;
   scaleX: number;
   scaleY: number;
+  rotation: number;
   insideFrame: boolean;
 }
 

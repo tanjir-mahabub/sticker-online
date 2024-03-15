@@ -118,20 +118,33 @@ const GroupImagesComponent: React.FC<GroupImagesComponentProps> = ({ imagesInsid
 
     const handleSelect = (e: Konva.KonvaEventObject<MouseEvent> | Konva.KonvaEventObject<TouchEvent>) => {
         onSelect();
+
+        dispatch(setCanvasProperties({ selectionCancel: true }))
     };
 
+    const imagePreviews = useAppSelector(state => state.imagePreview)
+    const matchingImage = imagesInsideFrame?.find(frameImage =>
+        imagePreviews?.images.some(previewImage => previewImage.id === frameImage.id)
+    );
 
 
     return (
         <>
             <KonvaImage
-                name='die-cut-bg'
+                name="die-cut-image"
                 image={konvaImageObj} // This is now always either an HTMLImageElement or undefined
                 ref={dieCutImgRef}
                 // width={frameWidth}
                 // height={frameHeight}
                 // x={centerX - frameWidth / 2}
-                // y={centerY - frameHeight / 2}               
+                // y={centerY - frameHeight / 2}    
+                // x={matchingImage?.x || 0}
+                // y={matchingImage?.y || 0}
+                // width={matchingImage?.width}
+                // height={matchingImage?.height}
+                // scaleX={matchingImage?.scaleX}
+                // scaleY={matchingImage?.scaleY}
+                // rotation={matchingImage?.rotation}
                 shadowEnabled
                 shadowBlur={15}
                 shadowColor='gray'

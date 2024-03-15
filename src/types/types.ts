@@ -19,6 +19,7 @@ export interface ImageData {
 export interface ImageInfo {
   id: string;
   src: string;
+  category?: string;
   x?: number;
   y?: number;
   width?: number;
@@ -39,6 +40,7 @@ export interface CanvasState {
   hojd: number;
   scale: number;
   grow: number;
+  selectionCancel?: boolean;
 }
 
 

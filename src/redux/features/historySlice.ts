@@ -7,6 +7,7 @@ interface Position {
   height?: number;
   scaleX?: number;
   scaleY?: number;
+  rotation?: number;
 }
 
 interface ObjectHistory {
