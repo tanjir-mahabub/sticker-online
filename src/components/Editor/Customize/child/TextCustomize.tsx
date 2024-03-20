@@ -63,12 +63,12 @@ const TextCustomize: React.FC = () => {
     return (
         <div className="w-full h-full overflow-auto pb-10">
             <div className="p-4 space-y-5 overflow-y-auto">
-                <h2 className="text-sm sm:text-lg font-bold">Lägg till text</h2>
+                <h2 className="text-sm sm:text-base lg:text-lg font-bold">Lägg till text</h2>
             </div>
 
-            <div className="flex flex-wrap flex-grow justify-start items-center gap-3 p-3">
+            <div className="grid grid-cols-2 xl:grid-cols-3 justify-start items-center gap-3 px-3">
                 {customizeFonts.map(customFonts => (
-                    <div key={customFonts.id} className={`${selectedFont === customFonts.id ? 'border-2 border-orange-300' : 'border-gray-300/70'} bg-so-deep-gray flex justify-center items-center w-20 h-20 rounded cursor-pointer hover:shadow-md border`}
+                    <div key={customFonts.id} className={`${selectedFont === customFonts.id ? 'border-2 border-orange-300' : 'border-gray-300/70'} bg-so-deep-gray flex justify-center items-center w-full h-20 rounded cursor-pointer hover:shadow-md border`}
                         onClick={() => setSelectedFont(customFonts.id)}
                     >
                         <p className={`${customFonts.font.className} text-lg`}>
@@ -87,15 +87,15 @@ const TextCustomize: React.FC = () => {
                         onFontSizeChange={handleFontSizeChange}
                     />
                 </div>
-                <div className='relative flex gap-2 py-5'>
+                <div className='relative flex gap-2 py-5 z-10'>
                     {isColorPickerVisible && (
-                        <div className='absolute left-0 bottom-[75px]'>
+                        <div className='absolute left-0 bottom-[75px] z-20'>
                             <ColorInput
                                 sketch
                                 defaultColor={selectedColor}
                                 onColorChange={setSelectedColor}
                                 styles={{
-                                    width: '90%',
+                                    width: '100%',
                                     margin: 'auto',
                                     // padding: '10px 5px 5px 5px',
                                     borderRadius: '3px'
@@ -103,7 +103,7 @@ const TextCustomize: React.FC = () => {
                             />
                         </div>
                     )}
-                    <p className='leading-7'>Text Color</p>
+                    <p className='text-xs font-bold leading-7'>Color</p>
                     <button onClick={toggleColorPicker} className="w-7 h-7 border border-black/30 rounded shadow" style={{ background: `${selectedColor}` }}></button>
                 </div>
 

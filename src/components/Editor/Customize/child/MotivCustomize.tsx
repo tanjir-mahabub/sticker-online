@@ -70,17 +70,17 @@ const MotivCustomize = () => {
     return (
         <div className="h-full">
             <div className="w-full h-[90%]">
-                <div className="p-4 space-y-5 overflow-y-auto">
-                    <h2 className="text-sm sm:text-lg font-bold">Lägg till motiv</h2>
+                <div className="p-4 space-y-3 lg:space-y-5 overflow-y-auto">
+                    <h2 className="text-sm md:text-base xl:text-lg font-bold">Lägg till motiv</h2>
                     <div>
-                        <label htmlFor="Kategori" className="block text-sm font-bold text-gray-700">
+                        <label htmlFor="Kategori" className="block text-xs lg:text-sm font-bold text-gray-700">
                             Kategori
                         </label>
                         <MotiveCategoryDropdown selectedOption={selectedMotiveCategory} onChange={setSelectedMotiveCategory} />
                     </div>
                 </div>
 
-                <div className="flex flex-wrap flex-grow justify-start items-center gap-3 p-3">
+                <div className="flex flex-wrap flex-grow justify-start items-center gap-3 px-3">
                     {motiveStore.map(motiv => {
                         if (motiv.category == selectedMotiveCategory) {
                             return motiv.icons.map((icon, idx) => (
@@ -106,7 +106,7 @@ const MotivCustomize = () => {
                         className="max-h-24 max-w-full w-full h-auto"
                     />
                 </div>
-                <p className="text-sm font-semibold">Ta bort  alla  motiv</p>
+                <p className="text-xs lg:text-sm font-semibold">Ta bort  alla  motiv</p>
             </div>
         </div>
     )

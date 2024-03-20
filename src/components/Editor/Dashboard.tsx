@@ -100,7 +100,7 @@ const Dashboard = () => {
 
 
     return (
-        <div ref={divRef} className="relative top-0 left-0 w-[75vw] overflow-hidden border-l bg-so-deep-gray">
+        <div ref={divRef} className="relative top-0 left-0 w-full overflow-hidden border-l bg-so-deep-gray">
             {CanvasProps && (
                 // <Canvas {...CanvasProps} />
                 <RaphaelComponentNoSSR />

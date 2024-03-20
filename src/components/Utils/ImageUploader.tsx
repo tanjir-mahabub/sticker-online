@@ -46,13 +46,13 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload }) => {
                 </div>
                 <input {...getInputProps()} />
                 {isDragActive ? (
-                    <p className="text-sm font-bold">Släpp bilderna här...</p>
+                    <p className="text-xs lg:text-sm font-bold">Släpp bilderna här...</p>
                 ) : (
-                    <p className="text-sm font-bold">Lägg till eller dra filer</p>
+                    <p className="text-xs lg:text-sm font-bold">Lägg till eller dra filer</p>
                 )}
             </div>
 
-            <div className="text-sm">
+            <div className="text-xs lg:text-sm">
                 <p><b>Accept file types:</b> png, jpg, svg, pdf</p>
                 <p><b>Max file size:</b> 10 MB</p>
             </div>

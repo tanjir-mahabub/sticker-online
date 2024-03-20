@@ -25,11 +25,11 @@ const SidebarNav = () => {
     return (
         <div className="flex flex-col w-full justify-center divide-y divide-white/30 pb-5">
             {sideNavs && sideNavs.map(nav => (
-                <div key={nav.id} className={`flex flex-col items-center gap-3 pt-2.5 pb-3 cursor-pointer group ${(nav.id === selected.id) ? "bg-white" : "hover:bg-so-deep-gray/80"}`} onClick={() => sideNavDispatch(selectedSideNav({ id: nav.id }))}>
-                    <div className="w-[28px]">
-                        <Image src={nav.icon} alt={nav.name} width={25} height={25} className={`w-full h-auto group-hover:filter group-hover:invert ${(nav.id === selected.id) ? "filter invert" : ""}`} />
+                <div key={nav.id} className={`flex flex-col items-center 2xl:gap-1.5 pt-2.5 pb-3 px-3 cursor-pointer group ${(nav.id === selected.id) ? "bg-white" : "hover:bg-so-deep-gray/80"}`} onClick={() => sideNavDispatch(selectedSideNav({ id: nav.id }))}>
+                    <div className="w-[22px]">
+                        <Image src={nav.icon} alt={nav.name} width={20} height={20} className={`w-full h-auto group-hover:filter group-hover:invert ${(nav.id === selected.id) ? "filter invert" : ""}`} />
                     </div>
-                    <h4 className={`text-xs font-semibold group-hover:text-black ${(nav.id === selected.id) ? "text-black" : ""}`}>{nav.name}</h4>
+                    <h4 className={`text-xxs xl:text-xs font-semibold group-hover:text-black ${(nav.id === selected.id) ? "text-black" : ""}`}>{nav.name}</h4>
                 </div>
             ))}
         </div>

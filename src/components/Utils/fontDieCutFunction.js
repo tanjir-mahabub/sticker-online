@@ -1,5 +1,3 @@
-import d3 from 'd3';
-import opentype from 'opentype';
 import "../../lib/geom";
 
 export const fontDieCutFunction = (inputText, fontFamilyPath, fontSize, svgWidth, svgHeight, fillColor, strokeColor, strokeWidth) => {
@@ -30,6 +28,7 @@ export const fontDieCutFunction = (inputText, fontFamilyPath, fontSize, svgWidth
                 </svg>`;
 
             drawImageOutline(svgString, svgWidth, svgHeight);
+            console.log('opentype running', svgString);
 
         }        
     });
@@ -60,6 +59,8 @@ export const fontDieCutFunction = (inputText, fontFamilyPath, fontSize, svgWidth
           
         };
         img.src = imgSrc;
+
+        console.log('drawImageoutline');
     }
 
     const redraw = (img, ctx, cw, ch, points, pngUrl) => {
@@ -84,7 +85,7 @@ export const fontDieCutFunction = (inputText, fontFamilyPath, fontSize, svgWidth
         ctx.fillRect(0, 0, cw, ch); 
 
         
-        const svg = d3.select('#svg');
+        const svg = d3.select('svg');
         svg.append('image')
             .attr('xlink:href', pngUrl)
             .attr('width', img.width)
@@ -110,6 +111,7 @@ export const fontDieCutFunction = (inputText, fontFamilyPath, fontSize, svgWidth
             
         
         combineTextPaths();
+        console.log('redrawing');
     }
 
 
@@ -131,7 +133,7 @@ export const fontDieCutFunction = (inputText, fontFamilyPath, fontSize, svgWidth
         combinedPath.setAttribute('stroke', 'red');
         combinedPath.setAttribute('stroke-width', '10');
         
-    
+    console.log(combinedPath);
         // Optionally, clear existing paths and append the combined path
         svg.innerHTML = ''; // Caution: This removes all existing children of the SVG
         svg.appendChild(combinedPath);

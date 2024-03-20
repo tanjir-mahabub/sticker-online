@@ -11,6 +11,9 @@ import { useAppSelector } from "@/redux/store"
 import { useDispatch } from "react-redux"
 import { addImages } from "@/redux/features/imagePreviewSlice"
 import { ImageInfo } from "@/types/types"
+import Head from "next/head"
+import Script from "next/script"
+import OverlayPopUp from "@/components/Utils/OverlayPopUp"
 
 const Editor = () => {
     const { data: previewImages, updateData: updatePreviewImages } = useImageStorage('imageStore');
@@ -45,16 +48,23 @@ const Editor = () => {
 
     return (
         <section>
-            <div className="h-auto">
-                <Header />
-            </div>
-            <div className="flex divide-x h-[78vh]">
-                <Sidebar />
-                <Customize />
-                <Dashboard />
-            </div>
-            <div className="h-auto">
-                <Footer />
+            <Script src="https://d3js.org/d3.v7.min.js" strategy="lazyOnload" />
+            <Script src="https://unpkg.com/opentype.js/dist/opentype.min.js" strategy="lazyOnload" />
+
+            <div className="grid">
+                <div className="h-auto">
+                    <Header />
+                </div>
+                <div className="flex overflow-hidden divide-x h-[78vh]">
+                    <Sidebar />
+                    <Customize />
+                    <Dashboard />
+                </div>
+                <div className="h-auto">
+                    <Footer />
+                </div>
+
+                <OverlayPopUp />
             </div>
         </section>
     )

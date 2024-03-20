@@ -36,7 +36,7 @@ const TextInput: React.FC<TextInputProps> = ({ value, fontSize, onChange, onFont
     return (
         <div className="relative w-full flex flex-col gap-2">
             <div className=''>
-                <label htmlFor="text">Text Input</label>
+                <label htmlFor="text" className='font-bold text-xs'>Text Input</label>
                 <input
                     type="text"
                     id="text"
@@ -47,11 +47,11 @@ const TextInput: React.FC<TextInputProps> = ({ value, fontSize, onChange, onFont
                     onChange={handleChange}
                     maxLength={maxChars}
                 />
-                <span className="text-xs">{`Remaining characters: ${remainingChars}`}</span>
+                <span className="text-xxs">{`Remaining characters: ${remainingChars}`}</span>
             </div>
 
             <div>
-                <label htmlFor="fontSize">Font Size</label>
+                <label htmlFor="fontSize" className='font-bold text-xs'>Font Size</label>
                 <div className="flex items-center">
                     <input
                         type="number"
