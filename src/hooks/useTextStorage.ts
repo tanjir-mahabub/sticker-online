@@ -16,37 +16,21 @@ export const useTextStorage = (key: string) => {
 
   useEffect(() => {
     const storedDataString = localStorage.getItem(key);
-    if (storedDataString) {
-      const storedData = JSON.parse(storedDataString) as TextData[];
-      setData(storedData);
-    }
+    // Ensure data is initialized as an empty array if storedDataString is null
+    const storedData = storedDataString ? JSON.parse(storedDataString) as TextData[] : [];
+    setData(storedData);
   }, [key]);
 
   const updateData = (newData: TextData) => {
-    const updatedData = [...data];
-  
-    const existingDataIndex = updatedData.findIndex(d => 
-      d.x === newData.x && 
-      d.y === newData.y && 
-      d.fontID === newData.fontID && 
-      d.fontFamily === newData.fontFamily && 
-      d.text === newData.text && 
-      d.fontSize === newData.fontSize && 
-      d.fill === newData.fill
-    );
-  
-    if (existingDataIndex !== -1) {
-      // Update existing data
-      updatedData[existingDataIndex] = newData;
-    } else {
-      // Add new data
-      updatedData.push(newData);
-    }
+    // Initialize updatedData as a copy of data, ensuring it's always an array
+    const updatedData = Array.isArray(data) ? [...data] : [];
+
+    // Add new data
+    updatedData.push(newData);
   
     setData(updatedData);
     localStorage.setItem(key, JSON.stringify(updatedData));
   };
-  
 
   return { data, updateData };
 };

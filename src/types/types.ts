@@ -15,6 +15,15 @@ export interface ImageData {
   file: string;
 }
 
+export interface CanvasProps {
+  width?: number;
+  height?: number;
+  frameWidth?: number;
+  frameHeight?: number;
+  centerX?: number,
+  centerY?: number,
+  scale?: number
+}
 
 export interface ImageInfo {
   id: string;
@@ -62,3 +71,10 @@ export interface ObjectPosition {
   width: number;
   height: number;
 }
+
+export type BoundingBox = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};

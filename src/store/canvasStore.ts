@@ -1,6 +1,6 @@
 import { ImageProps } from "@/components/Editor/CanvasTools/Image";
 import { RectangleProps } from "@/components/Editor/CanvasTools/Rectangle";
-import { TextProps } from "@/components/Editor/CanvasTools/Text";
+
 
 export const initialRectangles: RectangleProps['shapeProps'][] = [
     {
@@ -45,20 +45,5 @@ export const initialImages: ImageProps['imageProps'][] = [
         height: 200,
         src: '/editor/sidebar/spiderman.png',
         id: 'img2',
-    },
-];
-
-export const initialTexts: TextProps['textProps'][] = [
-    {
-        x: 50,
-        y: 300,
-        text: 'Sample Text',
-        fontSize: 36,
-        fontFamily: 'Arial',
-        fill: 'blue',
-        id: 'text1',
-        width: 350, // Add a default width value
-        height: 80, 
-        padding: 20
     },
 ];

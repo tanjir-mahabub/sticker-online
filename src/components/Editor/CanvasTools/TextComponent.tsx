@@ -47,7 +47,7 @@ const TextComponent: React.FC<TextProps> = ({ textProps, isSelected, onSelect, o
             trRef.current.moveToTop();
             trRef.current.getLayer()?.batchDraw();
 
-            console.log(textRef.current);
+            // console.log(textRef.current);
         }
     }, [isSelected]);
 
@@ -101,7 +101,7 @@ const TextComponent: React.FC<TextProps> = ({ textProps, isSelected, onSelect, o
                 pixelRatio: pixelRatio,
                 callback(img) {
                     const dataURL = img.src;
-                    console.log(dataURL);
+                    // console.log(dataURL);
                     dispatch(addImage({
                         id: generateUniqueId(),
                         src: dataURL,

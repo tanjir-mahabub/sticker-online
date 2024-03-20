@@ -33,7 +33,7 @@ const TextCustomize: React.FC = () => {
 
     const AddText = () => {
         const newID = generateUniqueId();
-        let startX = 100;
+        let startX = 200;
         let startY = 100;
         const gap = 20;
 
@@ -61,7 +61,7 @@ const TextCustomize: React.FC = () => {
 
 
     return (
-        <div onClick={() => isColorPickerVisible && setIsColorPickerVisible(false)} className="w-full h-full overflow-auto pb-10">
+        <div className="w-full h-full overflow-auto pb-10">
             <div className="p-4 space-y-5 overflow-y-auto">
                 <h2 className="text-sm sm:text-lg font-bold">Lägg till text</h2>
             </div>

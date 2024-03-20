@@ -13,20 +13,10 @@ import { useImageStorage } from '@/hooks/useImageStorage';
 import CustomTransformer from '@/components/Utils/CustomTransformer';
 import { addFiles } from '@/redux/features/fileUploadSlice';
 import GroupImagesComponent, { GroupImagesComponentProps } from './GroupImagesComponent';
-import { ImageInfo } from '@/types/types';
+import { CanvasProps, ImageInfo } from '@/types/types';
 import { setCanvasProperties } from '@/redux/features/canvasSlice';
 import { TextProps } from './TextComponent';
 
-
-interface CanvasProps {
-    width?: number;
-    height?: number;
-    frameWidth?: number;
-    frameHeight?: number;
-    centerX?: number,
-    centerY?: number,
-    scale?: number
-}
 
 const NewCanvas: React.FC<CanvasProps> = ({
     width = 0,

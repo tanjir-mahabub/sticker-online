@@ -40,3 +40,60 @@ div.w-color-interactive:nth-child(1) {
 /* body {
     cursor: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzUiIGhlaWdodD0iMzUiIHZpZXdCb3g9IjAgMCAzNSAzNSIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4NCjxjaXJjbGUgY3g9IjE3LjUiIGN5PSIxNy41IiByPSIxNy41IiBmaWxsPSIjMTIxMjEyIi8+DQo8ZyBjbGlwLXBhdGg9InVybCgjY2xpcDBfMTc1XzQ5NTQpIj4NCjxwYXRoIGQ9Ik0yNy4wODM0IDkuNjY2NjlWMTUuMTY2N0gyMS41ODM0IiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPg0KPHBhdGggZD0iTTI0Ljc4MjUgMTkuNzVDMjQuMTg2NiAyMS40MzY2IDIzLjA1ODcgMjIuODgzOCAyMS41Njg4IDIzLjg3MzZDMjAuMDc4OCAyNC44NjM0IDE4LjMwNzYgMjUuMzQyMiAxNi41MjE5IDI1LjIzNzdDMTQuNzM2MiAyNS4xMzMyIDEzLjAzMjggMjQuNDUxMiAxMS42Njg0IDIzLjI5NDRDMTAuMzA0IDIyLjEzNzcgOS4zNTI2MSAyMC41Njg4IDguOTU3NDcgMTguODI0MkM4LjU2MjM0IDE3LjA3OTYgOC43NDQ5MSAxNS4yNTM5IDkuNDc3NjggMTMuNjIyMUMxMC4yMTA0IDExLjk5MDQgMTEuNDUzNyAxMC42NDEgMTMuMDIwMSA5Ljc3NzI0QzE0LjU4NjUgOC45MTM1NCAxNi4zOTEyIDguNTgyMzMgMTguMTYyMyA4LjgzMzU0QzE5LjkzMzMgOS4wODQ3NSAyMS41NzQ3IDkuOTA0NzUgMjIuODM5MSAxMS4xN0wyNy4wODMzIDE1LjE2NjciIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+DQo8L2c+DQo8ZGVmcz4NCjxjbGlwUGF0aCBpZD0iY2xpcDBfMTc1XzQ5NTQiPg0KPHJlY3Qgd2lkdGg9IjIyIiBoZWlnaHQ9IjIyIiBmaWxsPSJ3aGl0ZSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNiA2KSIvPg0KPC9jbGlwUGF0aD4NCjwvZGVmcz4NCjwvc3ZnPg0K'), move;
   } */
+
+  .handle.bbox.side.index-0.axis-y,
+  .handle.bbox.side.index-2.axis-y,
+  .handle.bbox.side.index-3.axis-x,
+  .handle.bbox.side.index-1.axis-x,
+  .handle.arm.axis-y {
+    display: none;
+  }
+
+  /* .handle.bbox.corner.index-1.axis-x,
+  .handle.bbox.corner.index-3.axis-x {
+    cursor: ne-resize;
+  }
+
+  .handle.bbox.corner.index-0.axis-y,
+  .handle.bbox.corner.index-2.axis-y {
+    cursor: se-resize;
+  } */
+
+  svg text {
+    -webkit-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
+}
+
+svg.radial-loader {
+  background: rgba(0,0,0,.8);
+  border-radius: 10%;
+  box-shadow: 0 5px 10px 0 rgba(0,0,0,.5);
+  z-index: 10
+}
+
+svg.radial-loader .radial-loader__circle {
+  stroke-dasharray: 10 5.5;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+  transition: stroke-dashoffset .35s
+}
+
+svg.radial-loader[data-mode=buffer] .radial-loader__circle {
+  -webkit-animation: rotate 2.5s linear infinite;
+  animation: rotate 2.5s linear infinite;
+  transform: rotate(0deg)
+}
+
+@-webkit-keyframes rotate {
+  to {
+      -webkit-transform: rotate(1turn)
+  }
+}
+
+@keyframes rotate {
+  to {
+      transform: rotate(1turn)
+  }
+}

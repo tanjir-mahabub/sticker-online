@@ -113,7 +113,7 @@ const Text: React.FC<TextProps> = ({ textProps, isSelected, onSelect, onChange }
             trRef.current.nodes([textRef.current]);
             trRef.current.getLayer()?.batchDraw();
 
-            console.log(textRef.current);
+            // console.log(textRef.current);
         }
     }, [isSelected]);
 

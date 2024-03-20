@@ -207,7 +207,7 @@ const ImageComponent: React.FC<ImageProps> = ({ imageProps, isSelected, onSelect
                         dispatch(updateImages({ id: node.id(), attrs: updatePosition }))
 
 
-                        console.log(node.attrs);
+                        // console.log(node.attrs);
 
                     }
                 }}
