@@ -9,6 +9,7 @@ import motivReducer from './features/motivSlice';
 import historyReducer from './features/historySlice';
 import insideFrameReducer from './features/insideFrameSlice';
 import imagePreviewReducer from './features/imagePreviewSlice';
+import popupReducer from './features/popupSlice';
 
 const store = configureStore({
   reducer: {
@@ -20,7 +21,8 @@ const store = configureStore({
     motiv: motivReducer,
     history: historyReducer,
     insideFrame: insideFrameReducer,
-    imagePreview: imagePreviewReducer
+    imagePreview: imagePreviewReducer,
+    popup: popupReducer,
   },
 });
 

@@ -42,7 +42,7 @@ const MaterialDropdown: React.FC<MaterialDropdownProps> = ({ selectedOption, onC
                 <span className={`transition transform ${isOpen ? 'rotate-180' : ''}`}><Image src={'/downArrow.svg'} alt='down-arrow' width={11} height={11} /></span>
             </button>
             {isOpen && (
-                <div className={`absolute left-0 bottom-[92px] mb-2 w-[600px] bg-white border border-gray-300 divide-x rounded-md z-50 overflow-auto grid grid-cols-2 `}>
+                <div className={`absolute left-0 bottom-[92px] mb-2 w-[600px] bg-white border border-gray-300 divide-x rounded-md z-50 grid grid-cols-2 overflow-hidden`}>
                     <ul className="w-full">
                         <MaterialOptions materials={firstHalfOptions} />
                     </ul>

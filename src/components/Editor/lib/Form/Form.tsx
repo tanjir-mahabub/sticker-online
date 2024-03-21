@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
 import LaminatDropdown from './LaminatDropdown';
 import MaterialDropdown from './MaterialDropdown';
-import AntalDropdown from './AntalDropdown';
 import DimensionInput from './DimensionInput';
+import AntalDropdown from './AntalDropdown';
 
 const Form = () => {
     const [selectedLaminat, setSelectedLaminat] = useState('Glansig');
     const [selectedMaterial, setSelectedMaterial] = useState('Vinyl');
-    const [selectedAntal, setSelectedAntal] = useState('100 st');
+    const [selectedAntal, setSelectedAntal] = useState({
+        st: "10 st",
+        amount: "240kr",
+        rate: "24,5kr / st"
+    });
 
     return (
         <form className="">
