@@ -23,8 +23,8 @@ const OverlayPopUp = () => {
                         <h2 className="text-sm lg:text-lg font-bold">{content.title}</h2>
                         <div onClick={() => dispatch(hidePopup())} className="">
                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M2 18L18 2" stroke="#121212" stroke-width="3" />
-                                <path d="M2 2L18 18" stroke="#121212" stroke-width="3" />
+                                <path d="M2 18L18 2" stroke="#121212" strokeWidth="3" />
+                                <path d="M2 2L18 18" stroke="#121212" strokeWidth="3" />
                             </svg>
 
                         </div>

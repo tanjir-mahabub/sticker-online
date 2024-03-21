@@ -42,8 +42,10 @@ export const imagePreviewSlice = createSlice({
       state.images = state.images.filter(image => image.id !== action.payload);
     },
     // Action to clear all images
-    clearImages: (state) => {
-      state.images = [];
+    clearImages: (state, action: PayloadAction<string>) => {
+      const category = action.payload;
+      // Filter out images that match the given category
+      state.images = state.images.filter(image => image.category !== category);      
     },
   },
 });

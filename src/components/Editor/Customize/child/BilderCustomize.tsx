@@ -31,6 +31,7 @@ const BilderCustomize = () => {
 
         Promise.all(imagesData).then((imageDataArray) => {
             const newImageStore = [...imageDataArray];
+            dispatch(deleteAllFiles())
             dispatch(addFiles(newImageStore));
         });
 
@@ -38,8 +39,8 @@ const BilderCustomize = () => {
 
     const handleDeleteBTN = () => {
         dispatch(deleteAllFiles());
-        updatePreviewImages([]);
-        dispatch(clearImages())
+        updatePreviewImages(previewImages.filter((img) => img.category !== 'image'));
+        dispatch(clearImages("image"));
     }
 
     useEffect(() => {

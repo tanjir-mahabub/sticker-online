@@ -5,15 +5,17 @@ import Image from "next/image";
 import { useImageStorage } from "@/hooks/useImageStorage";
 import { useDispatch } from "react-redux";
 import { addMotiv, deleteAllMotiv } from "@/redux/features/motivSlice";
-import { addFiles } from "@/redux/features/fileUploadSlice";
+import { addFiles, deleteAllFiles } from "@/redux/features/fileUploadSlice";
 import { useAppSelector } from "@/redux/store";
-import { addImage } from "@/redux/features/imagePreviewSlice";
+import { addImage, clearImages } from "@/redux/features/imagePreviewSlice";
 import { generateUniqueId } from "@/components/Utils/functions";
 
 const MotivCustomize = () => {
     const [MotivDeleted, setMotivDeleted] = useState(false);
 
-    const { data: previewImages, updateData: updatePreviewImages } = useImageStorage('motivStore');
+    const [selectedMotiv, setSelectedMotive] = useState('');
+
+    const { data: previewImages, updateData: updatePreviewImages } = useImageStorage('imageStore');
 
     const [selectedMotiveCategory, setSelectedMotiveCategory] = useState('Populära');
 
@@ -22,50 +24,58 @@ const MotivCustomize = () => {
     const imagePreviews = useAppSelector(state => state.imagePreview);
     const FileState = useAppSelector(state => state.file)
 
-    // Function to convert image URL to data URL
-    const imageUrlToDataURL = async (imageUrl: string) => {
-        // Fetch the image as a blob
+    const imageUrlToDataURL = async (imageUrl: string): Promise<string> => {
         const response = await fetch(imageUrl);
         const blob = await response.blob();
 
-        // Convert blob to data URL
-        return new Promise((resolve, reject) => {
+        return new Promise<string>((resolve, reject) => {
             const reader = new FileReader();
             reader.onload = () => {
-                const imageData = reader.result as string;
-                resolve(imageData);
+                // Use a type assertion here to inform TypeScript that reader.result is expected to be a string.
+                const result = reader.result;
+                if (typeof result === 'string') {
+                    resolve(result);
+                } else {
+                    reject('Failed to convert blob to data URL');
+                }
             };
-            reader.onerror = reject;
+            reader.onerror = error => reject(error);
             reader.readAsDataURL(blob);
         });
     };
 
+    const handleMotivClick = async (icon: string) => {
+        try {
+            const dataUrl = await imageUrlToDataURL(icon);
+            dispatch(deleteAllFiles())
+            dispatch(addFiles([dataUrl]));
 
-    const handleMotivClick = (icon: string) => {
-
-        // Example usage
-        imageUrlToDataURL(icon)
-            .then((dataUrl) => {
-                // console.log('Data URL:', dataUrl);
-                const newImageStore: any = [...previewImages, dataUrl];
-                dispatch(addImage({
-                    id: generateUniqueId(),
-                    src: newImageStore,
-                    category: 'motiv',
-                }))
-            })
-            .catch((error) => {
-                console.error('Error converting image to data URL:', error);
-            });
+        } catch (error) {
+            console.error('Error converting image to data URL:', error);
+        }
     }
+
 
     const handleDeleteBTN = () => {
-        // dispatch(deleteAllMotiv());
-        setMotivDeleted(true);
-
-        updatePreviewImages([])
+        dispatch(deleteAllFiles())
+        updatePreviewImages(previewImages.filter((img) => img.category !== 'motiv'));
+        dispatch(clearImages("motiv"));
 
     }
+
+    useEffect(() => {
+        FileState?.map(image => {
+            dispatch(deleteAllFiles())
+
+            dispatch(addImage({
+                id: image.id,
+                src: image.src,
+                category: 'motiv'
+            }))
+        });
+    })
+
+
 
     return (
         <div className="h-full">

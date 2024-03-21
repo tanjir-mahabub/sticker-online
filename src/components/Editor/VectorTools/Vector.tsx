@@ -4,7 +4,6 @@ import '@/lib/raphael.free_transform'; // Ensure this path is correct
 import { CustomTransform } from './CustomTransform'; // Adjust the import path as needed
 import { RaphaelPaper, useRaphaelElements } from '@/hooks/useRaphaelElements'; // Adjust the import path
 import { useImageStorage } from '@/hooks/useImageStorage';
-import d3 from 'd3'
 import { useTextStorage } from '@/hooks/useTextStorage';
 import { useAppSelector } from '@/redux/store';
 import RangeSlider from "../Customize/child/Input/RangeSlider";
@@ -14,6 +13,7 @@ import { BoundingBox, Frame } from '@/types/types';
 import { calculateFrameEdges, isObjectInsideFrame } from '@/components/Utils/functions';
 import Spinner from '@/components/Utils/Spinner';
 import { fontDieCutFunction } from '@/components/Utils/fontDieCutFunction';
+import { imageDieCutFunction } from '@/components/Utils/imageDieCutFunction';
 
 interface ExtendedRaphaelPaper extends RaphaelPaper {
     width: number;
@@ -21,6 +21,7 @@ interface ExtendedRaphaelPaper extends RaphaelPaper {
     forEach(callback: (el: any) => void): void;
     rect: (x: number, y: number, width: number, height: number, round?: number) => void;
     circle: (x: number, y: number, radius: number) => void;
+    path: (d: string) => void;
 }
 
 const Vector = () => {
@@ -35,7 +36,10 @@ const Vector = () => {
     const currentFtRef = useRef<any>(null);
     const { addImages, addTexts } = useRaphaelElements(paper);
 
+
     const StickerSelected = useAppSelector(state => state.sticker);
+    const FileState = useAppSelector(state => state.file);
+    const TextState = useAppSelector(state => state.text);
     const CanvasProperties = useAppSelector(state => state.canvas);
     const { centerX, centerY, frameWidth, frameHeight, bredd, hojd, grow } = CanvasProperties;
 
@@ -48,6 +52,9 @@ const Vector = () => {
             const width = raphaelRef.current.clientWidth;
             const height = raphaelRef.current.clientHeight;
             const paperInstance = new Raphael(raphaelRef.current, width, height);
+            const svgElement = paperInstance.canvas;
+            svgElement.id = "VECTORSVGId";
+
             const StickerMainWrapper = paperInstance.rect(0, 0, width, height).attr({
                 fill: "transparent",
                 stroke: "none"
@@ -96,7 +103,7 @@ const Vector = () => {
 
             const images: any = [];
             const texts: any = [];
-            previewImages.map((image, i) => {
+            previewImages?.map((image, i) => {
                 let img = {
                     src: image.src,
                     x: 10 * (i + 1), y: 10 * (i + 1), width: 350, height: 300,
@@ -113,8 +120,8 @@ const Vector = () => {
                 texts.push(txt)
             })
 
-
             const elements = addImages(images).concat(addTexts(texts));
+
             elements.forEach(el => {
                 el.click(() => {
                     if (currentFtRef.current && currentFtRef.current.subject.id !== el.id) {
@@ -128,6 +135,65 @@ const Vector = () => {
             });
         }
     }, [paper, addImages, addTexts, previewImages, previewTexts]);
+
+    useEffect(() => {
+        if (paper) {
+
+            const images: any = [];
+            console.log('motive', FileState);
+            FileState?.map((image, i) => {
+                let img = {
+                    src: image.src,
+                    x: 10 * (i + 1), y: 10 * (i + 1), width: 350, height: 300,
+                    attrs: { "opacity": 0.3, "cursor": "move" }
+                }
+                images.push(img)
+            })
+
+            console.log(images);
+            const elements = addImages(images)
+
+            elements.forEach(el => {
+                el.click(() => {
+                    if (currentFtRef.current && currentFtRef.current.subject.id !== el.id) {
+                        currentFtRef.current.unplug();
+                    }
+                    setSelectedItem(el);
+                    el.toFront();
+                    const ft = CustomTransform(el, {});
+                    currentFtRef.current = ft;
+                });
+            });
+        }
+    }, [paper, addImages, FileState]);
+
+    useEffect(() => {
+        if (paper) {
+            const texts: any = [];
+
+            TextState.selectedTexts.map((text, i) => {
+                let txt = {
+                    x: text.x, y: text.y, text: text.text,
+                    attrs: { "cursor": "move", "fill": text.fill, "font-size": text.fontSize, "font-family": text.fontFamily, "opacity": 0.3 }
+                }
+                texts.push(txt)
+            })
+
+            const elements = addTexts(texts)
+
+            elements.forEach(el => {
+                el.click(() => {
+                    if (currentFtRef.current && currentFtRef.current.subject.id !== el.id) {
+                        currentFtRef.current.unplug();
+                    }
+                    setSelectedItem(el);
+                    el.toFront();
+                    const ft = CustomTransform(el, {});
+                    currentFtRef.current = ft;
+                });
+            });
+        }
+    }, [paper, addTexts, TextState]);
 
     useEffect(() => {
         if (selectedItem && paper) {
@@ -210,7 +276,7 @@ const Vector = () => {
             );
 
         }
-    })
+    });
 
 
 
@@ -281,15 +347,38 @@ const Vector = () => {
     };
 
 
-    const handleDieCut = () => {
-        setIsLoading(true);
-        console.log('Die cut applying...', grow);
+    const handleDieCut = async () => {
 
-        // fontDieCutFunction("Sample Text", "/fonts/Ravi_Prakash/RaviPrakash-Regular.ttf", "40", "800", "300", "red", "red", "10")
+        // add all images and text inside frame
+        // if images then call imageDieCutFunction
 
-        setTimeout(() => {
-            setIsLoading(false);
-        }, 3000)
+        // setIsLoading(true);
+        // // console.log('Die cut applying...', grow);
+
+        // try {
+        //     const selectedText = ("Sample Text").replace(/\s+/g, '');
+
+        //     const newPathData = await fontDieCutFunction(selectedText, "/fonts/Ropa_Sans/RopaSans-Regular.ttf", 170, 1920, 300, "red", "red")
+        //     // console.log('New Path Data:', newPathData);
+
+        //     if (newPathData) {
+        //         const pathEL = paper?.path(newPathData)
+        //         /** @ts-ignore */
+        //         pathEL?.attr({
+        //             fill: "red",
+        //             stroke: "rgba(0,0,0,0.3)"
+        //         })
+
+        //     }
+
+        //     // const url = '/editor/sidebar/spiderman.png';
+        //     // const pathData = await imageDieCutFunction(url);
+        //     //console.log('Path Data:', pathData);
+
+        //     setIsLoading(false);
+        // } catch (error) {
+        //     console.error('Error:', error);
+        // }
     }
 
     return (
