@@ -12,7 +12,7 @@ const OverlayPopUp = () => {
     if (!isVisible || !content) return null;
 
     return (
-        <div className='absolute left-0 right-0 w-full h-full flex justify-center items-center bg-black/70 z-[200]'>
+        <div className='fixed left-0 right-0 w-full h-full flex justify-center items-center bg-black/70 z-[200] overflow-hidden'>
             <AnimateIn
                 from="opacity-0 translate-y-4"
                 to="opacity-100 translate-y-0 translate-x-0"

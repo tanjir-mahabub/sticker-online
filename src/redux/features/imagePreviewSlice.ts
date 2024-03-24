@@ -9,6 +9,7 @@ const initialState: ImagePreviewState = {
   images: [],
 };
 
+
 export const imagePreviewSlice = createSlice({
   name: 'imagePreview',
   initialState,
@@ -38,18 +39,41 @@ export const imagePreviewSlice = createSlice({
       state.images = state.images.filter(image => image.category !== categoryToRemove);
     },
     // Action to remove an image by id
-    removeImage: (state, action: PayloadAction<string>) => {
-      state.images = state.images.filter(image => image.id !== action.payload);
+    deleteImage: (state, action: PayloadAction<string>) => {
+      const id = action.payload;
+      // Filter out images that match the given category
+      state.images = state.images.filter(image => image.id !== id);  
     },
+    
     // Action to clear all images
     clearImages: (state, action: PayloadAction<string>) => {
       const category = action.payload;
       // Filter out images that match the given category
       state.images = state.images.filter(image => image.category !== category);      
     },
+     
+    updateImagePosition: (state, action: PayloadAction<{ id: string; x: number; y: number; width?: number; height?: number }>) => {
+      const { id, x, y, width, height } = action.payload;
+      const index = state.images.findIndex(image => image.id === id);
+      if (index !== -1) {
+        state.images[index] = { ...state.images[index], x, y,width, height };
+      }
+    },
+
+    // Inside your imagePreviewSlice reducers:
+
+updateElementAttributes: (state, action: PayloadAction<{ id: string; attributes: Partial<ImageInfo> }>) => {
+  const { id, attributes } = action.payload;
+  const index = state.images.findIndex(image => image.id === id);
+  if (index !== -1) {
+    state.images[index] = { ...state.images[index], ...attributes };
+  }
+},
+
+
   },
 });
 
-export const { addImage, addImages, updateImages, removeImage, clearImages } = imagePreviewSlice.actions;
+export const { addImage, addImages, updateImages, deleteImage, clearImages, updateImagePosition, updateElementAttributes } = imagePreviewSlice.actions;
 
 export default imagePreviewSlice.reducer;

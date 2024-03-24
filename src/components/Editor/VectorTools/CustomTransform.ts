@@ -1,4 +1,6 @@
-export const CustomTransform = (element: any, options = {}) => {
+
+export const CustomTransform = (element: any, options = {}, dispatch?: any) => {
+    
     if (!element) {
         return {
             unplug: () => {/* Handle deselection */}
@@ -24,9 +26,15 @@ export const CustomTransform = (element: any, options = {}) => {
 
     const transformOptions = { ...defaultOptions, ...options };
 
-    const ft = element.paper.freeTransform(element, transformOptions, (callback: CallableFunction) => {
-        // Transformation callback
-    });
+    const onTransform = (ft: any, events: any) => {
+      
+        
+    };
+    
+    
+
+
+    const ft = element.paper.freeTransform(element, transformOptions, onTransform);
 
     if (ft && ft.handles && typeof window !== "undefined" && document) {
 

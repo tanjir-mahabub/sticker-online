@@ -1,31 +1,59 @@
-import { TextData } from '@/hooks/useTextStorage';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+// Define the structure for text element's data
+interface TextElement {
+  id: string;
+  text: string;
+  x: number;
+  y: number;
+  fontSize: number;
+  fontFamily: string;
+  fill: string;
+  rotation?: number;
+  scaleX?: number;
+  scaleY?: number;
+}
+
+// Initial state of the text elements slice
 interface TextState {
-  selectedTexts: TextData[];
+  texts: TextElement[];
 }
 
 const initialState: TextState = {
-  selectedTexts: [],
+  texts: [],
 };
 
 const textSlice = createSlice({
   name: 'text',
   initialState,
   reducers: {
-    setTextValue: (state, action: PayloadAction<TextData>) => {
-      const index = state.selectedTexts.findIndex(text => text.id === action.payload.id);
-      if (index !== -1) {
-        state.selectedTexts[index] = action.payload;
+    // Add or update a text element based on its ID
+    upsertText: (state, action: PayloadAction<TextElement>) => {
+      const newText = action.payload;
+      const textIndex = state.texts.findIndex(text => text.id === newText.id);
+      if (textIndex !== -1) {
+        // Update existing text
+        state.texts[textIndex] = newText;
       } else {
-        state.selectedTexts.push(action.payload);
+        // Add new text
+        state.texts.push(newText);
       }
     },
-    removeTextValue: (state, action: PayloadAction<string>) => {
-      state.selectedTexts = state.selectedTexts.filter(text => text.id !== action.payload);
-    }
+
+    // Remove a text element by its ID
+    removeText: (state, action: PayloadAction<string>) => {
+      state.texts = state.texts.filter(text => text.id !== action.payload);
+    },
+
+    // Clear all text elements
+    clearTexts: (state) => {
+      state.texts = [];
+    },
   },
 });
 
-export const { setTextValue, removeTextValue } = textSlice.actions;
+// Export the actions
+export const { upsertText, removeText, clearTexts } = textSlice.actions;
+
+// Export the reducer
 export default textSlice.reducer;

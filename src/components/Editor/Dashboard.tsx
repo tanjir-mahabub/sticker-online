@@ -5,12 +5,6 @@ import { useAppSelector } from '@/redux/store';
 import { useDispatch } from 'react-redux';
 import { setCanvasProperties } from '@/redux/features/canvasSlice';
 
-
-const Canvas = dynamic(() => import('./CanvasTools/Canvas'), {
-    loading: () => <Loading />,
-    ssr: false,
-});
-
 const RaphaelComponentNoSSR = dynamic(() => import('@/components/Editor/VectorTools/Vector'), {
     ssr: false, // This line disables server-side rendering
 });
@@ -26,8 +20,6 @@ const Dashboard = () => {
     const CanvasProperties = useAppSelector(state => state.canvas);
 
     const { centerX, centerY, frameWidth, frameHeight } = CanvasProperties;
-
-    const FileState = useAppSelector(state => state.file)
 
     useEffect(() => {
         const handleResize = () => {
@@ -102,7 +94,6 @@ const Dashboard = () => {
     return (
         <div ref={divRef} className="relative top-0 left-0 w-full overflow-hidden border-l bg-so-deep-gray">
             {CanvasProps && (
-                // <Canvas {...CanvasProps} />
                 <RaphaelComponentNoSSR />
             )}
         </div>
