@@ -61,8 +61,16 @@ const historySlice = createSlice({
         state.objectHistories[objectHistoryIndex].historyStep += 1;
       }
     },
+    deleteHistoryById: (state, action: PayloadAction<string>) => {
+      const objectIdToDelete = action.payload;
+      state.objectHistories = state.objectHistories.filter(obj => obj.objectId !== objectIdToDelete);
+    },
+
+    clearAllHistories: (state) => {
+      state.objectHistories = [];
+    },
   },
 });
 
-export const { addedToHistory, undo, redo } = historySlice.actions;
+export const { addedToHistory, undo, redo, deleteHistoryById, clearAllHistories } = historySlice.actions;
 export default historySlice.reducer;

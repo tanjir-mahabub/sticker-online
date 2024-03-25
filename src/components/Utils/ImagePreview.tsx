@@ -7,7 +7,7 @@ interface ImageProps {
 
 const ImagePreview: React.FC<ImageProps> = ({ images }) => {
 
-    console.log(images.filter(image => image.category === 'image'));
+    // console.log(images.filter(image => image.category === 'image'));
 
 
     return (

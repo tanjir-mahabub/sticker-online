@@ -30,6 +30,9 @@ const textSlice = createSlice({
     // Add or update a text element based on its ID
     upsertText: (state, action: PayloadAction<TextElement>) => {
       const newText = action.payload;
+      if (!state.texts) {
+        state.texts = []; // Ensure texts is an array if it's not already
+      }
       const textIndex = state.texts.findIndex(text => text.id === newText.id);
       if (textIndex !== -1) {
         // Update existing text
@@ -49,11 +52,19 @@ const textSlice = createSlice({
     clearTexts: (state) => {
       state.texts = [];
     },
+
+    updateTextElementAttributes: (state, action: PayloadAction<{ id: string; attributes: Partial<TextElement> }>) => {
+      const { id, attributes } = action.payload;
+      const index = state.texts.findIndex(text => text.id === id);
+      if (index !== -1) {
+        state.texts[index] = { ...state.texts[index], ...attributes };
+      }
+    },
   },
 });
 
 // Export the actions
-export const { upsertText, removeText, clearTexts } = textSlice.actions;
+export const { upsertText, removeText, clearTexts, updateTextElementAttributes } = textSlice.actions;
 
 // Export the reducer
 export default textSlice.reducer;

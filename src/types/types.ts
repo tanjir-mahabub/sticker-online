@@ -23,7 +23,7 @@ export interface CanvasProps {
 
 export interface ImageInfo {
   id: string;
-  src?: string;
+  src: string;
   category?: string;
   x?: number;
   y?: number;

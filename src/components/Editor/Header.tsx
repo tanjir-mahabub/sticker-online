@@ -13,13 +13,13 @@ const Header = () => {
     const objectHistories = useAppSelector((state: RootState) => state.history.objectHistories);
 
     const handleUndo = () => {
-        objectHistories.forEach((objectHistory) => {
+        objectHistories?.forEach((objectHistory) => {
             dispatch(undo(objectHistory.objectId));
         });
     };
 
     const handleRedo = () => {
-        objectHistories.forEach((objectHistory) => {
+        objectHistories?.forEach((objectHistory) => {
             dispatch(redo(objectHistory.objectId));
         });
     };
@@ -27,12 +27,15 @@ const Header = () => {
 
     useEffect(() => {
 
-        const canUndo = objectHistories.some((objectHistory) => objectHistory.historyStep > 0);
-        setDisabledUndo(!canUndo);
+        if (objectHistories) {
+
+            const canUndo = objectHistories?.some((objectHistory) => objectHistory.historyStep > 0);
+            setDisabledUndo(!canUndo);
 
 
-        const canRedo = objectHistories.some((objectHistory) => objectHistory.historyStep < objectHistory.history.length - 1);
-        setDisabledRedo(!canRedo);
+            const canRedo = objectHistories?.some((objectHistory) => objectHistory.historyStep < objectHistory.history.length - 1);
+            setDisabledRedo(!canRedo);
+        }
     }, [objectHistories]);
 
     return (

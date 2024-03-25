@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Raphael from 'raphael';
 import '@/lib/raphael.free_transform'; // Ensure this path is correct
 import { CustomTransform } from './CustomTransform'; // Adjust the import path as needed
-import { RaphaelPaper, useRaphaelElements } from '@/hooks/useRaphaelElements'; // Adjust the import path
+import { useRaphaelElements } from '@/hooks/useRaphaelElements'; // Adjust the import path
 
 import { useAppSelector } from '@/redux/store';
 import RangeSlider from "../Customize/child/Input/RangeSlider";
@@ -15,10 +15,11 @@ import { fontDieCutFunction } from '@/components/Utils/fontDieCutFunction';
 import { imageDieCutFunction } from '@/components/Utils/imageDieCutFunction';
 import { useDispatch } from 'react-redux';
 import { deleteImage, updateElementAttributes, updateImagePosition } from '@/redux/features/imagePreviewSlice';
-import { removeText } from '@/redux/features/textSlice';
+import { removeText, updateTextElementAttributes } from '@/redux/features/textSlice';
 import { removeImage } from '@/redux/features/insideFrameSlice';
+import { clearAllHistories, deleteHistoryById } from '@/redux/features/historySlice';
 
-interface ExtendedRaphaelPaper extends RaphaelPaper {
+interface ExtendedRaphaelPaper {
     width: number;
     height: number;
     forEach(callback: (el: any) => void): void;
@@ -36,20 +37,24 @@ const Vector = () => {
     const [selectedItem, setSelectedItem] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(false);
 
+
     const dispatch = useDispatch();
 
     const imagePreviews = useAppSelector((state) => state.imagePreview.images);
     const textPreviews = useAppSelector((state) => state.text.texts);
 
     const currentFtRef = useRef<any>(null);
-    const { addImage, addText } = useRaphaelElements(paper);
+    const { addImageElement, addTextElement } = useRaphaelElements(paper);
 
+    const ElementHistories = useAppSelector((state) => state.history.objectHistories);
     const StickerSelected = useAppSelector(state => state.sticker);
 
     const CanvasProperties = useAppSelector(state => state.canvas);
     const { centerX, centerY, frameWidth, frameHeight, bredd, hojd, grow } = CanvasProperties;
 
-
+    /**
+     * Paper Initialized
+     */
     useEffect(() => {
         if (typeof window !== "undefined" && raphaelRef.current && !paper) {
             const width = raphaelRef.current.clientWidth;
@@ -63,7 +68,8 @@ const Vector = () => {
                 stroke: "none"
             });
 
-            const circle = paperInstance.circle(centerX, centerY, frameWidth / 2.5)
+            const circleRadius = Math.min(frameWidth, frameHeight) / 2;
+            const circle = paperInstance.circle(centerX, centerY, circleRadius)
                 /** @ts-ignore */
                 .attr({
                     fill: "white",
@@ -88,18 +94,53 @@ const Vector = () => {
         }
     }, [paper, centerX, centerY, frameWidth, frameHeight, StickerSelected])
 
+
+    /**
+     * Form Customize Logic
+     */
     useEffect(() => {
         if (paper) {
-            /** @ts-ignore */
-            StickerSelected.id === 1 && rectEl?.hide() & circleEl?.hide();
-            /** @ts-ignore */
-            StickerSelected.id === 2 && rectEl?.show() & rectEl?.attr({ r: 0 }) & circleEl?.hide();
-            /** @ts-ignore */
-            StickerSelected.id === 3 && rectEl?.hide() & circleEl?.show();
-            /** @ts-ignore */
-            StickerSelected.id === 4 && rectEl?.show() & rectEl?.attr({ r: 10 }) & circleEl?.hide();
+            if (StickerSelected.id === 1) {
+                // @ts-ignore
+                rectEl?.hide();
+                // @ts-ignore
+                circleEl?.hide();
+            } else if (StickerSelected.id === 2) {
+                // @ts-ignore
+                rectEl?.show();
+                // @ts-ignore
+                rectEl?.attr({ r: 0 });
+                // @ts-ignore
+                circleEl?.hide();
+            } else if (StickerSelected.id === 3) {
+                // @ts-ignore
+                rectEl?.hide();
+                // @ts-ignore
+                circleEl?.show();
+            } else if (StickerSelected.id === 4) {
+                // @ts-ignore
+                rectEl?.show();
+                // @ts-ignore
+                rectEl?.attr({ r: 10 });
+                // @ts-ignore
+                circleEl?.hide();
+            }
         }
-    }, [paper, centerX, centerY, frameWidth, frameHeight, StickerSelected, circleEl, rectEl])
+
+        if (rectEl) {
+            // @ts-ignore
+            rectEl.animate({ x: centerX - frameWidth / 2, y: centerY - frameHeight / 2, width: frameWidth, height: frameHeight }, 300, 'easeInOut');
+        }
+
+        if (circleEl) {
+            const circleRadius = Math.min(frameWidth, frameHeight) / 2;
+            // @ts-ignore
+            circleEl.animate({ cx: centerX, cy: centerY, r: circleRadius }, 300, 'easeInOut');
+        }
+    }, [paper, centerX, centerY, frameWidth, frameHeight, StickerSelected, circleEl, rectEl]);
+
+
+
 
 
     const handleElementInteraction = useCallback((el: any) => {
@@ -113,62 +154,127 @@ const Vector = () => {
 
     }, [dispatch, setSelectedItem, currentFtRef]);
 
+    /**
+     * Free Transform Logic
+     * 
+     * @param el any
+     */
+    const reapplyFreeTransform = async (el: any) => {
+        if (currentFtRef.current) {
+            currentFtRef.current.unplug(); // Remove current free transform
+        }
+        const ft = await CustomTransform(el, {}, dispatch); // Reapply with new settings
+        currentFtRef.current = ft;
+    };
+
     useEffect(() => {
         if (paper) {
-            imagePreviews.forEach((image) => {
-                const element = addImage({
+            imagePreviews.forEach((image, index) => {
+                const element = addImageElement({
                     id: image.id,
                     src: image.src,
-                    x: image.x || 0,
-                    y: image.y || 0,
-                    width: image.width || 350,
-                    height: image.height || 280,
-                    attrs: { opacity: 0.5, cursor: 'move' }, // Example attributes
+                    x: image.x || index * 200,
+                    y: image.y || 50,
+                    width: image.width || 220,
+                    height: image.height || 180,
+                    attrs: { opacity: 0.5, cursor: 'move' },
+                    type: (image.category === "image") ? "image" : "motiv", // Example attributes
                 });
                 // Attach event listeners or transformations to element here
                 element.click(() => handleElementInteraction(element));
 
             });
         }
-    }, [paper, imagePreviews, addImage, handleElementInteraction]);
+    }, [paper, imagePreviews, addImageElement, handleElementInteraction]);
 
 
     useEffect(() => {
         if (paper) {
-            textPreviews.forEach((text) => {
-                const element = addText({
+            textPreviews?.forEach((text: any, index: number) => {
+                const element = addTextElement({
                     id: text.id,
                     text: text.text,
-                    x: text.x || 0, // Default to 0 if undefined
-                    y: text.y || 0, // Default to 0 if undefined
-                    rotate: 0, // Assuming default rotation of 0
-                    scaleX: 1, // Assuming default scaleX of 1
-                    scaleY: 1, // Assuming default scaleY of 1
+                    x: (index + 1) * 200,
+                    y: 300,
                     attrs: {
                         cursor: "move",
-                        fill: text.fill || '', // Default to empty string if undefined
-                        "font-size": text.fontSize || 12, // Default font size if undefined
-                        "font-family": text.fontFamily || 'Arial', // Default font family if undefined
+                        fill: text.fill || '',
+                        "font-size": text.fontSize || 24,
+                        "font-family": text.fontFamily || 'Arial',
                         opacity: 0.3
-                    }
+                    },
+                    type: "text"
                 });
                 // Attach event listeners or transformations to element here
                 element.click(() => handleElementInteraction(element));
 
             });
         }
-    }, [paper, textPreviews, addText, handleElementInteraction]);
+    }, [paper, textPreviews, addTextElement, handleElementInteraction]);
 
 
-
-
-
+    // History snippet
     useEffect(() => {
-        if (selectedItem && paper) {
-            const ft = CustomTransform(selectedItem, {}, dispatch);
-            currentFtRef.current = ft;
+        if (selectedItem) {
+            const objectId = selectedItem.id;
+            const objectHistory = ElementHistories.find(history => history.objectId === objectId);
+            const historyStep = objectHistory ? objectHistory.historyStep : 0;
+            ElementHistories.map((item) => {
+                // console.log('history item', item);
+            })
+
+
         }
-    }, [selectedItem, paper, dispatch]);
+    })
+
+
+    /**
+     * Elements cleanup tasks from the paper
+     */
+    useEffect(() => {
+        if (paper) {
+            const elementsToRemove: any = [];
+            const newImageElements: any = [];
+            const newTextElements: any = [];
+
+            paper.forEach(element => {
+                if (isElementInsideFrame(element, centerX, centerY, frameWidth, frameHeight)) {
+                    element.attr({ opacity: 1 });
+                } else {
+                    element.attr({ opacity: 0.3 });
+                }
+
+                const data = element.data().data;
+                if (data === "image" || data === "motiv") {
+                    newImageElements.push(element);
+                }
+                if (data === "text") {
+                    newTextElements.push(element);
+                }
+            });
+
+            const newImageArray = newImageElements.filter((img: any) => imagePreviews.some((item: any) => item.id === img.id));
+            const newTextArray = newTextElements.filter((img: any) => textPreviews.some((item: any) => item.id === img.id));
+
+            // Remove elements not present in the new image array
+            paper.forEach((el: any) => {
+                const data = el.data().data;
+                if ((data === "image" || data === "motiv") && !newImageArray.some((item: any) => item.id === el.id)) {
+                    elementsToRemove.push(el);
+                } else if ((data === "text") && !newTextArray.some((item: any) => item.id === el.id)) {
+                    elementsToRemove.push(el);
+                }
+            });
+
+            elementsToRemove.forEach((el: any) => el.remove());
+            deselect();
+
+        }
+    }, [paper, centerX, centerY, frameWidth, frameHeight, imagePreviews, textPreviews]);
+
+
+
+
 
     const deselect = () => {
         if (currentFtRef.current) {
@@ -202,6 +308,10 @@ const Vector = () => {
     //     };
     // }, [updateAllTextTransforms]);
 
+    // useEffect(() => {
+    //     ElementHistories && console.log(ElementHistories);
+    // }, [ElementHistories])
+
 
     const isElementInsideFrame = (
         element: any,
@@ -224,16 +334,6 @@ const Vector = () => {
         return inside
     }
 
-    console.log(textPreviews);
-
-    // Assuming you have a function to reinitialize the free transform on an element
-    const reapplyFreeTransform = (el: any) => {
-        if (currentFtRef.current) {
-            currentFtRef.current.unplug(); // Remove current free transform
-        }
-        const ft = CustomTransform(el, {}, dispatch); // Reapply with new settings
-        currentFtRef.current = ft;
-    };
 
     const handleFlipX = () => {
         if (selectedItem && paper) {
@@ -259,10 +359,10 @@ const Vector = () => {
                 currentFtRef.current.unplug(); // Proper cleanup
             }
 
-            console.log("Deleting item with ID:", selectedItem.id);
+            // console.log("Deleting item with ID:", selectedItem.id);
 
-            selectedItem.type === "image" && dispatch(deleteImage(selectedItem.id))
-            selectedItem.type === "text" && dispatch(removeText(selectedItem.id))
+            selectedItem.type === "image" && dispatch(deleteImage(selectedItem.id)) && dispatch(deleteHistoryById(selectedItem.id))
+            selectedItem.type === "text" && dispatch(removeText(selectedItem.id)) && dispatch(deleteHistoryById(selectedItem.id))
 
 
             deselect();
@@ -298,32 +398,33 @@ const Vector = () => {
             });
         }
     };
+
     const handleCenterEL = () => {
-        if (paper) {
+        if (paper && selectedItem) {
             const paperCenter = { x: paper.width / 2, y: paper.height / 2 };
             const el = selectedItem;
 
-            console.log(paper, el);
             if (el.data('isCenterable')) {
                 const bbox = el.getBBox();
                 const elCenter = { x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 };
                 const translation = { x: paperCenter.x - elCenter.x, y: paperCenter.y - elCenter.y };
 
+                // Apply translation to center the element
                 el.transform(`...T${translation.x},${translation.y}`);
 
+                // Check if the element is inside the frame and adjust opacity accordingly
                 if (isElementInsideFrame(el, centerX, centerY, frameWidth, frameHeight)) {
-                    el.attr({ opacity: 1 })
-                    // console.log("The element is inside the frame.");
+                    el.attr({ opacity: 1 });
                 } else {
-                    el.attr({ opacity: 0.3 })
-                    // console.log("The element is outside the frame.");
+                    el.attr({ opacity: 0.3 });
                 }
 
-
-                reapplyFreeTransform(el)
+                // Reapply free transformation if necessary
+                reapplyFreeTransform(el);
             }
         }
     };
+
 
 
     const handleDieCut = async () => {
@@ -361,133 +462,37 @@ const Vector = () => {
     }
 
 
-    const updatePositionFromTransform = (transformations: any) => {
-        let translation = transformations.find((trans: any) => trans[0] === 'T');
-        if (!translation) return { x: 0, y: 0 }; // Default to no movement if no translation found
-
-        // Translation found, extract the dx and dy values
-        let dx = translation[1];
-        let dy = translation[2];
-
-        // Assuming you have the initial position stored or accessible
-        let initialX = 0; // Replace with the actual initial X position of your element
-        let initialY = 0; // Replace with the actual initial Y position of your element
-
-        // Calculate new position by applying the translation to the initial position
-        const newX = initialX + dx;
-        const newY = initialY + dy;
-
-        return { newX, newY };
-    };
-
-
-    function getTransformValues(el: any) {
-        let matrix = el.matrix;
-        let scaleX = Math.sqrt(matrix.a * matrix.a + matrix.b * matrix.b);
-        let scaleY = Math.sqrt(matrix.c * matrix.c + matrix.d * matrix.d);
-        let rotation = Math.atan2(matrix.b, matrix.a) * (180 / Math.PI); // In degrees
-        let translateX = matrix.e;
-        let translateY = matrix.f;
-
-        return {
-            x: translateX,
-            y: translateY,
-            width: el.attrs.width * scaleX, // Assuming el.attrs.width is the original width
-            height: el.attrs.height * scaleY, // Assuming el.attrs.height is the original height
-            scaleX: scaleX,
-            scaleY: scaleY,
-            rotation: rotation
-        };
-    }
-
-
-    const handleEndOfTransformation = useCallback((element: any) => {
-        // Example of how to get bbox which gives us x, y, width, and height
-        const bbox = element.getBBox();
-
-        console.log(`New Position: x=${bbox.x}, y=${bbox.y}`);
-
-
-        // Example of extracting the transformation matrix for scale and rotation (if applicable)
-        const matrix = element.matrix;
-        const scaleX = Math.sqrt(matrix.a * matrix.a + matrix.b * matrix.b);
-        const scaleY = Math.sqrt(matrix.c * matrix.c + matrix.d * matrix.d);
-        const rotation = Math.atan2(matrix.b, matrix.a) * (180 / Math.PI); // Rotation in degrees
-
-        // Dispatch update to Redux store
-        dispatch(updateElementAttributes({
-            id: element.id,
-            attributes: {
-                x: bbox.x,
-                y: bbox.y,
-                width: bbox.width,
-                height: bbox.height,
-                scaleX: scaleX,
-                scaleY: scaleY,
-                rotate: rotation,
-            }
-        }));
-    }, [dispatch]);
-
-
-    const onEndFN = useCallback(() => {
-
-        if (currentFtRef.current && typeof currentFtRef.current.updateHandles === 'function') {
-            currentFtRef.current.updateHandles();
-        }
-
-        handleEndOfTransformation(selectedItem)
-
-
-
-        if (isElementInsideFrame(selectedItem, centerX, centerY, frameWidth, frameHeight)) {
-            selectedItem.attr({ opacity: 1 })
-            // console.log("The element is inside the frame.");
-        } else {
-            selectedItem.attr({ opacity: 0.3 })
-            // console.log("The element is outside the frame.");
-        }
-
-    }, [centerX, centerY, frameWidth, frameHeight, selectedItem, handleEndOfTransformation])
-
     useEffect(() => {
         if (selectedItem && paper) {
             if (selectedItem && paper) {
-                let startX = 0; // Initial X position
-                let startY = 0; // Initial Y position
 
                 // Define drag functions
                 const onMove = function (dx: number, dy: number) {
-                    // Applying translation relative to the initial drag start position plus the delta
-                    const newTransform = `T${startX + dx},${startY + dy}`;
-                    selectedItem.transform(newTransform);
+
                 };
 
                 const onStart = function () {
-                    // Extracting the current translation from the element's total transformation
-                    const currentTransform = selectedItem.transform().local;
-                    const translate = /T([\d.+-]+),([\d.+-]+)/.exec(currentTransform);
-                    if (translate) {
-                        startX = parseFloat(translate[1]);
-                        startY = parseFloat(translate[2]);
-                    } else {
-                        startX = 0;
-                        startY = 0;
-                    }
-                    console.log('Drag start at:', startX, startY);
+
                 };
 
                 const onEnd = function () {
-                    console.log('Drag end');
-                    onEndFN();
+                    // console.log('Drag end');
+
+                    if (isElementInsideFrame(selectedItem, centerX, centerY, frameWidth, frameHeight)) {
+                        selectedItem.attr({ opacity: 1 })
+                        // console.log("The element is inside the frame.");
+                    } else {
+                        selectedItem.attr({ opacity: 0.3 })
+                        // console.log("The element is outside the frame.");
+                    }
                 };
 
-                selectedItem.undrag(); // Remove previous drag handlers if any
+
                 selectedItem.drag(onMove, onStart, onEnd);
             }
 
         }
-    }, [onEndFN, paper, selectedItem, centerX, centerY, frameWidth, frameHeight]);
+    }, [paper, selectedItem, centerX, centerY, frameWidth, frameHeight]);
 
 
 
