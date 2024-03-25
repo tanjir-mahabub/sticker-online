@@ -1,28 +1,48 @@
 import StickerReducer from '@/redux/features/stickerSlice';
-import { configureStore } from '@reduxjs/toolkit';
+import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { TypedUseSelectorHook, useSelector } from 'react-redux';
 import SideNavReducer from './features/sideNavSlice';
 import canvasReducer from './features/canvasSlice';
 import textReducer from './features/textSlice';
-import fileReducer from './features/fileUploadSlice';
 import motivReducer from './features/motivSlice';
 import historyReducer from './features/historySlice';
 import insideFrameReducer from './features/insideFrameSlice';
 import imagePreviewReducer from './features/imagePreviewSlice';
+import popupReducer from './features/popupSlice';
+import storage from 'redux-persist/lib/storage';
+import { persistStore, persistReducer } from 'redux-persist';
 
-const store = configureStore({
-  reducer: {
-    sticker: StickerReducer,
-    sideNav: SideNavReducer,
-    canvas: canvasReducer,
-    text: textReducer,
-    file: fileReducer,
-    motiv: motivReducer,
-    history: historyReducer,
-    insideFrame: insideFrameReducer,
-    imagePreview: imagePreviewReducer
-  },
+const rootReducer = combineReducers({
+  sticker: StickerReducer,
+  sideNav: SideNavReducer,
+  canvas: canvasReducer,
+  text: textReducer,  
+  motiv: motivReducer,
+  history: historyReducer,
+  insideFrame: insideFrameReducer,
+  imagePreview: imagePreviewReducer,
+  popup: popupReducer,
+})
+
+const persistConfig = {
+  key: 'root',
+  storage
+}
+
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
+export const store = configureStore({
+  reducer: persistedReducer,
+  middleware: (getDefaultMiddleware) =>
+  getDefaultMiddleware({
+    serializableCheck: {
+      ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
+    },
+  }),  
 });
+
+export const persistor = persistStore(store);
+
 
 export default store;
 

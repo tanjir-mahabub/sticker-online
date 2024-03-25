@@ -6,7 +6,9 @@ const EgnaStickers = () => {
     return (
         <section className="container mx-auto w-[60%] flex flex-col justify-center items-center gap-10 pt-7 pb-14">
             <div className="flex flex-col gap-4 justify-center items-center">
-                <Image src="/homepage/hang-loose.svg" alt="hang-loose" width={120} height={100} />
+                <div className="w-auto h-auto">
+                    <Image className="w-full h-auto" src="/homepage/hang-loose.svg" alt="hang-loose" width={120} height={100} />
+                </div>
                 <h2 className="text-5xl italic uppercase font-extrabold pt-3">Gör dina egna stickers</h2>
                 <p>Skapa unika stickers, välj material, redigera i editorn och se direkt hur det kommer se ut.</p>
             </div>
@@ -14,7 +16,9 @@ const EgnaStickers = () => {
             <div className="flex py-5">
 
                 <div className="flex items-start gap-3">
-                    <Image src="/homepage/one.svg" alt="one-icon" width={28} height={100} />
+                    <div className="w-auto h-auto">
+                        <Image src="/homepage/one.svg" alt="one-icon" width={48} height={100} />
+                    </div>
                     <div className="space-y-2">
                         <h4 className="text-xl font-bold uppercase">Välj format</h4>
                         <p>Lorem ipsum dolor sit amet consectetur. Aliquet cras montes vulputate velit consequat nulla lectus.</p>
@@ -22,7 +26,9 @@ const EgnaStickers = () => {
                 </div>
 
                 <div className="flex items-start gap-3">
-                    <Image src="/homepage/two.svg" alt="two-icon" width={28} height={100} />
+                    <div className="w-auto h-auto">
+                        <Image src="/homepage/two.svg" alt="two-icon" width={48} height={100} />
+                    </div>
                     <div className="space-y-2">
                         <h4 className="text-xl font-bold uppercase">Ladda upp design</h4>
                         <p>Lorem ipsum dolor sit amet consectetur. Aliquet cras montes vulputate velit consequat nulla lectus.</p>
@@ -30,7 +36,9 @@ const EgnaStickers = () => {
                 </div>
 
                 <div className="flex items-start gap-3">
-                    <Image src="/homepage/three.svg" alt="three-icon" width={28} height={100} />
+                    <div className="w-auto h-auto">
+                        <Image src="/homepage/three.svg" alt="three-icon" width={48} height={100} />
+                    </div>
                     <div className="space-y-2">
                         <h4 className="text-xl font-bold uppercase">Beställ stickers</h4>
                         <p>Lorem ipsum dolor sit amet consectetur. Aliquet cras montes vulputate velit consequat nulla lectus.</p>

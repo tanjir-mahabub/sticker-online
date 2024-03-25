@@ -16,6 +16,7 @@ const CustomTransformer: FC<{
     useEffect(() => {
         if (shapeRef.current && trRef.current && isSelected) {
             trRef.current.nodes([shapeRef.current]);
+            trRef.current.moveToTop();
             trRef.current.getLayer()?.batchDraw();
         }
 

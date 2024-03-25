@@ -6,7 +6,7 @@ const Footer = () => {
             <div className="flex-auto xl:py-7 border-r border-so-black/20">
                 <Form />
             </div>
-            <div className="w-[30%] 3xl:w-[20%] flex h-full xl:gap-6 justify-end items-center xl:py-7">
+            <div className="w-fit 4xl:w-[20%] flex h-full xl:gap-6 justify-end items-center xl:py-7">
                 <div className="px-3">
                     <h6 className="text-xs font-bold">Totalt</h6>
                     <p className="text-so-orange text-lg font-bold">2 495 kr</p>

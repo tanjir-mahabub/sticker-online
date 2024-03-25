@@ -22,7 +22,7 @@ const StickerSelector = () => {
 
     }, [StickerSelected]);
 
-    console.log(StickerSelected);
+
     return (
         <>
             {StickerSelectorStore.map((sticker) => (
@@ -32,13 +32,17 @@ const StickerSelector = () => {
                         }`}
                     onClick={() => stickerDispatch(selectedSticker({ id: sticker.id }))}
                 >
-                    <div className="flex items-center h-[60%]">
+                    <div className="flex items-center justify-center w-full h-[60%]">
                         <Image
+                            className={`w-full h-auto`}
                             src={sticker.img}
                             alt={sticker.altTxt}
                             width={sticker.width}
                             height={100}
                             priority
+                            style={{
+                                padding: `${sticker.padding}px`,
+                            }}
                         />
                     </div>
                     <span className="font-bold">{sticker.title}</span>

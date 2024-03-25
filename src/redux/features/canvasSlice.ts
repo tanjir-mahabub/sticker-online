@@ -12,6 +12,7 @@ const initialState: CanvasState = {
   hojd: 0,
   scale: 1,
   grow: 0,
+  selectionCancel: false
 };
 
 const canvasSlice = createSlice({

@@ -1,7 +1,3 @@
-import { ImageProps } from "@/components/Editor/CanvasTools/Image";
-import { RectangleProps } from "@/components/Editor/CanvasTools/Rectangle";
-import { TextProps } from "@/components/Editor/CanvasTools/Text";
-
 export interface StickerState {    
   id: number
 }
@@ -15,10 +11,27 @@ export interface ImageData {
   file: string;
 }
 
+export interface CanvasProps {
+  width?: number;
+  height?: number;
+  frameWidth?: number;
+  frameHeight?: number;
+  centerX?: number,
+  centerY?: number,
+  scale?: number
+}
 
 export interface ImageInfo {
   id: string;
   src: string;
+  category?: string;
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+  scaleX?: number;
+  scaleY?: number;
+  rotate?: number;
 }
 
 
@@ -33,12 +46,13 @@ export interface CanvasState {
   hojd: number;
   scale: number;
   grow: number;
+  selectionCancel?: boolean;
 }
 
 
-type HistoryAction = Partial<RectangleProps['shapeProps'][]> | Partial<ImageProps['imageProps'][]> | Partial<TextProps['textProps'][]>;
+// type HistoryAction = Partial<RectangleProps['shapeProps'][]> | Partial<ImageProps['imageProps'][]> | Partial<TextProps['textProps'][]>;
 
-export type AddToHistory= (action: HistoryAction) => void;
+// export type AddToHistory= (action: HistoryAction) => void;
 
 
 export interface Frame {
@@ -54,3 +68,10 @@ export interface ObjectPosition {
   width: number;
   height: number;
 }
+
+export type BoundingBox = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};

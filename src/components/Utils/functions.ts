@@ -66,9 +66,13 @@ export const ConvertCMTOPX = (cm: number, dpi = 300) => {
 export const drawImage = async (img: HTMLImageElement, grow: number, color: string): Promise<HTMLImageElement> => {
   return new Promise<HTMLImageElement>((resolve, reject) => {
       const canvas1 = document.createElement("canvas");
-      const ctx1 = canvas1.getContext("2d");
+      const ctx1 = canvas1.getContext("2d", {
+        willReadFrequently: true,
+   });
       const canvas2 = document.createElement("canvas");
-      const ctx2 = canvas2.getContext("2d");
+      const ctx2 = canvas2.getContext("2d", {
+        willReadFrequently: true,
+   });
 
       canvas1.width = canvas2.width = img.width + grow * 2;
       canvas1.height = canvas2.height = img.height + grow * 2;
@@ -463,29 +467,13 @@ export const calculateFrameEdges = (frame: Frame) => {
   };
 };
 
-// export const isObjectInsideFrame = (objectPosition: ObjectPosition, frameEdges: ReturnType<typeof calculateFrameEdges>) => {
-//   // Calculate object edges
-//   const objectLeft = objectPosition.x;
-//   const objectRight = objectPosition.x + objectPosition.width;
-//   const objectTop = objectPosition.y;
-//   const objectBottom = objectPosition.y + objectPosition.height;
-
-//   // Check if the object is within the frame
-//   return (
-//       objectLeft >= frameEdges.startX &&
-//       objectRight <= frameEdges.endX &&
-//       objectTop >= frameEdges.startY &&
-//       objectBottom <= frameEdges.endY
-//   );
-// };
-
 
 export const isObjectInsideFrame = (objectPosition: ObjectPosition, frameEdges: ReturnType<typeof calculateFrameEdges>) => {
   // Calculate object edges
-  const objectLeft = objectPosition.x;
-  const objectRight = objectPosition.x + objectPosition.width;
-  const objectTop = objectPosition.y;
-  const objectBottom = objectPosition.y + objectPosition.height;
+  const objectLeft = objectPosition?.x;
+  const objectRight = objectPosition?.x + objectPosition?.width;
+  const objectTop = objectPosition?.y;
+  const objectBottom = objectPosition?.y + objectPosition?.height;
 
   // Check if the object intersects with the frame
   const intersects = !(

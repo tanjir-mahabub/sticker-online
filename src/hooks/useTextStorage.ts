@@ -1,24 +1,39 @@
-import { useEffect, useState } from "react";
+// import { useEffect, useState } from "react";
 
-type TextData = {
-    id: number,
-    name: string
-}
-export const useTextStorage = (key: string) => {
-  const [data, setData] = useState<TextData>();
+// export interface TextData {
+//   id: string;
+//   x?: number;
+//   y?: number;
+//   fontID: number;
+//   fontFamily: string;
+//   text: string;
+//   fontSize: number;
+//   fill: string;
+// }
 
-  useEffect(() => {
-    const storedDataString = localStorage.getItem(key);
-    if (storedDataString) {
-      const storedData = JSON.parse(storedDataString) as TextData;
-      setData(storedData);
-    }
-  }, [key]);
+// export const useTextStorage = (key: string) => {
+//   const [data, setData] = useState<TextData[]>([]);
+//   const [isLoading, setIsLoading] = useState(false);
 
-  const updateData = (newData: TextData) => {
-    localStorage.setItem(key, JSON.stringify(newData));
-    setData(newData);
-  };
+//   useEffect(() => {
+//     setIsLoading(true);
+//     const storedDataString = localStorage.getItem(key);
+    
+//     if (storedDataString) { 
+//     const storedData = JSON.parse(storedDataString) as TextData[]    
+//     setData(storedData);
+//     }
+//     setIsLoading(false);
 
-  return { data, updateData };
-};
+//   }, [key]);
+
+//   const updateData = (newData: TextData[]) => {
+//     setIsLoading(true);
+//     localStorage.setItem(key, JSON.stringify(newData));
+//     setData(newData);
+//     setIsLoading(false);
+//   };
+
+//   return { data, updateData, isLoading };
+// };
+

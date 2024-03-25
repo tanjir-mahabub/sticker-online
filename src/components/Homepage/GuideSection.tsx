@@ -5,10 +5,10 @@ const GuideSection = () => {
         <section className="my-10">
             <div className="relative">
 
-                <Image src="/homepage/waterdrop.svg" alt="waterdrop" width={60} height={100} className="absolute -top-[18px] -right-[18px] z-20" />
+                <Image src="/homepage/waterdrop.svg" alt="waterdrop" width={60} height={100} className="absolute -top-[18px] -right-[18px] z-20 w-[65px] h-auto" />
 
                 <div className="overflow-hidden rounded-lg relative">
-                    <Image src="/homepage/guide.png" alt="guide" width={750} height={100} className="rounded-lg" />
+                    <Image src="/homepage/guide.png" alt="guide" width={750} height={100} priority className="rounded-lg w-full h-auto" />
 
                     <div className="absolute top-0 left-0 z-10 bg-gradient-to-b to-so-black/80 from-white/10 w-full h-full"></div>
                     <div className="absolute bottom-0 left-0 z-20 p-7">

@@ -14,7 +14,7 @@ const Background: React.FC = () => {
 
     useEffect(() => {
         const wrapper = stageRef.current?.content.parentElement?.parentElement?.parentElement;
-        console.log(wrapper);
+        // console.log(wrapper);
         const width = wrapper?.offsetWidth;
         const height = wrapper?.offsetHeight;
 
