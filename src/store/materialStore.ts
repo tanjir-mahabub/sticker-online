@@ -4,6 +4,7 @@ const materialStore = [
         id: 1,
         label: "Vinyl",
         value: "vinyl",
+        cost: 37,
         icon: "/materials/vinyl.png",
         popup: {
             title: "Vinyl",
@@ -15,6 +16,7 @@ const materialStore = [
         id: 2,
         label: "Holografisk",
         value: "holografisk",
+        cost: 32,
         icon: "/materials/holographic.png",
         popup: {
             title: "Holografisk",
@@ -26,6 +28,7 @@ const materialStore = [
         id: 3,
         label: "Glitter",
         value: "glitter",
+        cost: 43,
         icon: "/materials/glitter.png",
         popup: {
             title: "Glitter",
@@ -37,6 +40,7 @@ const materialStore = [
         id: 4,
         label: "Clear",
         value: "clear",
+        cost: 15,
         icon: "/materials/clear.png",
         popup: {
             title:"Clear",
@@ -48,6 +52,7 @@ const materialStore = [
         id: 5,
         label: "Mirror",
         value: "mirror",
+        cost: 33,
         icon: "/materials/mirror.png",
         popup: {
             title:"Mirror",
@@ -59,6 +64,7 @@ const materialStore = [
         id: 6,
         label: "Pixie Dust",
         value: "pixie-dust",
+        cost: 51,
         icon: "/materials/pixie-dust.png",
         popup: {
             title:"Pixie Dust",
@@ -70,6 +76,7 @@ const materialStore = [
         id: 7,
         label: "Prismatic",
         value: "prismatic",
+        cost: 48,
         icon: "/materials/prismatic.png",
         popup: {
             title: "Prismatic",
@@ -81,6 +88,7 @@ const materialStore = [
         id: 8,
         label: "Brushed Alloy",
         value: "brushed-alloy",
+        cost: 49,
         icon: "/materials/burshed-alloy.png",
         popup: {
             title: "Brushed Alloy",

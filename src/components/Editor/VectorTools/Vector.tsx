@@ -76,6 +76,7 @@ const Vector = () => {
                     stroke: "rgba(0,0,0,0.4)"
                 })
 
+            circle.click(() => deselect())
             circle.hide();
             setCircleEl(circle);
 
@@ -86,6 +87,7 @@ const Vector = () => {
                     stroke: "rgba(0,0,0,0.4)"
                 })
 
+            rect.click(() => deselect())
             rect.hide();
             setRectEl(rect);
 
@@ -159,13 +161,13 @@ const Vector = () => {
      * 
      * @param el any
      */
-    const reapplyFreeTransform = async (el: any) => {
+    const reapplyFreeTransform = useCallback((el: any) => {
         if (currentFtRef.current) {
             currentFtRef.current.unplug(); // Remove current free transform
         }
-        const ft = await CustomTransform(el, {}, dispatch); // Reapply with new settings
+        const ft = CustomTransform(el, {}, dispatch); // Reapply with new settings
         currentFtRef.current = ft;
-    };
+    }, [dispatch]);
 
     useEffect(() => {
         if (paper) {
@@ -365,8 +367,8 @@ const Vector = () => {
             selectedItem.type === "text" && dispatch(removeText(selectedItem.id)) && dispatch(deleteHistoryById(selectedItem.id))
 
 
+            selectedItem.remove(); // Remove the element            
             deselect();
-            selectedItem.remove(); // Remove the element
             setSelectedItem(null); // Reset selection
         }
     };
@@ -464,7 +466,7 @@ const Vector = () => {
 
     useEffect(() => {
         if (selectedItem && paper) {
-            if (selectedItem && paper) {
+            if (selectedItem && currentFtRef.current && paper) {
 
                 // Define drag functions
                 const onMove = function (dx: number, dy: number) {
@@ -480,9 +482,13 @@ const Vector = () => {
 
                     if (isElementInsideFrame(selectedItem, centerX, centerY, frameWidth, frameHeight)) {
                         selectedItem.attr({ opacity: 1 })
+                        console.log(selectedItem);
+
                         // console.log("The element is inside the frame.");
                     } else {
                         selectedItem.attr({ opacity: 0.3 })
+                        currentFtRef.current.opts.attrs.opacity = 0.3
+                        // currentFtRef.current.attrs({ opacity: 0.3 })
                         // console.log("The element is outside the frame.");
                     }
                 };

@@ -9,8 +9,10 @@ import historyReducer from './features/historySlice';
 import insideFrameReducer from './features/insideFrameSlice';
 import imagePreviewReducer from './features/imagePreviewSlice';
 import popupReducer from './features/popupSlice';
+import calculationReducer from './features/calculationSlice';
 import storage from 'redux-persist/lib/storage';
 import { persistStore, persistReducer } from 'redux-persist';
+import formReducer from './features/formSlice';
 
 const rootReducer = combineReducers({
   sticker: StickerReducer,
@@ -22,6 +24,8 @@ const rootReducer = combineReducers({
   insideFrame: insideFrameReducer,
   imagePreview: imagePreviewReducer,
   popup: popupReducer,
+  calculation: calculationReducer,
+  formValues: formReducer
 })
 
 const persistConfig = {
