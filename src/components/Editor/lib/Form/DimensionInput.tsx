@@ -4,11 +4,17 @@ import HojdInput from './HojdInput';
 import { useDispatch } from 'react-redux';
 import { setCanvasProperties } from '@/redux/features/canvasSlice';
 import { cmToPixel } from '@/components/Utils/functions';
+import { setCalculation } from '@/redux/features/calculationSlice';
+import { setBreddDefaultValue, setHojdDefaultValue } from '@/redux/features/formSlice';
+import { useAppSelector } from '@/redux/store';
 
 const DimensionInput = () => {
     const dispatch = useDispatch();
-    const [bredd, setBredd] = useState(6.5);
-    const [hojd, setHojd] = useState(5);
+
+    const dimensionDefault = useAppSelector(state => state.formValues);
+
+    const [bredd, setBredd] = useState(dimensionDefault.breddDefaultValue);
+    const [hojd, setHojd] = useState(dimensionDefault.hojdDefaultValue);
 
     const handleBreddStepUp = () => {
         setBredd((prevValue) => prevValue + 0.1);
@@ -27,6 +33,23 @@ const DimensionInput = () => {
     };
 
 
+
+    useEffect(() => {
+
+        dispatch(setBreddDefaultValue(bredd)); // Set default value for bredd input
+        dispatch(setHojdDefaultValue(hojd)); // Set default value for hojd input
+    }, [dispatch, bredd, hojd]);
+
+
+    useEffect(() => {
+        const newBreddCost = bredd * 10;
+        dispatch(setCalculation({ breddCost: newBreddCost }));
+    }, [bredd, dispatch]);
+
+    useEffect(() => {
+        const newHojdCost = hojd * 10;
+        dispatch(setCalculation({ HojdCost: newHojdCost }));
+    }, [hojd, dispatch]);
 
 
     useEffect(() => {

@@ -3,23 +3,20 @@ import Image from 'next/image';
 import { useDispatch } from 'react-redux';
 import { showPopup } from '@/redux/features/popupSlice';
 import AnimateIn from '@/lib/AnimateIn';
+import { MaterialOption } from '../MaterialDropdown';
 
-interface MaterialOption {
-    label: string;
-    icon: string;
-    popup: {
-        title: string,
-        imgSrc: string,
-        content: string
-    }
-}
 
 interface MaterialOptionsProps {
     materials: MaterialOption[];
+    onSelectOption: (option: MaterialOption) => void;
 }
 
-const MaterialOptions: React.FC<MaterialOptionsProps> = ({ materials }) => {
+const MaterialOptions: React.FC<MaterialOptionsProps> = ({ materials, onSelectOption }) => {
     const dispatch = useDispatch();
+
+    const handleOptionClick = (option: MaterialOption) => {
+        onSelectOption(option);
+    };
 
     return (
         <>
@@ -30,7 +27,7 @@ const MaterialOptions: React.FC<MaterialOptionsProps> = ({ materials }) => {
                     to="opacity-100 translate-y-0 translate-x-0"
                     delay={50 * index}
                     duration={700}>
-                    <li key={index} className="py-1 font-semibold hover:bg-gray-100 cursor-pointer flex justify-start items-center">
+                    <li key={index} className="py-1 font-semibold hover:bg-gray-100 cursor-pointer flex justify-start items-center" onClick={() => handleOptionClick(option)}>
                         <div className='w-4/12 px-1'>
                             <Image className='w-fit object-contain' src={option.icon} width={100} height={100} alt={option.label} />
                         </div>
