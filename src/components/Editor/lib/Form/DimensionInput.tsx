@@ -54,8 +54,8 @@ const DimensionInput = () => {
 
     useEffect(() => {
         dispatch(setCanvasProperties({ frameWidth: cmToPixel(bredd), frameHeight: cmToPixel(hojd), bredd: bredd, hojd: hojd }));
-        console.log(bredd, hojd, cmToPixel(bredd), 'aspect ratio', cmToPixel(bredd) / cmToPixel(hojd));
-        console.log('frameHeight', cmToPixel(hojd));
+        // console.log(bredd, hojd, cmToPixel(bredd), 'aspect ratio', cmToPixel(bredd) / cmToPixel(hojd));
+        // console.log('frameHeight', cmToPixel(hojd));
     }, [bredd, hojd, dispatch]);
 
     return (

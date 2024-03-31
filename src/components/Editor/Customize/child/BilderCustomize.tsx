@@ -9,21 +9,31 @@ import { generateUniqueId } from "@/components/Utils/functions";
 const BilderCustomize = () => {
     const dispatch = useDispatch();
 
+    const CanvasProperties = useAppSelector(state => state.canvas);
+    const { centerX, centerY, frameWidth, frameHeight } = CanvasProperties;
+
     const imagePreviews = useAppSelector((state: RootState) => state.imagePreview.images);
 
     const handleImageUpload = (files: File[]) => {
         files.forEach((file) => {
             const reader = new FileReader();
             reader.onload = (event: ProgressEvent<FileReader>) => {
-
                 const imageDataUrl = event.target?.result;
                 if (typeof imageDataUrl === "string") {
-
-                    dispatch(addImage({
-                        id: generateUniqueId(),
-                        src: imageDataUrl,
-                        category: 'image',
-                    }));
+                    const image = new window.Image();
+                    image.onload = () => {
+                        const aspectRatio = image.naturalWidth / image.naturalHeight;
+                        const width = 280;
+                        const height = width / aspectRatio;
+                        dispatch(addImage({
+                            id: generateUniqueId(),
+                            src: imageDataUrl,
+                            width: width,
+                            height: height,
+                            category: 'image',
+                        }));
+                    };
+                    image.src = imageDataUrl;
                 }
             };
             reader.readAsDataURL(file);
@@ -31,7 +41,6 @@ const BilderCustomize = () => {
     };
 
     const handleDeleteBTN = () => {
-
         dispatch(clearImages("image"));
     };
 
@@ -51,6 +60,7 @@ const BilderCustomize = () => {
                         width={18}
                         height={100}
                         className="max-h-24 max-w-full w-full h-auto"
+                        priority
                     />
                 </div>
                 <p className="text-xs md:text-sm font-semibold">Ta bort alla bilder</p>

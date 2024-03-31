@@ -6,44 +6,35 @@ import { setCalculation } from '@/redux/features/calculationSlice';
 import { setAntalLastSelected, setMaterialLastSelected } from '@/redux/features/formSlice';
 import { useAppSelector } from '@/redux/store';
 
+const antalOptions = [
+    { id: 1, st: '500 st', cost: 4990, rate: '10 kr / st' },
+    { id: 2, st: '200 st', cost: 2590, rate: '13,5 kr / st' },
+    { id: 3, st: '100 st', cost: 1490, rate: '14,9 kr / st' },
+    { id: 4, st: '50 st', cost: 890, rate: '17,8 kr / st' },
+    { id: 5, st: '25 st', cost: 490, rate: '19,9 kr / st' },
+    { id: 6, st: '10 st', cost: 240, rate: '24,5 kr / st' },
+];
 
 const AntalDropdown: React.FC = () => {
+
+    const antalDefault = useAppSelector(state => state.formValues.antalLastSelected);
+    const selected = antalOptions.find(option => option.id === antalDefault)
     const [isOpen, setIsOpen] = useState(false);
-    const [selectedOption, setSelectedOption] = useState<AntalOption | null>(null);
+    const [selectedOption, setSelectedOption] = useState<AntalOption | null>(selected || null);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     const dispatch = useDispatch();
-
-    const antalDefault = useAppSelector(state => state.formValues);
-
-    const antalOptions = [
-        { id: 1, st: '500 st', cost: 4990, rate: '10 kr / st' },
-        { id: 2, st: '200 st', cost: 2590, rate: '13,5 kr / st' },
-        { id: 3, st: '100 st', cost: 1490, rate: '14,9 kr / st' },
-        { id: 4, st: '50 st', cost: 890, rate: '17,8 kr / st' },
-        { id: 5, st: '25 st', cost: 490, rate: '19,9 kr / st' },
-        { id: 6, st: '10 st', cost: 240, rate: '24,5 kr / st' },
-    ];
-
-
-    useEffect(() => {
-        console.log("Antal default value:", antalDefault.antalLastSelected); // Debug statement
-
-        if (antalDefault.antalLastSelected !== null) {
-            const selected = antalOptions.find(option => option.id === antalDefault.antalLastSelected);
-            console.log("Selected option:", selected); // Debug statement
-            setSelectedOption(selected || null);
-        }
-    }, [antalDefault]);
 
     const handleOptionChange = (option: AntalOption) => {
         setIsOpen(false);
         setSelectedOption(option);
 
         dispatch(setAntalLastSelected(option.id));
-        dispatch(setCalculation({ antalCost: option.cost }));
     };
 
+    useEffect(() => {
+        selectedOption && dispatch(setCalculation({ antalCost: selectedOption.cost }));
+    }, [dispatch, selectedOption])
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {

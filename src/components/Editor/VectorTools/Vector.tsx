@@ -18,6 +18,8 @@ import { deleteImage, updateElementAttributes, updateImagePosition } from '@/red
 import { removeText, updateTextElementAttributes } from '@/redux/features/textSlice';
 import { removeImage } from '@/redux/features/insideFrameSlice';
 import { clearAllHistories, deleteHistoryById } from '@/redux/features/historySlice';
+import { Tooltip } from '@/components/Utils/ToolTips';
+import ButtonControl from '../lib/ButtonControll';
 
 interface ExtendedRaphaelPaper {
     width: number;
@@ -36,6 +38,7 @@ const Vector = () => {
     const [circleEl, setCircleEl] = useState<HTMLDivElement | null>(null);
     const [selectedItem, setSelectedItem] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [lastAddedElement, setLastAddedElement] = useState<any>(null);
 
 
     const dispatch = useDispatch();
@@ -50,7 +53,7 @@ const Vector = () => {
     const StickerSelected = useAppSelector(state => state.sticker);
 
     const CanvasProperties = useAppSelector(state => state.canvas);
-    const { centerX, centerY, frameWidth, frameHeight, bredd, hojd, grow } = CanvasProperties;
+    const { centerX, centerY, frameWidth, frameHeight, bredd, hojd, grow, backgroundColor } = CanvasProperties;
 
     /**
      * Paper Initialized
@@ -87,6 +90,7 @@ const Vector = () => {
                     stroke: "rgba(0,0,0,0.4)"
                 })
 
+            rect.toBack();
             rect.click(() => deselect())
             rect.hide();
             setRectEl(rect);
@@ -101,31 +105,37 @@ const Vector = () => {
      * Form Customize Logic
      */
     useEffect(() => {
-        if (paper) {
+        if (paper && StickerSelected && backgroundColor) {
             if (StickerSelected.id === 1) {
                 // @ts-ignore
                 rectEl?.hide();
                 // @ts-ignore
                 circleEl?.hide();
+
             } else if (StickerSelected.id === 2) {
                 // @ts-ignore
                 rectEl?.show();
                 // @ts-ignore
-                rectEl?.attr({ r: 0 });
+                rectEl?.attr({ r: 0, fill: backgroundColor });
                 // @ts-ignore
                 circleEl?.hide();
+
             } else if (StickerSelected.id === 3) {
                 // @ts-ignore
                 rectEl?.hide();
                 // @ts-ignore
                 circleEl?.show();
+                // @ts-ignore
+                circleEl?.attr({ fill: backgroundColor });
+
             } else if (StickerSelected.id === 4) {
                 // @ts-ignore
                 rectEl?.show();
                 // @ts-ignore
-                rectEl?.attr({ r: 10 });
+                rectEl?.attr({ r: 10, fill: backgroundColor });
                 // @ts-ignore
                 circleEl?.hide();
+
             }
         }
 
@@ -139,7 +149,7 @@ const Vector = () => {
             // @ts-ignore
             circleEl.animate({ cx: centerX, cy: centerY, r: circleRadius }, 300, 'easeInOut');
         }
-    }, [paper, centerX, centerY, frameWidth, frameHeight, StickerSelected, circleEl, rectEl]);
+    }, [paper, centerX, centerY, frameWidth, frameHeight, StickerSelected, circleEl, rectEl, backgroundColor]);
 
 
 
@@ -150,7 +160,7 @@ const Vector = () => {
             currentFtRef.current.unplug();
         }
         setSelectedItem(el);
-        el.toFront();
+        // el.toFront();
         const ft = CustomTransform(el, {}, dispatch);
         currentFtRef.current = ft;
 
@@ -169,22 +179,34 @@ const Vector = () => {
         currentFtRef.current = ft;
     }, [dispatch]);
 
+
     useEffect(() => {
         if (paper) {
+            const paperCenter = { x: paper.width / 2, y: paper.height / 2 };
+
             imagePreviews.forEach((image, index) => {
                 const element = addImageElement({
                     id: image.id,
                     src: image.src,
-                    x: image.x || index * 200,
-                    y: image.y || 50,
+                    x: image.x || 0,
+                    y: image.y || 0,
                     width: image.width || 220,
                     height: image.height || 180,
                     attrs: { opacity: 0.5, cursor: 'move' },
                     type: (image.category === "image") ? "image" : "motiv", // Example attributes
                 });
-                // Attach event listeners or transformations to element here
-                element.click(() => handleElementInteraction(element));
 
+                if (element) {
+                    const bbox = element.getBBox();
+                    const elCenter = { x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 };
+                    const translation = { x: paperCenter.x - elCenter.x, y: paperCenter.y - elCenter.y };
+
+                    element.attr({ x: translation.x, y: translation.y });
+
+                    element.click(() => handleElementInteraction(element));
+
+                    setLastAddedElement(element);
+                }
             });
         }
     }, [paper, imagePreviews, addImageElement, handleElementInteraction]);
@@ -192,12 +214,16 @@ const Vector = () => {
 
     useEffect(() => {
         if (paper) {
+            const paperCenter = { x: paper.width / 2, y: paper.height / 2 };
+
             textPreviews?.forEach((text: any, index: number) => {
                 const element = addTextElement({
                     id: text.id,
                     text: text.text,
-                    x: (index + 1) * 200,
-                    y: 300,
+                    x: text.x + 10 || 0,
+                    y: text.y + 10 || 0,
+                    width: text.width,
+                    height: text.height,
                     attrs: {
                         cursor: "move",
                         fill: text.fill || '',
@@ -207,12 +233,31 @@ const Vector = () => {
                     },
                     type: "text"
                 });
-                // Attach event listeners or transformations to element here
-                element.click(() => handleElementInteraction(element));
+
+                if (element) {
+                    const bbox = element.getBBox();
+                    const elCenter = { x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 };
+                    const translation = { x: paperCenter.x - elCenter.x, y: paperCenter.y - elCenter.y };
+
+                    element.attr({ x: translation.x, y: translation.y, width: bbox.width + 10, height: bbox.height + 10 });
+
+                    element.click(() => handleElementInteraction(element));
+
+                    setLastAddedElement(element);
+                    reapplyFreeTransform(element)
+                }
 
             });
         }
-    }, [paper, textPreviews, addTextElement, handleElementInteraction]);
+    }, [paper, textPreviews, addTextElement, handleElementInteraction, reapplyFreeTransform]);
+
+    useEffect(() => {
+        if (lastAddedElement) {
+            setSelectedItem(lastAddedElement)
+            handleElementInteraction(lastAddedElement);
+            reapplyFreeTransform(lastAddedElement)
+        }
+    }, [lastAddedElement, handleElementInteraction, reapplyFreeTransform])
 
 
     // History snippet
@@ -349,11 +394,108 @@ const Vector = () => {
     const handleFlipY = () => {
         if (selectedItem && paper) {
             const bbox = selectedItem.getBBox(true);
-            // Apply flipping by scaling
             selectedItem.transform(`...s1,-1,${bbox.x + bbox.width / 2},${bbox.y + bbox.height / 2}`);
-            reapplyFreeTransform(selectedItem); // Reapply free transform
+            reapplyFreeTransform(selectedItem);
         }
     };
+
+
+    const [stackOrder, setStackOrder] = useState<any[]>([]);
+
+    // Update the stacking order when adding or removing elements
+    useEffect(() => {
+        if (paper) {
+            const elements: any[] = [];
+            paper.forEach(el => {
+                if (el.type !== "rect" && el.type !== "circle") {
+                    elements.push(el)
+                }
+            });
+            setStackOrder(elements);
+        }
+    }, [paper]);
+
+
+    const handleSendFront = () => {
+        if (selectedItem && paper) {
+            if (selectedItem.type !== "rect" && selectedItem.type !== "circle") {
+                const currentIndex = stackOrder.indexOf(selectedItem);
+                if (currentIndex < stackOrder.length - 1) {
+                    const lastElement = stackOrder[stackOrder.length - 1];
+                    selectedItem.insertAfter(lastElement);
+                    setStackOrder(prevOrder => {
+                        const newOrder = [...prevOrder];
+                        newOrder.splice(currentIndex, 1); // Remove selectedItem from its current position
+                        newOrder.push(selectedItem); // Append selectedItem to the end of the array
+                        return newOrder;
+                    });
+                    reapplyFreeTransform(selectedItem);
+                }
+            }
+        }
+    };
+
+    const handleSendBack = () => {
+        if (selectedItem && paper) {
+            if (selectedItem.type !== "rect" && selectedItem.type !== "circle") {
+                const currentIndex = stackOrder.indexOf(selectedItem);
+                if (currentIndex > 0) {
+                    const firstElement = stackOrder[0];
+                    selectedItem.insertBefore(firstElement);
+                    setStackOrder(prevOrder => {
+                        const newOrder = [...prevOrder];
+                        newOrder.splice(currentIndex, 1); // Remove selectedItem from its current position
+                        newOrder.unshift(selectedItem); // Add selectedItem to the beginning of the array
+                        return newOrder;
+                    });
+                    reapplyFreeTransform(selectedItem);
+                }
+            }
+        }
+    };
+
+
+    const handleSendForward = () => {
+        if (selectedItem && paper) {
+            if (selectedItem.type !== "rect" && selectedItem.type !== "circle") {
+                const currentIndex = stackOrder.indexOf(selectedItem);
+                if (currentIndex < stackOrder.length - 1) {
+                    const nextElement = stackOrder[currentIndex + 1];
+                    selectedItem.insertAfter(nextElement);
+                    setStackOrder(prevOrder => {
+                        const newOrder = [...prevOrder];
+                        newOrder.splice(currentIndex, 1); // Remove from current position
+                        newOrder.splice(currentIndex + 1, 0, selectedItem); // Insert after next element
+                        return newOrder;
+                    });
+                    reapplyFreeTransform(selectedItem);
+                }
+            }
+        }
+    };
+
+    const handleSendBackward = () => {
+        if (selectedItem && paper) {
+            if (selectedItem.type !== "rect" && selectedItem.type !== "circle") {
+                const currentIndex = stackOrder.indexOf(selectedItem);
+                if (currentIndex > 0) {
+                    const prevElement = stackOrder[currentIndex - 1];
+                    selectedItem.insertBefore(prevElement);
+                    setStackOrder(prevOrder => {
+                        const newOrder = [...prevOrder];
+                        newOrder.splice(currentIndex, 1); // Remove from current position
+                        newOrder.splice(currentIndex - 1, 0, selectedItem); // Insert before previous element
+                        return newOrder;
+                    });
+                    reapplyFreeTransform(selectedItem);
+                }
+            }
+        }
+    };
+
+
+
+
 
     const handleDelete = () => {
         if (selectedItem && paper) {
@@ -502,6 +644,17 @@ const Vector = () => {
 
 
 
+    const buttons = [
+        { onClick: handleFlipY, iconSrc: "/mirrorUpDownIcon.svg", tooltip: "Flip Vertically", borderClasses: "border-r-0 border-black/20 rounded-l-full", borderRadiusClasses: "pr-1" },
+        { onClick: handleFlipX, iconSrc: "/mirrorSideIcon.svg", tooltip: "Flip Horizontally", borderClasses: "border-x-0 border-black/20", borderRadiusClasses: "px-1.5" },
+        { onClick: handleSendFront, iconSrc: "/sendFront.svg", tooltip: "Send to Front", borderClasses: "border-x-0 border-black/20", borderRadiusClasses: "px-1.5" },
+        { onClick: handleSendBack, iconSrc: "/sendBack.svg", tooltip: "Send to Back", borderClasses: "border-x-0 border-black/20", borderRadiusClasses: "px-1.5" },
+        { onClick: handleSendForward, iconSrc: "/forward.svg", tooltip: "Send Forward", borderClasses: "border-x-0 border-black/20", borderRadiusClasses: "px-1.5" },
+        { onClick: handleSendBackward, iconSrc: "/backward.svg", tooltip: "Send Backward", borderClasses: "border-x-0 border-black/20", borderRadiusClasses: "px-1.5" },
+        { onClick: handleCenterEL, iconSrc: "/centerIcon.svg", tooltip: "Center Element", borderClasses: "border-x-0 border-black/20", borderRadiusClasses: "px-1.5" },
+        { onClick: handleDelete, iconSrc: "/trash.svg", tooltip: "Delete Element", borderClasses: "border-l-0 border-black/20 rounded-r-full", borderRadiusClasses: "pl-1" },
+    ];
+
     return (
         <div className="relative w-full h-full">
 
@@ -523,25 +676,14 @@ const Vector = () => {
                 {selectedItem && (
                     <div className="absolute bottom-2 left-0 w-full mx-auto h-3 flex justify-start items-end gap-5 z-40">
                         <div className="flex justify-center items-center w-full">
-                            <div className='flex justify-center items-center bg-white shadow-sm border border-black/20 rounded-full overflow-hidden'>
-                                <div onClick={handleFlipY} className='flex justify-center items-center h-full pl-3 pr-1 py-2 hover:bg-so-deep-gray cursor-pointer'>
-                                    <Image src="/mirrorUpDownIcon.svg" width="20" height="20" alt="mirror-up-down-icon" />
-                                </div>
-                                <div onClick={handleFlipX} className='flex justify-center items-center h-full px-1.5 py-2 hover:bg-so-deep-gray cursor-pointer'>
-                                    <Image src="/mirrorSideIcon.svg" width="20" height="20" alt="mirror-side-icon" />
-                                </div>
-                                <div onClick={handleCenterEL} className='flex justify-center items-center h-full px-1.5 py-2 hover:bg-so-deep-gray cursor-pointer'>
-                                    <Image src="/centerIcon.svg" width="20" height="20" alt="center-icon" />
-                                </div>
-                                <div onClick={handleDelete} className='flex justify-center items-center h-full pr-3 pl-1 py-2 hover:bg-so-deep-gray cursor-pointer'>
-                                    <Image src="/trash.svg" width="20" height="20" alt="trash" />
-                                </div>
-
+                            <div className='flex justify-center items-center bg-white shadow-sm border rounded-full'>
+                                {buttons.map((button, index) => (
+                                    <ButtonControl key={index} {...button} />
+                                ))}
                             </div>
                         </div>
                     </div>
                 )}
-
                 {/* <div onClick={handleCenterEL} className='absolute right-3 bottom-3 cursor-pointer z-50'>
                     <Image src="/centerIcon.svg" width="20" height="20" alt="center-icon" />
                 </div> */}

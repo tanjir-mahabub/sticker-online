@@ -12,47 +12,46 @@ type LaminateOption = {
     cost: number;
 }
 
+const laminatOptions: LaminateOption[] = [
+    {
+        id: 1,
+        label: 'Glansig',
+        cost: 5
+    },
+    {
+        id: 2,
+        label: 'Glansig 2',
+        cost: 10
+    },
+    {
+        id: 3,
+        label: 'Glansig 3',
+        cost: 15
+    },
+];
+
 const LaminatingDropdown: React.FC = () => {
+    const laminatingDefault = useAppSelector(state => state.formValues.laminatingLastSelected);
+
+    const selected = laminatOptions.find(option => option.id === laminatingDefault);
+
     const [isOpen, setIsOpen] = useState(false);
-    const [selectedOption, setSelectedOption] = useState<LaminateOption | null>(null);
+    const [selectedOption, setSelectedOption] = useState<LaminateOption | null>(selected || null);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     const dispatch = useDispatch();
-
-    const laminatingDefault = useAppSelector(state => state.formValues);
-
-    const laminatOptions: LaminateOption[] = [
-        {
-            id: 1,
-            label: 'Glansig',
-            cost: 5
-        },
-        {
-            id: 2,
-            label: 'Glansig 2',
-            cost: 10
-        },
-        {
-            id: 3,
-            label: 'Glansig 3',
-            cost: 15
-        },
-    ];
 
     const handleOptionChange = (option: LaminateOption) => {
         setIsOpen(false);
         setSelectedOption(option);
 
         dispatch(setLaminatingLastSelected(option.id));
-        dispatch(setCalculation({ laminatingCost: option.cost }));
     };
 
     useEffect(() => {
-        // Set default selected option to have id 1
-        if (laminatingDefault.materialLastSelected !== null) {
-            setSelectedOption(laminatOptions.find(option => option.id === laminatingDefault.laminatingLastSelected) || null);
-        }
-    }, [laminatingDefault]);
+        selectedOption && dispatch(setCalculation({ laminatingCost: selectedOption.cost }));
+
+    }, [selectedOption, dispatch]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {

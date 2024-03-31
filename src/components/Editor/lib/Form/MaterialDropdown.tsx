@@ -22,13 +22,15 @@ export interface MaterialOption {
 
 // Assuming materialStore is correctly imported and structured
 const MaterialDropdown: React.FC = () => {
+    const materialDefault = useAppSelector(state => state.formValues.materialLastSelected);
+    const selected = materialStore.find(option => option.id === materialDefault);
+
     const [isOpen, setIsOpen] = useState(false);
-    const [selectedOption, setSelectedOption] = useState<MaterialOption | null>(null);
+    const [selectedOption, setSelectedOption] = useState<MaterialOption | null>(selected || null);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     const dispatch = useDispatch();
 
-    const materialDefault = useAppSelector(state => state.formValues);
 
     // Splitting the materialStore into two arrays for explicit column control
     const halfIndex = Math.ceil(materialStore.length / 2);
@@ -42,19 +44,11 @@ const MaterialDropdown: React.FC = () => {
         const selectedMaterial = materialStore.find(material => material.id === option.id);
 
         dispatch(setMaterialLastSelected(option.id));
-        if (selectedMaterial) {
-            dispatch(setCalculation({ materialCost: selectedMaterial.cost }));
-        }
     };
 
-
-
     useEffect(() => {
-        // Set default selected option to have id 1
-        if (materialDefault.materialLastSelected !== null) {
-            setSelectedOption(materialStore.find(option => option.id === materialDefault.materialLastSelected) || null);
-        }
-    }, [materialDefault]);
+        selectedOption && dispatch(setCalculation({ materialCost: selectedOption.cost }));
+    }, [dispatch, selectedOption]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
