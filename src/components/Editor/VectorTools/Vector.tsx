@@ -8,7 +8,7 @@ import { useAppSelector } from '@/redux/store';
 import RangeSlider from "../Customize/child/Input/RangeSlider";
 import Image from 'next/image';
 import VectorFrame from './CanvasFrame';
-import { BoundingBox, Frame } from '@/types/types';
+import { BoundingBox, ExtendedRaphaelPaper, Frame } from '@/types/types';
 import { calculateFrameEdges, isObjectInsideFrame } from '@/components/Utils/functions';
 import Spinner from '@/components/Utils/Spinner';
 import { fontDieCutFunction } from '@/components/Utils/fontDieCutFunction';
@@ -21,14 +21,6 @@ import { clearAllHistories, deleteHistoryById } from '@/redux/features/historySl
 import { Tooltip } from '@/components/Utils/ToolTips';
 import ButtonControl from '../lib/ButtonControll';
 
-interface ExtendedRaphaelPaper {
-    width: number;
-    height: number;
-    forEach(callback: (el: any) => void): void;
-    rect: (x: number, y: number, width: number, height: number, round?: number) => void;
-    circle: (x: number, y: number, radius: number) => void;
-    path: (d: string) => void;
-}
 
 const Vector = () => {
     const raphaelRef = useRef<HTMLDivElement | null>(null);
@@ -220,8 +212,8 @@ const Vector = () => {
                 const element = addTextElement({
                     id: text.id,
                     text: text.text,
-                    x: text.x + 10 || 0,
-                    y: text.y + 10 || 0,
+                    x: text.x || 0,
+                    y: text.y || 0,
                     width: text.width,
                     height: text.height,
                     attrs: {
@@ -645,14 +637,14 @@ const Vector = () => {
 
 
     const buttons = [
-        { onClick: handleFlipY, iconSrc: "/mirrorUpDownIcon.svg", tooltip: "Flip Vertically", borderClasses: "border-r-0 border-black/20 rounded-l-full", borderRadiusClasses: "pr-1" },
+        { onClick: handleFlipY, iconSrc: "/mirrorUpDownIcon.svg", tooltip: "Flip Vertically", borderClasses: "border-r-0 border-black/20 rounded-l-full", borderRadiusClasses: "pl-3 pr-1" },
         { onClick: handleFlipX, iconSrc: "/mirrorSideIcon.svg", tooltip: "Flip Horizontally", borderClasses: "border-x-0 border-black/20", borderRadiusClasses: "px-1.5" },
         { onClick: handleSendFront, iconSrc: "/sendFront.svg", tooltip: "Send to Front", borderClasses: "border-x-0 border-black/20", borderRadiusClasses: "px-1.5" },
         { onClick: handleSendBack, iconSrc: "/sendBack.svg", tooltip: "Send to Back", borderClasses: "border-x-0 border-black/20", borderRadiusClasses: "px-1.5" },
         { onClick: handleSendForward, iconSrc: "/forward.svg", tooltip: "Send Forward", borderClasses: "border-x-0 border-black/20", borderRadiusClasses: "px-1.5" },
         { onClick: handleSendBackward, iconSrc: "/backward.svg", tooltip: "Send Backward", borderClasses: "border-x-0 border-black/20", borderRadiusClasses: "px-1.5" },
         { onClick: handleCenterEL, iconSrc: "/centerIcon.svg", tooltip: "Center Element", borderClasses: "border-x-0 border-black/20", borderRadiusClasses: "px-1.5" },
-        { onClick: handleDelete, iconSrc: "/trash.svg", tooltip: "Delete Element", borderClasses: "border-l-0 border-black/20 rounded-r-full", borderRadiusClasses: "pl-1" },
+        { onClick: handleDelete, iconSrc: "/trash.svg", tooltip: "Delete Element", borderClasses: "border-l-0 border-black/20 rounded-r-full", borderRadiusClasses: "pr-3 pl-1" },
     ];
 
     return (
@@ -665,10 +657,12 @@ const Vector = () => {
 
             <div className='absolute z-50 left-0 bottom-0 w-full h-fit'>
                 {(StickerSelected.id === 1) && (
-                    <div className="absolute bottom-1.5 left-0 w-fit mx-auto h-3 flex justify-start items-end gap-5 z-50">
+                    <div className="absolute bottom-0 left-0 w-fit mx-auto h-3 flex justify-start items-end gap-5 z-50">
                         <div className="flex gap-3 p-4 space-y-3 w-60">
                             <RangeSlider minValue={0} maxValue={100} step={1} defaultValue={0} label="Kantlinje" />
-                            <button onClick={handleDieCut} className='bg-white border border-black/20 rounded-full px-2.5 py-1.5'>Apply</button>
+                            <Tooltip message='Die Cut Effect'>
+                                <button onClick={handleDieCut} className='text-sm font-semibold bg-white hover:bg-so-deep-gray cursor-pointer border border-black/20 hover:border-black/50 shadow-sm hover:shadow-lg rounded-full px-2 pt-1 pb-1.5'>Apply</button>
+                            </Tooltip>
                         </div>
                     </div>
                 )}

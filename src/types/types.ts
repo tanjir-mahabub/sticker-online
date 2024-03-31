@@ -34,6 +34,15 @@ export interface ImageInfo {
   rotate?: number;
 }
 
+export interface ExtendedRaphaelPaper {
+  width: number;
+  height: number;
+  forEach(callback: (el: any) => void): void;
+  rect: (x: number, y: number, width: number, height: number, round?: number) => void;
+  circle: (x: number, y: number, radius: number) => void;
+  path: (d: string) => void;
+}
+
 
 export interface CanvasState {  
   width: number;
