@@ -18,7 +18,7 @@ const ButtonControl: FC<ButtonControlProps> = ({
     tooltip,
     borderClasses = '',
     borderRadiusClasses = '',
-    disabled = false,
+    disabled,
     disabledIconFilter = 'brightness(0) invert(0.5)',
 }) => (
     <Tooltip message={tooltip}>

@@ -259,7 +259,9 @@ const Vector = () => {
             const objectHistory = ElementHistories.find(history => history.objectId === objectId);
             const historyStep = objectHistory ? objectHistory.historyStep : 0;
             ElementHistories.map((item) => {
-                // console.log('history item', item);
+                if (selectedItem.id === item.objectId) {
+                    console.log('history last step', item.history[historyStep]);
+                }
             })
 
 
@@ -396,7 +398,7 @@ const Vector = () => {
 
     // Update the stacking order when adding or removing elements
     useEffect(() => {
-        if (paper) {
+        if (paper && imagePreviews && textPreviews) {
             const elements: any[] = [];
             paper.forEach(el => {
                 if (el.type !== "rect" && el.type !== "circle") {
@@ -405,16 +407,16 @@ const Vector = () => {
             });
             setStackOrder(elements);
         }
-    }, [paper]);
+    }, [paper, imagePreviews, textPreviews]);
 
 
     const handleSendFront = () => {
-        if (selectedItem && paper) {
+        if (selectedItem && paper && stackOrder.length > 0) {
             if (selectedItem.type !== "rect" && selectedItem.type !== "circle") {
                 const currentIndex = stackOrder.indexOf(selectedItem);
                 if (currentIndex < stackOrder.length - 1) {
                     const lastElement = stackOrder[stackOrder.length - 1];
-                    selectedItem.insertAfter(lastElement);
+                    selectedItem?.insertAfter(lastElement);
                     setStackOrder(prevOrder => {
                         const newOrder = [...prevOrder];
                         newOrder.splice(currentIndex, 1); // Remove selectedItem from its current position
@@ -428,12 +430,13 @@ const Vector = () => {
     };
 
     const handleSendBack = () => {
-        if (selectedItem && paper) {
+        if (selectedItem && paper && stackOrder.length > 0) {
+            console.log(selectedItem, stackOrder);
             if (selectedItem.type !== "rect" && selectedItem.type !== "circle") {
                 const currentIndex = stackOrder.indexOf(selectedItem);
                 if (currentIndex > 0) {
                     const firstElement = stackOrder[0];
-                    selectedItem.insertBefore(firstElement);
+                    selectedItem?.insertBefore(firstElement);
                     setStackOrder(prevOrder => {
                         const newOrder = [...prevOrder];
                         newOrder.splice(currentIndex, 1); // Remove selectedItem from its current position
@@ -448,7 +451,7 @@ const Vector = () => {
 
 
     const handleSendForward = () => {
-        if (selectedItem && paper) {
+        if (selectedItem && paper && stackOrder.length > 0) {
             if (selectedItem.type !== "rect" && selectedItem.type !== "circle") {
                 const currentIndex = stackOrder.indexOf(selectedItem);
                 if (currentIndex < stackOrder.length - 1) {
@@ -467,7 +470,7 @@ const Vector = () => {
     };
 
     const handleSendBackward = () => {
-        if (selectedItem && paper) {
+        if (selectedItem && paper && stackOrder.length > 0) {
             if (selectedItem.type !== "rect" && selectedItem.type !== "circle") {
                 const currentIndex = stackOrder.indexOf(selectedItem);
                 if (currentIndex > 0) {
@@ -639,10 +642,10 @@ const Vector = () => {
     const buttons = [
         { onClick: handleFlipY, iconSrc: "/mirrorUpDownIcon.svg", tooltip: "Flip Vertically", borderClasses: "border-r-0 border-black/20 rounded-l-full", borderRadiusClasses: "pl-3 pr-1" },
         { onClick: handleFlipX, iconSrc: "/mirrorSideIcon.svg", tooltip: "Flip Horizontally", borderClasses: "border-x-0 border-black/20", borderRadiusClasses: "px-1.5" },
-        { onClick: handleSendFront, iconSrc: "/sendFront.svg", tooltip: "Send to Front", borderClasses: "border-x-0 border-black/20", borderRadiusClasses: "px-1.5" },
-        { onClick: handleSendBack, iconSrc: "/sendBack.svg", tooltip: "Send to Back", borderClasses: "border-x-0 border-black/20", borderRadiusClasses: "px-1.5" },
-        { onClick: handleSendForward, iconSrc: "/forward.svg", tooltip: "Send Forward", borderClasses: "border-x-0 border-black/20", borderRadiusClasses: "px-1.5" },
-        { onClick: handleSendBackward, iconSrc: "/backward.svg", tooltip: "Send Backward", borderClasses: "border-x-0 border-black/20", borderRadiusClasses: "px-1.5" },
+        { onClick: handleSendFront, disabled: stackOrder.length === 1 && true, iconSrc: "/sendFront.svg", tooltip: "Send to Front", borderClasses: "border-x-0 border-black/20", borderRadiusClasses: "px-1.5" },
+        { onClick: handleSendBack, disabled: stackOrder.length === 1 && true, iconSrc: "/sendBack.svg", tooltip: "Send to Back", borderClasses: "border-x-0 border-black/20", borderRadiusClasses: "px-1.5" },
+        { onClick: handleSendForward, disabled: stackOrder.length === 1 && true, iconSrc: "/forward.svg", tooltip: "Send Forward", borderClasses: "border-x-0 border-black/20", borderRadiusClasses: "px-1.5" },
+        { onClick: handleSendBackward, disabled: stackOrder.length === 1 && true, iconSrc: "/backward.svg", tooltip: "Send Backward", borderClasses: "border-x-0 border-black/20", borderRadiusClasses: "px-1.5" },
         { onClick: handleCenterEL, iconSrc: "/centerIcon.svg", tooltip: "Center Element", borderClasses: "border-x-0 border-black/20", borderRadiusClasses: "px-1.5" },
         { onClick: handleDelete, iconSrc: "/trash.svg", tooltip: "Delete Element", borderClasses: "border-l-0 border-black/20 rounded-r-full", borderRadiusClasses: "pr-3 pl-1" },
     ];
