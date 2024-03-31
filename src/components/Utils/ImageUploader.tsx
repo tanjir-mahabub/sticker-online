@@ -42,7 +42,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload }) => {
         <div className="space-y-5">
             <div {...getRootProps()} className="flex flex-col justify-center items-center border-2 border-dashed border-black/30 w-full h-40 space-y-3 hover:bg-so-deep-gray cursor-pointer transition">
                 <div className="flex">
-                    <Image src="/editor/sidebar/upload.svg" alt="logo" width={50} height={100} className="drop-shadow-lg w-fit h-fit rounded-full" />
+                    <Image src="/editor/sidebar/upload.svg" alt="logo" width={50} height={100} className="drop-shadow-lg w-fit h-fit rounded-full" priority />
                 </div>
                 <input {...getInputProps()} />
                 {isDragActive ? (

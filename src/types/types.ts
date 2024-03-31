@@ -47,6 +47,7 @@ export interface CanvasState {
   scale: number;
   grow: number;
   selectionCancel?: boolean;
+  backgroundColor?: string;
 }
 
 

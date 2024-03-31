@@ -1,21 +1,27 @@
+import { setCanvasProperties } from '@/redux/features/canvasSlice';
+import { useAppSelector } from '@/redux/store';
 import { Sketch, Compact } from '@uiw/react-color';
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 
 interface ColorStyle {
     sketch?: boolean;
     compact?: boolean;
     showValue?: boolean;
     styles?: React.CSSProperties;
-    defaultColor?: string;
     onColorChange?: (color: string) => void;
 }
 
-const ColorInput: React.FC<ColorStyle> = ({ sketch, compact, showValue, styles, defaultColor = "#ffffff", onColorChange }) => {
-    const [hex, setHex] = useState(defaultColor);
+const ColorInput: React.FC<ColorStyle> = ({ sketch, compact, showValue, styles, onColorChange }) => {
+    const defaultBackgroundColor = useAppSelector(state => state.canvas.backgroundColor)
+    const [hex, setHex] = useState(defaultBackgroundColor);
+
+    const dispatch = useDispatch();
 
     const handleChange = (color: { hex: string }) => {
         setHex(color.hex);
         onColorChange && onColorChange(color.hex);
+        dispatch(setCanvasProperties({ backgroundColor: color.hex }))
     };
 
     return (
