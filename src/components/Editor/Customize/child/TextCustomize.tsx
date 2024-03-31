@@ -94,7 +94,6 @@ const TextCustomize: React.FC = () => {
                             <div className='absolute left-0 bottom-[75px] z-20'>
                                 <ColorInput
                                     sketch
-                                    defaultColor={selectedColor}
                                     onColorChange={setSelectedColor}
                                     styles={{
                                         width: '100%',
