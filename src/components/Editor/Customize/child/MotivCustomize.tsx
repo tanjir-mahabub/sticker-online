@@ -6,6 +6,7 @@ import { useDispatch } from "react-redux";
 import { addImage, clearImages } from "@/redux/features/imagePreviewSlice";
 import { RootState, useAppSelector } from "@/redux/store";
 import { generateUniqueId } from "@/components/Utils/functions";
+import { deleteAllHistoriesByCategory } from "@/redux/features/historySlice";
 
 const MotivCustomize = () => {
     const [selectedMotiveCategory, setSelectedMotiveCategory] = useState('Populära');
@@ -25,6 +26,7 @@ const MotivCustomize = () => {
     const handleDeleteBTN = () => {
 
         dispatch(clearImages("motiv"));
+        dispatch(deleteAllHistoriesByCategory("motiv"))
     };
 
     return (

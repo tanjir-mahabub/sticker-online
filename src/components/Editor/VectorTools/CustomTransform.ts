@@ -34,6 +34,8 @@ export const CustomTransform = (element: any, options = {}, dispatch?: any) => {
             console.log('applied', ft.subject.transform());
     
             const matrix = ft.subject.transform();
+
+            console.log(matrix);
     
             let x = bbox.x;
             let y = bbox.y;
@@ -65,33 +67,34 @@ export const CustomTransform = (element: any, options = {}, dispatch?: any) => {
             });
     
             // Calculate width and height based on original dimensions and scaling
-            const originalWidth = 651; // Example original width
-            const originalHeight = 416; // Example original height
-            width = originalWidth * scaleX;
-            height = originalHeight * scaleY;
+            // const originalWidth = 651; // Example original width
+            // const originalHeight = 416; // Example original height
+            // width = originalWidth * scaleX;
+            // height = originalHeight * scaleY;
     
             // Log transformation values
     
-            // console.log("X:", x);
-            // console.log("Y:", y);
-            // console.log("ScaleX:", scaleX);
-            // console.log("ScaleY:", scaleY);
-            // console.log("Width:", width);
-            // console.log("Height:", height);
-            // console.log("Rotate:", rotate);
+            console.log("X:", bbox.x);
+            console.log("Y:", bbox.y);
+            console.log("ScaleX:", scaleX);
+            console.log("ScaleY:", scaleY);
+            console.log("Width:", width);
+            console.log("Height:", height);
+            console.log("Rotate:", rotate);
     
-            dispatch(addedToHistory({
-                objectId: ft.subject.id,
-                position: {
-                    x: initialPosition.x, // Use initial position instead of bbox.x
-                    y: initialPosition.y, // Use initial position instead of bbox.y
-                    width: width,
-                    height: height,
-                    scaleX: scaleX,
-                    scaleY: scaleY,
-                    rotation: rotate
-                }
-            }));
+            // dispatch(addedToHistory({
+            //     objectId: ft.subject.id,
+            //     category: ft.subject.data().data || '',
+            //     position: {
+            //         x: bbox.x, // Use initial position instead of bbox.x
+            //         y: bbox.y, // Use initial position instead of bbox.y
+            //         width: width,
+            //         height: height,
+            //         scaleX: scaleX,
+            //         scaleY: scaleY,
+            //         rotation: rotate
+            //     }
+            // }));
         }
     };
     
@@ -116,6 +119,7 @@ export const CustomTransform = (element: any, options = {}, dispatch?: any) => {
     
             // Capture initial position before any transformation
             const initialPosition = { x: bbox.x, y: bbox.y };
+            console.log('initialPosition', initialPosition);
     
             // Extract transformation values from the transformation matrix
             matrix.forEach(([operation, ...params]: any) => {
@@ -144,22 +148,23 @@ export const CustomTransform = (element: any, options = {}, dispatch?: any) => {
             // Log transformation values
             console.log(ft.subject.id);
     
-            // console.log("Drag end X:", x);
-            // console.log("Drag end Y:", y);
-            // console.log("Drag end ScaleX:", scaleX);
-            // console.log("Drag end ScaleY:", scaleY);
-            // console.log("Drag end Width:", width);
-            // console.log("Drag end Height:", height);
-            // console.log("Drag end Rotate:", rotate);
+            console.log("Drag end X:", bbox.x);
+            console.log("Drag end Y:", bbox.y);
+            console.log("Drag end ScaleX:", scaleX);
+            console.log("Drag end ScaleY:", scaleY);
+            console.log("Drag end Width:", width);
+            console.log("Drag end Height:", height);
+            console.log("Drag end Rotate:", rotate);
     
             // Dispatch action if necessary
             dispatch(addedToHistory({
                 objectId: ft.subject.id,
+                category: ft.subject.data().data || '',
                 position: {
-                    x: initialPosition.x, // Use initial position instead of bbox.x
-                    y: initialPosition.y, // Use initial position instead of bbox.y
-                    width: width,
-                    height: height,
+                    x: bbox.x, // Use initial position instead of bbox.x
+                    y: bbox.y, // Use initial position instead of bbox.y
+                    // width: width,
+                    // height: height,
                     scaleX: scaleX,
                     scaleY: scaleY,
                     rotation: rotate

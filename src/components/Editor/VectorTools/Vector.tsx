@@ -31,6 +31,7 @@ const Vector = () => {
     const [selectedItem, setSelectedItem] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [lastAddedElement, setLastAddedElement] = useState<any>(null);
+    const [stackOrder, setStackOrder] = useState<any[]>([]);
 
 
     const dispatch = useDispatch();
@@ -252,23 +253,6 @@ const Vector = () => {
     }, [lastAddedElement, handleElementInteraction, reapplyFreeTransform])
 
 
-    // History snippet
-    useEffect(() => {
-        if (selectedItem) {
-            const objectId = selectedItem.id;
-            const objectHistory = ElementHistories.find(history => history.objectId === objectId);
-            const historyStep = objectHistory ? objectHistory.historyStep : 0;
-            ElementHistories.map((item) => {
-                if (selectedItem.id === item.objectId) {
-                    console.log('history last step', item.history[historyStep]);
-                }
-            })
-
-
-        }
-    })
-
-
     /**
      * Elements cleanup tasks from the paper
      */
@@ -332,28 +316,6 @@ const Vector = () => {
     });
 
 
-    // useEffect(() => {
-    //     // Define the function that should run before unload
-    //     const handleBeforeUnload = (e: Event) => {
-    //         // updateAllTextTransforms();
-
-    //         console.log('Saving text transformations before refresh or page navigation');
-    //     };
-
-    //     // Attach the event listener to the window object
-    //     window.addEventListener('beforeunload', handleBeforeUnload);
-
-    //     // Return a cleanup function that removes the event listener
-    //     return () => {
-    //         window.removeEventListener('beforeunload', handleBeforeUnload);
-    //     };
-    // }, [updateAllTextTransforms]);
-
-    // useEffect(() => {
-    //     ElementHistories && console.log(ElementHistories);
-    // }, [ElementHistories])
-
-
     const isElementInsideFrame = (
         element: any,
         centerX: number,
@@ -392,9 +354,6 @@ const Vector = () => {
             reapplyFreeTransform(selectedItem);
         }
     };
-
-
-    const [stackOrder, setStackOrder] = useState<any[]>([]);
 
     // Update the stacking order when adding or removing elements
     useEffect(() => {
@@ -505,6 +464,7 @@ const Vector = () => {
 
 
             selectedItem.remove(); // Remove the element            
+            dispatch(deleteHistoryById(selectedItem.id)) // delete history
             deselect();
             setSelectedItem(null); // Reset selection
         }
@@ -649,6 +609,50 @@ const Vector = () => {
         { onClick: handleCenterEL, iconSrc: "/centerIcon.svg", tooltip: "Center Element", borderClasses: "border-x-0 border-black/20", borderRadiusClasses: "px-1.5" },
         { onClick: handleDelete, iconSrc: "/trash.svg", tooltip: "Delete Element", borderClasses: "border-l-0 border-black/20 rounded-r-full", borderRadiusClasses: "pr-3 pl-1" },
     ];
+
+
+    // useEffect(() => {
+    //     if (ElementHistories && stackOrder) {
+    //         const stackOrderIds = new Set(stackOrder.map(item => item.id));
+    //         console.log("stackOrderIds:", stackOrderIds);
+
+    //         // Filter ElementHistories to find items whose objectId matches any id in stackOrderIds
+    //         const matchedHistories = ElementHistories.filter(history => stackOrderIds.has(history.objectId));
+    //         console.log("matchedHistories:", matchedHistories);
+
+    //         // Loop through each item in stackOrder
+    //         stackOrder.forEach((stackItem) => {
+    //             // Find the corresponding history in ElementHistories
+    //             const objectHistory = matchedHistories.find(history => history.objectId === stackItem.id);
+    //             if (objectHistory) {
+    //                 const historyStep = objectHistory.historyStep;
+    //                 // Access item.history[historyStep]
+    //                 console.log(`History for stackOrder item ${stackItem.id} at step ${historyStep}:`, objectHistory.history[historyStep]);
+    //             }
+    //         });
+    //     }
+    // })
+
+    // const handleBeforeUnload = useCallback((e: Event) => {
+
+
+    //     console.log('Saving text transformations before refresh or page navigation');
+    // }, [])
+
+    // useEffect(() => {
+    //     // Define the function that should run before unload
+    //     // updateAllTextTransforms();
+
+    //     // Attach the event listener to the window object
+    //     window.addEventListener('beforeunload', handleBeforeUnload);
+
+    //     // Return a cleanup function that removes the event listener
+    //     return () => {
+    //         window.removeEventListener('beforeunload', handleBeforeUnload);
+    //     };
+    // });
+
+
 
     return (
         <div className="relative w-full h-full">
