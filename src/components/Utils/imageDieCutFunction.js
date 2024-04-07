@@ -18,7 +18,7 @@ async function loadImage(src) {
 
 async function convertSVGtoPNG(dataURL) {
     await loadImage(dataURL);
-    ctx.drawImage(img, 0, 0, img.width, img.height);
+    ctx.drawImage(img, 100, 100, img.width * .50, img.height * 0.5);
     const pngDataUrl = canvas.toDataURL('image/png');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     return loadImage(pngDataUrl);
@@ -78,7 +78,7 @@ function redraw(points) {
             .attr("d", lineGenerator)
             .attr("fill", "none")
             .attr("stroke", "red") // First modified path in red
-            .attr("stroke-width", 100) 
+            .attr("stroke-width", 10) 
             .attr("stroke-linejoin", "bevel")
             .attr("stroke-linecap", "round")
             .attr("clip-path", "url(#myClip)");
@@ -90,7 +90,7 @@ function redraw(points) {
             .attr("d", lineGenerator)
             .attr("fill", "red")
             .attr("stroke", "red") // Second modified path in green
-            .attr("stroke-width", 100) 
+            .attr("stroke-width", 10) 
             .attr("stroke-linejoin", "bevel")
             .attr("stroke-linecap", "round")
             .attr('width', img.width)

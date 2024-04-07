@@ -14,14 +14,47 @@ const MotivCustomize = () => {
     const imagePreviews = useAppSelector((state: RootState) => state.imagePreview.images);
 
     const handleMotivClick = async (icon: string) => {
+        // Create a new image element
+        const img = new window.Image();
 
-        const newImage = {
-            id: generateUniqueId(),
-            src: icon,
-            category: 'motiv',
+        // Set the source of the image to the icon URL
+        img.src = icon;
+
+        // Once the image has loaded, draw it onto a canvas
+        img.onload = function () {
+            // Create a canvas element
+            const canvas = document.createElement('canvas');
+
+            // Set the canvas dimensions
+            canvas.width = img.width;
+            canvas.height = img.height;
+
+            // Get the canvas context
+            const ctx = canvas.getContext('2d');
+
+            // Check if the canvas context is available
+            if (ctx) {
+                // Draw the image onto the canvas
+                ctx.drawImage(img, 0, 0);
+
+                // Convert the canvas content to a data URL
+                const dataURL = canvas.toDataURL();
+
+                // Create a new image object with the data URL
+                const newImage = {
+                    id: generateUniqueId(),
+                    src: dataURL,
+                    category: 'motiv',
+                };
+
+                // Dispatch the new image to the store
+                dispatch(addImage(newImage));
+            } else {
+                console.error('Unable to get canvas context');
+            }
         };
-        dispatch(addImage(newImage));
     };
+
 
     const handleDeleteBTN = () => {
 

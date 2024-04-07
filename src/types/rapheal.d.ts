@@ -3,6 +3,7 @@ declare module 'raphael' {
     
     interface Element {
       freeTransform: (options?: any) => any; 
+      toSVG: () => any;
     }
       
     export default Raphael;

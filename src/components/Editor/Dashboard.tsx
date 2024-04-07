@@ -10,10 +10,12 @@ const RaphaelComponentNoSSR = dynamic(() => import('@/components/Editor/VectorTo
 });
 
 const Dashboard = () => {
-    const divRef = useRef<HTMLDivElement>(null);
-    const [innerWidth, setInnerWidth] = useState(0);
-    const [innerHeight, setInnerHeight] = useState(0);
-    const [CanvasProps, setCanvasProps] = useState({});
+    const divRef = useRef<HTMLDivElement | null>(null);
+
+    const [containerDimensions, setContainerDimensions] = useState<{
+        width: number;
+        height: number;
+    }>({ width: 0, height: 0 });
 
     const dispatch = useDispatch();
 
@@ -23,9 +25,9 @@ const Dashboard = () => {
 
     useEffect(() => {
         const handleResize = () => {
-            if (divRef.current) {
-                setInnerWidth(divRef.current.clientWidth);
-                setInnerHeight(divRef.current.clientHeight);
+            if (divRef?.current) {
+                const { clientWidth, clientHeight } = divRef.current;
+                setContainerDimensions({ width: clientWidth, height: clientHeight });
             }
         };
 
@@ -38,49 +40,27 @@ const Dashboard = () => {
         };
     }, []);
 
-    // useEffect(() => {
-    //     setCanvasProps({
-    //         width: innerWidth,
-    //         height: innerHeight,
-    //         frameWidth: frameWidth,
-    //         frameHeight: frameHeight,
-    //         centerX: innerWidth / 2,
-    //         centerY: innerHeight / 2
-    //     })
-    // }, [innerWidth, innerHeight, frameWidth, frameHeight]);
-
     useEffect(() => {
+        const { width, height } = containerDimensions;
         // Calculate the aspect ratios
-        const canvasAspectRatio = innerWidth / innerHeight;
-        const frameAspectRatio = frameWidth / frameHeight;
+        const canvasAspectRatio = width / height;
 
-        // Calculate the scale to fit the frame within 90% of the canvas
-        let scale;
-        if (frameAspectRatio > canvasAspectRatio) {
-            // Frame is wider than canvas, scale based on width
-            scale = (innerWidth * 0.75) / frameWidth;
-        } else {
-            // Frame is taller than canvas, scale based on height
-            scale = (innerHeight * 0.75) / frameHeight;
+        // Calculate the frame dimensions to maintain 75% aspect ratio of container dimensions
+        let scaledFrameWidth = width * 0.75;
+        let scaledFrameHeight = height * 0.75;
+
+        // If the frame aspect ratio is wider than the canvas, adjust height
+        if (frameWidth / frameHeight > canvasAspectRatio) {
+            scaledFrameHeight = (width * 0.75) / (frameWidth / frameHeight);
+        }
+        // If the frame aspect ratio is taller than the canvas, adjust width
+        else {
+            scaledFrameWidth = (height * 0.75) * (frameWidth / frameHeight);
         }
 
-        // Calculate new frame dimensions
-        const scaledFrameWidth = frameWidth * scale;
-        const scaledFrameHeight = frameHeight * scale;
-
-        // Adjust center position based on scaled size
-        const scaledCenterX = innerWidth / 2 - scaledFrameWidth / 2;
-        const scaledCenterY = innerHeight / 2 - scaledFrameHeight / 2;
-
-        setCanvasProps({
-            width: innerWidth,
-            height: innerHeight,
-            frameWidth: scaledFrameWidth,
-            frameHeight: scaledFrameHeight,
-            centerX: scaledCenterX + scaledFrameWidth / 2, // Center of the scaled frame
-            centerY: scaledCenterY + scaledFrameHeight / 2, // Center of the scaled frame
-            scale // You might need to adjust how this scale is applied within your Canvas component
-        });
+        // Calculate center position based on scaled size
+        const scaledCenterX = width / 2 - scaledFrameWidth / 2;
+        const scaledCenterY = height / 2 - scaledFrameHeight / 2;
 
         dispatch(setCanvasProperties({
             frameWidth: scaledFrameWidth,
@@ -88,14 +68,12 @@ const Dashboard = () => {
             centerX: scaledCenterX + scaledFrameWidth / 2, // Center of the scaled frame
             centerY: scaledCenterY + scaledFrameHeight / 2, // Center of the scaled frame            
         }))
-    }, [innerWidth, innerHeight, frameWidth, frameHeight, dispatch]);
+    }, [containerDimensions, frameWidth, frameHeight, dispatch]);
 
 
     return (
         <div ref={divRef} className="relative top-0 left-0 w-full overflow-hidden border-l bg-so-deep-gray">
-            {CanvasProps && (
-                <RaphaelComponentNoSSR />
-            )}
+            <RaphaelComponentNoSSR />
         </div>
     );
 };

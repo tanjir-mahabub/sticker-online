@@ -34,6 +34,7 @@
     "@image-tracer-ts/browser": "^1.0.3",
     "@types/d3": "^7.4.3",
     "@types/node": "^20",
+    "@types/raphael": "^2.3.9",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/redux-persist": "^4.3.1",

@@ -29,13 +29,13 @@ export const CustomTransform = (element: any, options = {}, dispatch?: any) => {
     const onTransform = (ft: any, events: any) => {
         if (events.includes('scale end') || events.includes('rotate end')) {
             const bbox: any = ft.subject.getBBox();
-            console.log('drag start', bbox);
+            // console.log('drag start', bbox);
     
-            console.log('applied', ft.subject.transform());
+            // console.log('applied', ft.subject.transform());
     
             const matrix = ft.subject.transform();
 
-            console.log(matrix);
+            // console.log(matrix);
     
             let x = bbox.x;
             let y = bbox.y;
@@ -74,13 +74,13 @@ export const CustomTransform = (element: any, options = {}, dispatch?: any) => {
     
             // Log transformation values
     
-            console.log("X:", bbox.x);
-            console.log("Y:", bbox.y);
-            console.log("ScaleX:", scaleX);
-            console.log("ScaleY:", scaleY);
-            console.log("Width:", width);
-            console.log("Height:", height);
-            console.log("Rotate:", rotate);
+            // console.log("X:", bbox.x);
+            // console.log("Y:", bbox.y);
+            // console.log("ScaleX:", scaleX);
+            // console.log("ScaleY:", scaleY);
+            // console.log("Width:", width);
+            // console.log("Height:", height);
+            // console.log("Rotate:", rotate);
     
             // dispatch(addedToHistory({
             //     objectId: ft.subject.id,
@@ -100,7 +100,7 @@ export const CustomTransform = (element: any, options = {}, dispatch?: any) => {
     
     
     
-    const ft = element.paper.freeTransform(element, transformOptions, onTransform);
+    const ft = element?.paper?.freeTransform(element, transformOptions, onTransform);
 
     ft.subject.node.addEventListener('mouseup', () => {
         // Check if the current event is a drag end event (consider checking for 'dragmove' before to ensure it's a drag)
@@ -119,7 +119,7 @@ export const CustomTransform = (element: any, options = {}, dispatch?: any) => {
     
             // Capture initial position before any transformation
             const initialPosition = { x: bbox.x, y: bbox.y };
-            console.log('initialPosition', initialPosition);
+            // console.log('initialPosition', initialPosition);
     
             // Extract transformation values from the transformation matrix
             matrix.forEach(([operation, ...params]: any) => {
@@ -146,15 +146,15 @@ export const CustomTransform = (element: any, options = {}, dispatch?: any) => {
             height = originalHeight * scaleY;
     
             // Log transformation values
-            console.log(ft.subject.id);
+            // console.log(ft.subject.id);
     
-            console.log("Drag end X:", bbox.x);
-            console.log("Drag end Y:", bbox.y);
-            console.log("Drag end ScaleX:", scaleX);
-            console.log("Drag end ScaleY:", scaleY);
-            console.log("Drag end Width:", width);
-            console.log("Drag end Height:", height);
-            console.log("Drag end Rotate:", rotate);
+            // console.log("Drag end X:", bbox.x);
+            // console.log("Drag end Y:", bbox.y);
+            // console.log("Drag end ScaleX:", scaleX);
+            // console.log("Drag end ScaleY:", scaleY);
+            // console.log("Drag end Width:", width);
+            // console.log("Drag end Height:", height);
+            // console.log("Drag end Rotate:", rotate);
     
             // Dispatch action if necessary
             dispatch(addedToHistory({
