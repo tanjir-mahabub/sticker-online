@@ -11,9 +11,10 @@ interface Position {
 }
 
 interface ObjectHistory {
-  objectId: string; // Unique identifier for the object
-  history: Position[]; // History of positions for the object
-  historyStep: number; // Current history step for the object
+  objectId: string; 
+  category: string; 
+  history: Position[];
+  historyStep: number;
 }
 
 interface HistoryState {
@@ -28,8 +29,8 @@ const historySlice = createSlice({
   name: 'history',
   initialState,
   reducers: {
-    addedToHistory: (state, action: PayloadAction<{ objectId: string; position: Position }>) => {
-      const { objectId, position } = action.payload;
+    addedToHistory: (state, action: PayloadAction<{ objectId: string; category: string, position: Position }>) => {
+      const { objectId, category, position } = action.payload;
       const objectHistoryIndex = state.objectHistories.findIndex((obj) => obj.objectId === objectId);
       if (objectHistoryIndex !== -1) {
         const objectHistory = state.objectHistories[objectHistoryIndex];
@@ -41,6 +42,7 @@ const historySlice = createSlice({
       } else {
         state.objectHistories.push({
           objectId,
+          category,
           history: [position],
           historyStep: 0,
         });
@@ -66,11 +68,16 @@ const historySlice = createSlice({
       state.objectHistories = state.objectHistories.filter(obj => obj.objectId !== objectIdToDelete);
     },
 
+    deleteAllHistoriesByCategory: (state, action: PayloadAction<string>) => {
+      const categoryToDelete = action.payload;
+      state.objectHistories = state.objectHistories.filter(obj => obj.category !== categoryToDelete);
+    },    
+
     clearAllHistories: (state) => {
       state.objectHistories = [];
     },
   },
 });
 
-export const { addedToHistory, undo, redo, deleteHistoryById, clearAllHistories } = historySlice.actions;
+export const { addedToHistory, undo, redo, deleteHistoryById, deleteAllHistoriesByCategory, clearAllHistories } = historySlice.actions;
 export default historySlice.reducer;

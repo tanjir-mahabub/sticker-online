@@ -11,7 +11,7 @@ const initialState: CanvasState = {
   bredd: 0,
   hojd: 0,
   scale: 1,
-  grow: 0,
+  grow: 1,
   selectionCancel: false,
   backgroundColor: "#ffffff"
 };

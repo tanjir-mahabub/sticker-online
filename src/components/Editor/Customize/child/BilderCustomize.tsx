@@ -5,6 +5,7 @@ import { addImage, clearImages } from "@/redux/features/imagePreviewSlice";
 import { RootState, useAppSelector } from "@/redux/store";
 import Image from "next/image";
 import { generateUniqueId } from "@/components/Utils/functions";
+import { deleteAllHistoriesByCategory } from "@/redux/features/historySlice";
 
 const BilderCustomize = () => {
     const dispatch = useDispatch();
@@ -42,6 +43,7 @@ const BilderCustomize = () => {
 
     const handleDeleteBTN = () => {
         dispatch(clearImages("image"));
+        dispatch(deleteAllHistoriesByCategory("image"))
     };
 
     return (

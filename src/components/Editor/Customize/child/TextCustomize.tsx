@@ -7,6 +7,7 @@ import TextInput from './Input/TextInput';
 import { generateUniqueId } from '@/components/Utils/functions';
 import { useAppSelector } from "@/redux/store"; // Adjust the import path as necessary
 import Image from 'next/image';
+import { deleteAllHistoriesByCategory } from '@/redux/features/historySlice';
 
 const TextCustomize: React.FC = () => {
     const dispatch = useDispatch();
@@ -59,6 +60,7 @@ const TextCustomize: React.FC = () => {
     // Implement a function to remove a text element if needed
     const handleClearTexts = () => {
         dispatch(clearTexts());
+        dispatch(deleteAllHistoriesByCategory("text"))
     };
 
     return (
