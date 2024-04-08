@@ -205,13 +205,15 @@ const ControlElement = () => {
 
 
     const handleDieCut = async () => {
+        deselect()
         setIsLoading(true);
 
         try {
             const imageUrl: string = selectedItem.attrs.src;
 
             // Generate SVG image data with the specified growth factor
-            const svgImageData: string = await generateSVGImageData(imageUrl, frameWidth, frameHeight, grow);
+            // const svgImageData: string = await generateSVGImageData(imageUrl, frameWidth, frameHeight, grow);
+            const svgImageData: string = paper.toSVG(centerX - frameWidth / 2, centerY - frameHeight / 2, frameWidth, frameHeight);
 
             // Calculate the position for centering the dieCutImage within the frame
             const dieCutX: number = centerX - frameWidth / 2;
