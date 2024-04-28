@@ -16,6 +16,9 @@ import { generateSVGImageData, pixelsToCm } from "@/components/Utils/vectorFunct
 import { setCanvasProperties } from "@/redux/features/canvasSlice";
 import { setBreddDefaultValue, setHojdDefaultValue } from "@/redux/features/formSlice";
 import { BoundingBox } from "@/types/types";
+import * as d3 from 'd3';
+import { fontMapping } from "@/store/customizeFontStore";
+import opentype from "opentype.js";
 
 const ControlElement = () => {
     const { paper, selectedItem, setSelectedItem, lastAddedElement, setLastAddedElement, stackOrder, setStackOrder, currentFtRef, isLoading, setIsLoading } = usePaper();
@@ -204,62 +207,122 @@ const ControlElement = () => {
 
 
 
+    // const handleDieCut = async () => {
+    //     deselect()
+    //     setIsLoading(true);
+
+    //     try {
+    //         const imageUrl: string = selectedItem.attrs.src;
+
+    //         // Generate SVG image data with the specified growth factor
+    //         // const svgImageData: string = await generateSVGImageData(imageUrl, frameWidth, frameHeight, grow);
+    //         const svgImageData: string = paper.toSVG(centerX - frameWidth / 2, centerY - frameHeight / 2, frameWidth, frameHeight);
+
+    //         // Calculate the position for centering the dieCutImage within the frame
+    //         const dieCutX: number = centerX - frameWidth / 2;
+    //         const dieCutY: number = centerY - frameHeight / 2;
+
+    //         // Create the dieCutImage using the generated SVG image data
+    //         const dieCutImage = paper?.image("data:image/svg+xml," + encodeURIComponent(svgImageData), dieCutX, dieCutY, frameWidth, frameHeight);
+
+    //         // Set additional attributes for the dieCutImage
+    //         dieCutImage?.attr({
+    //             opacity: selectedItem.attr('opacity'), // Set opacity
+    //             // Add any other necessary attributes
+    //         });
+
+    //         paper.forEach((element: any) => {
+    //             const { data } = element.data();
+    //             const isRectOrCircle = data === "frame-rect" || data === "frame-circle";
+    //             const isCircle = data === "frame-circle";
+
+    //             console.log('testing', isRectOrCircle, isCircle);
+
+    //             if (isRectOrCircle) {
+    //                 dieCutImage.insertAfter(element);
+
+    //             }
+    //         })
+    //         const bbox = dieCutImage.getBBox();
+
+    //         console.log(bbox);
+
+
+    //         // Set the canvas properties width and height to match the dieCutImage dimensions
+    //         // dispatch(setCanvasProperties({ frameWidth: dieCutWidth, frameHeight: dieCutHeight }));
+
+    //         const dpi = 96; // Example DPI value
+    //         const widthInCm = pixelsToCm(bbox.width, dpi);
+    //         const heightInCm = pixelsToCm(bbox.height, dpi);
+    //         console.log(`${bbox.width} pixels is approximately ${widthInCm.toFixed(1)} cm at ${dpi} DPI.`);
+    //         console.log(`${bbox.height} pixels is approximately ${heightInCm.toFixed(1)} cm at ${dpi} DPI.`);
+
+    //         dispatch(setBreddDefaultValue(widthInCm))
+    //         dispatch(setHojdDefaultValue(heightInCm))
+
+
+    //         // Set loading state to false after completion
+    //         setIsLoading(false);
+    //     } catch (error: any) {
+    //         console.error('Error:', error);
+    //     }
+    // }
+
+
     const handleDieCut = async () => {
         deselect()
         setIsLoading(true);
+        console.log('grow', grow);
 
         try {
-            const imageUrl: string = selectedItem.attrs.src;
+            const svgData = await paper.toSVG(centerX - frameWidth / 2, centerY - frameHeight / 2, frameWidth, frameHeight);
+            // console.log(svgData);
 
-            // Generate SVG image data with the specified growth factor
-            // const svgImageData: string = await generateSVGImageData(imageUrl, frameWidth, frameHeight, grow);
-            const svgImageData: string = paper.toSVG(centerX - frameWidth / 2, centerY - frameHeight / 2, frameWidth, frameHeight);
+            // Create a Blob from the SVG data
+            if (svgData) {
 
-            // Calculate the position for centering the dieCutImage within the frame
-            const dieCutX: number = centerX - frameWidth / 2;
-            const dieCutY: number = centerY - frameHeight / 2;
+                const modifiedSVG = await generateSVGImageData(svgData, frameWidth, frameHeight, grow, backgroundColor)
 
-            // Create the dieCutImage using the generated SVG image data
-            const dieCutImage = paper?.image("data:image/svg+xml," + encodeURIComponent(svgImageData), dieCutX, dieCutY, frameWidth, frameHeight);
+                const dieCutX: number = centerX - frameWidth / 2;
+                const dieCutY: number = centerY - frameHeight / 2;
 
-            // Set additional attributes for the dieCutImage
-            dieCutImage?.attr({
-                opacity: selectedItem.attr('opacity'), // Set opacity
-                // Add any other necessary attributes
-            });
+                // Remove existing dieCutImage if it exists
+                paper?.forEach((element: any) => {
+                    const { data } = element.data();
+                    if (data === "dieCutImage") {
+                        element.remove();
+                    }
+                });
 
-            paper.forEach((element: any) => {
-                const { data } = element.data();
-                const isRectOrCircle = data === "frame-rect" || data === "frame-circle";
-                const isCircle = data === "frame-circle";
+                // Create the dieCutImage using the generated SVG image data
+                const dieCutImage = paper?.image(modifiedSVG, dieCutX, dieCutY, frameWidth, frameHeight);
 
-                console.log('testing', isRectOrCircle, isCircle);
+                // Set data attribute to identify as dieCutImage
+                dieCutImage?.data('data', 'dieCutImage');
 
-                if (isRectOrCircle) {
-                    dieCutImage.insertAfter(element);
+                // Set additional attributes for the dieCutImage
+                dieCutImage?.attr({
+                    opacity: selectedItem?.attr('opacity'), // Set opacity
+                    // Add any other necessary attributes
+                });
 
-                }
-            })
-            const bbox = dieCutImage.getBBox();
+                paper.forEach((element: any) => {
+                    const { data } = element.data();
+                    const isRectOrCircle = data === "frame-rect" || data === "frame-circle";
+                    const isCircle = data === "frame-circle";
 
-            console.log(bbox);
+                    console.log('testing', isRectOrCircle, isCircle);
 
+                    if (isRectOrCircle) {
+                        dieCutImage.insertAfter(element);
 
-            // Set the canvas properties width and height to match the dieCutImage dimensions
-            // dispatch(setCanvasProperties({ frameWidth: dieCutWidth, frameHeight: dieCutHeight }));
+                    }
+                })
+                // const bbox = dieCutImage.getBBox();
 
-            const dpi = 96; // Example DPI value
-            const widthInCm = pixelsToCm(bbox.width, dpi);
-            const heightInCm = pixelsToCm(bbox.height, dpi);
-            console.log(`${bbox.width} pixels is approximately ${widthInCm.toFixed(1)} cm at ${dpi} DPI.`);
-            console.log(`${bbox.height} pixels is approximately ${heightInCm.toFixed(1)} cm at ${dpi} DPI.`);
-
-            dispatch(setBreddDefaultValue(widthInCm))
-            dispatch(setHojdDefaultValue(heightInCm))
-
-
-            // Set loading state to false after completion
-            setIsLoading(false);
+                // console.log(bbox);
+                setIsLoading(false);
+            }
         } catch (error: any) {
             console.error('Error:', error);
         }
@@ -268,9 +331,56 @@ const ControlElement = () => {
     /**
      * Svg export function
      */
-    const handleDownloadSVG = () => {
-        deselect()
+    const handleDownloadSVG = async (): Promise<void> => {
+        deselect();
+
+        // Create a promise to load fonts for all text elements
+        const loadFontsPromises: Promise<void>[] = [];
+
         if (paper) {
+            paper?.forEach((element: any) => {
+                if (element.type === "text") {
+                    const fontFamily = element.attrs["font-family"];
+                    console.log(element);
+
+                    const promise = new Promise<void>((resolve) => {
+                        opentype?.load(fontMapping[fontFamily], (err: any, font: any) => {
+                            if (err) {
+                                resolve();
+                                return;
+                            }
+
+                            const textPath = font.getPath(
+                                element.attrs.text,
+                                element.attrs.x,
+                                element.attrs.y,
+                                element.attrs["font-size"],
+                                {
+                                    fill: element.attrs.fill,
+                                    stroke: element.attrs.stroke,
+                                    width: element.attrs.width,
+                                    height: element.attrs.height,
+                                }
+                            );
+
+                            const pathData = textPath.toPathData();
+
+                            console.log(pathData);
+
+                            element?.data('textPath', pathData);
+
+                            resolve();
+                        });
+                    });
+
+                    loadFontsPromises.push(promise);
+                }
+            });
+
+            // Wait for all font loading promises to resolve
+            await Promise.all(loadFontsPromises);
+
+            // Proceed with SVG export and download
             const svgData = paper.toSVG(centerX - frameWidth / 2, centerY - frameHeight / 2, frameWidth, frameHeight);
 
             // Create a Blob from the SVG data
@@ -295,6 +405,9 @@ const ControlElement = () => {
     };
 
 
+
+
+
     useEffect(() => {
         if (selectedItem && paper) {
             if (selectedItem && currentFtRef.current && paper) {
@@ -313,7 +426,7 @@ const ControlElement = () => {
 
                     if (isElementInsideFrame(selectedItem, centerX, centerY, frameWidth, frameHeight)) {
                         selectedItem.attr({ opacity: 1 })
-                        console.log(selectedItem);
+                        // console.log(selectedItem);
 
                         // console.log("The element is inside the frame.");
                     } else {
@@ -351,12 +464,12 @@ const ControlElement = () => {
                 {(StickerSelected.id) && (
                     <div className="absolute bottom-0 left-0 w-fit mx-auto h-3 flex justify-start items-end gap-5 z-50">
                         <div className="flex gap-3 p-4 space-y-3 w-60">
-                            <RangeSlider minValue={1} maxValue={100} step={1} defaultValue={1} label="Kantlinje" />
+                            <RangeSlider minValue={1} maxValue={100} step={1} defaultValue={grow} label="Kantlinje" />
                             <Tooltip message='Die Cut Effect'>
                                 <button onClick={handleDieCut} className='text-sm font-semibold bg-white hover:bg-so-deep-gray cursor-pointer border border-black/20 hover:border-black/50 shadow-sm hover:shadow-lg rounded-full px-2 pt-1 pb-1.5'>Apply</button>
                             </Tooltip>
 
-                            {/* <button onClick={handleDownloadSVG} className='text-sm font-semibold bg-white hover:bg-so-deep-gray cursor-pointer border border-black/20 hover:border-black/50 shadow-sm hover:shadow-lg rounded-full px-2 pt-1 pb-1.5'>Download</button> */}
+                            <button onClick={handleDownloadSVG} className='text-sm font-semibold bg-white hover:bg-so-deep-gray cursor-pointer border border-black/20 hover:border-black/50 shadow-sm hover:shadow-lg rounded-full px-2 pt-1 pb-1.5'>Download</button>
 
                         </div>
                     </div>

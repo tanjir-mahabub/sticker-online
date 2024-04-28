@@ -26,7 +26,7 @@ const TextElement = () => {
                     x: text.x || 0,
                     y: text.y || 0,
                     width: text.width,
-                    height: text.height,
+                    height: "auto",
                     attrs: {
                         cursor: "move",
                         fill: text.fill || '',
@@ -42,7 +42,7 @@ const TextElement = () => {
                     const elCenter = { x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 };
                     const translation = { x: paperCenter.x - elCenter.x, y: paperCenter.y - elCenter.y };
 
-                    element.attr({ x: translation.x, y: translation.y, width: bbox.width + 10, height: bbox.height + 10 });
+                    element.attr({ x: translation.x, y: translation.y, width: bbox.width, height: bbox.height });
 
                     element.click(() => handleElementInteraction(element));
 
