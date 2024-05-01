@@ -147,24 +147,23 @@
     }
 
     /**
-    * @param style object from style()
-    * @return string
-    */
+  * @return string
+  */
     function styleToString(style) {
-        // TODO figure out what is 'normal'
-        // Tyler: it refers to the default inherited from CSS. Order of terms here:
-        // 		  http://www.w3.org/TR/SVG/text.html#FontProperty
         var norm = 'normal',
             textAnchor = 'text-anchor: ' + (style.anchor || 'middle') + '; ',
             font = style.font;
-        // return 'font: normal normal normal 10px/normal ' + style.font.family + ( style.font.size === null ? '' : '; font-size: ' + style.font.size + 'px' );
-        return textAnchor + ['font:',
+
+        var fontFamily = font.family ? 'font-family: ' + font.family + '; ' : '';
+
+        return textAnchor + fontFamily + ['font:',
             (font.style || norm), // font-style (e.g. italic)
             norm, // font-variant
             (font.weight || norm), // font-weight (e.g. bold)
             (font.size ? font.size + 'px' : '10px') + '/normal', // font-size/IGNORED line-height!
             font.family].join(' ');
     }
+
 
     /**
      * repairs the hex color which missed the '#'
@@ -221,11 +220,57 @@
             }
         },
 
+        // 'text': function (node) {
+        //     var style = extractStyle(node),
+        //         tags = [],
+        //         textLines = node.attrs['text'].toString().split('\n'),
+        //         totalLines = textLines.length;
+
+        //     map(textLines, function (text, line) {
+        //         var attrs = reduce(
+        //             node.attrs,
+        //             function (initial, value, name) {
+        //                 if (name !== 'text' && name !== 'w' && name !== 'h') {
+        //                     if (name === 'font-size') value = parseInt(value) + 'px';
+        //                     if (name === 'stroke') {
+        //                         value = convertToHexColor(value);
+        //                     }
+        //                     initial[name] = escapeXML(value.toString());
+        //                 }
+        //                 return initial;
+        //             },
+        //             { style: styleToString(style) + ';' }
+        //         );
+
+        //         // Check if font-family attribute exists and add it to attrs
+        //         if (node.attrs['font-family']) {
+        //             attrs['font-family'] = escapeXML(node.attrs['font-family']);
+        //         }
+
+        //         /**
+        //          * if text node has a class set, apply it to the attrs object
+        //         */
+        //         if (node.node.className.baseVal != "" && node.node.className.baseVal !== undefined) {
+        //             attrs["class"] = node.node.className.baseVal;
+        //         }
+
+        //         tags.push(tag(
+        //             'text',
+        //             attrs,
+        //             node.matrix,
+        //             tag('tspan', { dy: computeTSpanDy(style.font.size, line + 1, totalLines) }, null, text.replace(/&/g, "&amp;"))
+        //         ));
+        //     });
+
+        //     return tags;
+        // },
+
+
 
         'text': function (node) {
 
             var textPathData = node.data('textPath'); // Get textPath data from node
-            // console.log(textPathData);
+            console.log(textPathData);
 
             if (!textPathData) {
                 console.error("textPath is empty for text element:", node);

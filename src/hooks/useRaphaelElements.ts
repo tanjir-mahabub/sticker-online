@@ -16,16 +16,16 @@ export const useRaphaelElements = (paper: any) => {
       element.attr({ src, x, y, width, height, ...attrs });
     }
 
-      // Apply scaling transformation
-      if (scaleX !== undefined || scaleY !== undefined) {
-        const scaleString = `S${scaleX || 1},${scaleY || 1}`;
-        element.transform(scaleString);
-      }
-  
-      // Apply rotation transformation
-      if (rotation !== undefined) {
-        element.transform(`R${rotation}`);
-      }
+    // Apply scaling transformation
+    if (scaleX !== undefined || scaleY !== undefined) {
+      const scaleString = `S${scaleX || 1},${scaleY || 1}`;
+      element.transform(scaleString);
+    }
+
+    // Apply rotation transformation
+    if (rotation !== undefined) {
+      element.transform(`R${rotation}`);
+    }
 
     return element;
   }, [paper]);
@@ -46,5 +46,21 @@ export const useRaphaelElements = (paper: any) => {
     return element;
   }, [paper]);
 
-  return { addImageElement, addTextElement };
+  const addPathElement = useCallback((pathItem: any) => {
+    if (!paper) return null;
+
+    const { id, pathData, attrs, type } = pathItem;
+    let element = paper.getById(id);
+    if (!element) {
+      element = paper.path(pathData).attr(attrs);
+      element.id = id;
+      element.data({ 'data': type });
+      element.data({ 'isCenterable': true });
+    } else {
+      element.attr({ path: pathData, ...attrs });
+    }
+    return element;
+  }, [paper]);
+
+  return { addImageElement, addTextElement, addPathElement };
 };

@@ -12,7 +12,7 @@ import { isElementInsideFrame } from "../elementUtils";
 import { useAppSelector } from "@/redux/store";
 import { fontDieCutFunction } from "@/components/Utils/fontDieCutFunction";
 import { imageDieCutFunction } from "@/components/Utils/imageDieCutFunction";
-import { generateSVGImageData, pixelsToCm } from "@/components/Utils/vectorFunction";
+import { convertTextToPath, generateSVGJoin, generateSVGImageData, pixelsToCm, generateContours } from "@/components/Utils/vectorFunction";
 import { setCanvasProperties } from "@/redux/features/canvasSlice";
 import { setBreddDefaultValue, setHojdDefaultValue } from "@/redux/features/formSlice";
 import { BoundingBox } from "@/types/types";
@@ -272,16 +272,31 @@ const ControlElement = () => {
     const handleDieCut = async () => {
         deselect()
         setIsLoading(true);
-        console.log('grow', grow);
+        // console.log('grow', grow);
 
         try {
             const svgData = await paper.toSVG(centerX - frameWidth / 2, centerY - frameHeight / 2, frameWidth, frameHeight);
             // console.log(svgData);
+            // const svgNode = await generateContours(svgData, frameWidth, frameHeight, grow, backgroundColor);
 
             // Create a Blob from the SVG data
             if (svgData) {
 
+
+                // const svgDataUrl = "data:image/svg+xml;base64," + btoa(new XMLSerializer().serializeToString(svgNode));
+
+                // Display the SVG image using the data URL
+                // const testImage = paper?.image(svgDataUrl, centerX - paper.width / 2, centerY - paper.height / 2, paper.width, paper.height);
+
+                // const joinedSVG = await generateSVGJoin(svgData, frameWidth, frameHeight, 1, backgroundColor)
+                // console.log(joinedSVG);
+                // const svgString = new XMLSerializer().serializeToString(svgNode);
+
+                // console.log(svgString, svgData);
+
                 const modifiedSVG = await generateSVGImageData(svgData, frameWidth, frameHeight, grow, backgroundColor)
+                // console.log(modifiedSVG);
+                // paper?.image(modifiedSVG, centerX - frameWidth / 2, centerY - frameHeight / 2, frameWidth, frameHeight);
 
                 const dieCutX: number = centerX - frameWidth / 2;
                 const dieCutY: number = centerY - frameHeight / 2;
@@ -297,7 +312,7 @@ const ControlElement = () => {
                 // Create the dieCutImage using the generated SVG image data
                 const dieCutImage = paper?.image(modifiedSVG, dieCutX, dieCutY, frameWidth, frameHeight);
 
-                // Set data attribute to identify as dieCutImage
+                //Set data attribute to identify as dieCutImage
                 dieCutImage?.data('data', 'dieCutImage');
 
                 // Set additional attributes for the dieCutImage
@@ -311,10 +326,11 @@ const ControlElement = () => {
                     const isRectOrCircle = data === "frame-rect" || data === "frame-circle";
                     const isCircle = data === "frame-circle";
 
-                    console.log('testing', isRectOrCircle, isCircle);
+                    // console.log('testing', isRectOrCircle, isCircle);
 
                     if (isRectOrCircle) {
                         dieCutImage.insertAfter(element);
+                        // testImage.insertAfter(element);
 
                     }
                 })
@@ -334,51 +350,7 @@ const ControlElement = () => {
     const handleDownloadSVG = async (): Promise<void> => {
         deselect();
 
-        // Create a promise to load fonts for all text elements
-        const loadFontsPromises: Promise<void>[] = [];
-
         if (paper) {
-            paper?.forEach((element: any) => {
-                if (element.type === "text") {
-                    const fontFamily = element.attrs["font-family"];
-                    console.log(element);
-
-                    const promise = new Promise<void>((resolve) => {
-                        opentype?.load(fontMapping[fontFamily], (err: any, font: any) => {
-                            if (err) {
-                                resolve();
-                                return;
-                            }
-
-                            const textPath = font.getPath(
-                                element.attrs.text,
-                                element.attrs.x,
-                                element.attrs.y,
-                                element.attrs["font-size"],
-                                {
-                                    fill: element.attrs.fill,
-                                    stroke: element.attrs.stroke,
-                                    width: element.attrs.width,
-                                    height: element.attrs.height,
-                                }
-                            );
-
-                            const pathData = textPath.toPathData();
-
-                            console.log(pathData);
-
-                            element?.data('textPath', pathData);
-
-                            resolve();
-                        });
-                    });
-
-                    loadFontsPromises.push(promise);
-                }
-            });
-
-            // Wait for all font loading promises to resolve
-            await Promise.all(loadFontsPromises);
 
             // Proceed with SVG export and download
             const svgData = paper.toSVG(centerX - frameWidth / 2, centerY - frameHeight / 2, frameWidth, frameHeight);
@@ -469,7 +441,7 @@ const ControlElement = () => {
                                 <button onClick={handleDieCut} className='text-sm font-semibold bg-white hover:bg-so-deep-gray cursor-pointer border border-black/20 hover:border-black/50 shadow-sm hover:shadow-lg rounded-full px-2 pt-1 pb-1.5'>Apply</button>
                             </Tooltip>
 
-                            <button onClick={handleDownloadSVG} className='text-sm font-semibold bg-white hover:bg-so-deep-gray cursor-pointer border border-black/20 hover:border-black/50 shadow-sm hover:shadow-lg rounded-full px-2 pt-1 pb-1.5'>Download</button>
+                            {/* <button onClick={handleDownloadSVG} className='text-sm font-semibold bg-white hover:bg-so-deep-gray cursor-pointer border border-black/20 hover:border-black/50 shadow-sm hover:shadow-lg rounded-full px-2 pt-1 pb-1.5'>Download</button> */}
 
                         </div>
                     </div>
