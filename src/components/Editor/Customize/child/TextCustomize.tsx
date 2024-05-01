@@ -46,6 +46,7 @@ const TextCustomize: React.FC = () => {
             fontID: selectedFont,
             fontFamily: customizeFonts.find(font => font.id === selectedFont)?.fontName || '',
             text: text,
+            type: 'text',
             fontSize: fontSize,
             fill: selectedColor,
             rotation: 0, // Add default rotation if necessary
@@ -96,6 +97,7 @@ const TextCustomize: React.FC = () => {
                             <div className='absolute left-0 bottom-[75px] z-20'>
                                 <ColorInput
                                     sketch
+                                    type="Text"
                                     onColorChange={setSelectedColor}
                                     styles={{
                                         width: '100%',

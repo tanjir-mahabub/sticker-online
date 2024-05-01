@@ -1,3 +1,4 @@
+import { convertTextToPath } from "@/components/Utils/vectorFunction";
 import { usePaper } from "@/context/PaperContext";
 import { useRaphaelElements } from "@/hooks/useRaphaelElements";
 import { useTransformUtils } from "@/hooks/useTransformUtils";
@@ -7,7 +8,7 @@ import { useDispatch } from "react-redux";
 
 const TextElement = () => {
     const { paper, lastAddedElement, setSelectedItem, setLastAddedElement, setStackOrder, currentFtRef, isLoading } = usePaper();
-    const { addTextElement } = useRaphaelElements(paper);
+    const { addPathElement } = useRaphaelElements(paper);
 
     const dispatch = useDispatch();
 
@@ -20,39 +21,46 @@ const TextElement = () => {
             const paperCenter = { x: paper.width / 2, y: paper.height / 2 };
 
             textPreviews?.forEach((text: any, index: number) => {
-                const element = addTextElement({
-                    id: text.id,
-                    text: text.text,
-                    x: text.x || 0,
-                    y: text.y || 0,
-                    width: text.width,
-                    height: text.height,
-                    attrs: {
-                        cursor: "move",
-                        fill: text.fill || '',
-                        "font-size": text.fontSize || 24,
-                        "font-family": text.fontFamily || 'Arial',
-                        opacity: 0.3
-                    },
-                    type: "text"
-                });
 
-                if (element) {
-                    const bbox = element.getBBox();
-                    const elCenter = { x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 };
-                    const translation = { x: paperCenter.x - elCenter.x, y: paperCenter.y - elCenter.y };
+                convertTextToPath(text)
+                    .then((pathData) => {
+                        // console.log('Text converted to path successfully.', pathData);
 
-                    element.attr({ x: translation.x, y: translation.y, width: bbox.width + 10, height: bbox.height + 10 });
+                        const element = addPathElement({
+                            id: text.id,
+                            pathData: pathData,
+                            attrs: {
+                                cursor: "move",
+                                fill: text.fill || '',
+                                stroke: text.stroke || 'red',
+                                "stroke-width": text.strokeWidth || 0,
+                                "font-size": text.fontSize || 24,
+                                "font-family": text.fontFamily || 'Arial'
+                            },
+                            type: "text"
+                        });
 
-                    element.click(() => handleElementInteraction(element));
+                        if (element) {
+                            const bbox = element.getBBox();
+                            const elCenter = { x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 };
+                            const translation = { x: paperCenter.x - elCenter.x, y: paperCenter.y - elCenter.y };
 
-                    setLastAddedElement(element);
-                    reapplyFreeTransform(element)
-                }
+                            element.attr({ x: translation.x, y: translation.y, width: bbox.width, height: bbox.height });
+
+                            element.click(() => handleElementInteraction(element));
+
+                            setLastAddedElement(element);
+                            reapplyFreeTransform(element)
+                        }
+
+                    })
+                    .catch((error) => {
+                        console.error('Error converting text to path:', error);
+                    });
 
             });
         }
-    }, [paper, setLastAddedElement, textPreviews, addTextElement, handleElementInteraction, reapplyFreeTransform]);
+    }, [paper, setLastAddedElement, textPreviews, addPathElement, handleElementInteraction, reapplyFreeTransform]);
 
     useEffect(() => {
         if (lastAddedElement) {

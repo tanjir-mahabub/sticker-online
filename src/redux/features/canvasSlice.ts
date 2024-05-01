@@ -13,7 +13,8 @@ const initialState: CanvasState = {
   scale: 1,
   grow: 1,
   selectionCancel: false,
-  backgroundColor: "#ffffff"
+  backgroundColor: "#ffffff",
+  textColor: "#000000"
 };
 
 const canvasSlice = createSlice({
@@ -21,11 +22,11 @@ const canvasSlice = createSlice({
   initialState,
   reducers: {
     setCanvasProperties(state, action: PayloadAction<Partial<CanvasState>>) {
-        return {
-          ...state,
-          ...action.payload,
-        };
-      },
+      return {
+        ...state,
+        ...action.payload,
+      };
+    },
   },
 });
 

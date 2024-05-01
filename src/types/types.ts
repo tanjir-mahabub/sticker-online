@@ -1,8 +1,8 @@
-export interface StickerState {    
+export interface StickerState {
   id: number
 }
 
-export interface SideNavState {    
+export interface SideNavState {
   id: number
 }
 
@@ -44,19 +44,20 @@ export interface ExtendedRaphaelPaper {
 }
 
 
-export interface CanvasState {  
+export interface CanvasState {
   width: number;
   height: number;
   centerX: number;
   centerY: number;
   frameWidth: number;
-  frameHeight: number;    
+  frameHeight: number;
   bredd: number;
   hojd: number;
   scale: number;
   grow: number;
   selectionCancel?: boolean;
-  backgroundColor?: string;
+  backgroundColor: string;
+  textColor: string;
 }
 
 

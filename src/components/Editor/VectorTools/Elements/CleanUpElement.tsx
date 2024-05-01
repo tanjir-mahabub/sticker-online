@@ -20,7 +20,8 @@ const CleanUpElement: React.FC<CleanUpElementProps> = () => {
         if (paper && imagePreviews && textPreviews) {
             const elements = new Set(); // Use a Set to ensure uniqueness
             paper.forEach((el: any) => {
-                if (el.type === "image" || el.type === "text") {
+                const { data } = el.data()
+                if ((el.type === "image" || el.type === "text" || el.type === "path") && data !== "dieCutImage") {
                     elements.add(el); // Add elements to the Set
                 }
             });
