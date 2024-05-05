@@ -278,8 +278,8 @@
             }
 
 
-            console.log('testing', node);
-            console.log('testing', node.matrix);
+            // console.log('testing', node);
+            // console.log('testing', node.matrix);
 
             return tag(
                 'path',
@@ -289,7 +289,19 @@
         },
 
 
-        'path': function (node) {
+        'path': function (node, strokeColor, removeDieCut) {
+            var { data } = node.data();
+
+            if ((data === "dieCutImage") && strokeColor && !removeDieCut) {
+                node.attr({ stroke: strokeColor })
+            }
+
+            if (!strokeColor) {
+                node.attr({ stroke: "rgba(0,0,0,0.3)" })
+            }
+
+            if ((data === "dieCutImage") && removeDieCut) return '';
+
             var initial = (node.matrix.a === 1 && node.matrix.d === 1) ? {} : { 'transform': node.matrix.toString() };
 
             return tag(
@@ -315,7 +327,7 @@
         // Other serializers should go here
     };
 
-    R.fn.toSVG = function (x, y, width, height) {
+    R.fn.toSVG = function (x, y, width, height, strokeColor, removeDieCut) {
         var
             paper = this,
             restore = { svg: R.svg, vml: R.vml },
@@ -335,7 +347,7 @@
 
             // Use serializer
             if (typeof serializer[node.type] === 'function') {
-                svg += serializer[node.type](node);
+                svg += serializer[node.type](node, strokeColor, removeDieCut);
 
                 continue;
             }

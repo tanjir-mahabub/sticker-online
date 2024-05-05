@@ -49,12 +49,13 @@ export const useRaphaelElements = (paper: any) => {
   const addPathElement = useCallback((pathItem: any) => {
     if (!paper) return null;
 
-    const { id, pathData, attrs, type } = pathItem;
+    const { id, pathData, attrs, type, category } = pathItem;
     let element = paper.getById(id);
     if (!element) {
       element = paper.path(pathData).attr(attrs);
       element.id = id;
       element.data({ 'data': type });
+      element.data({ 'category': category });
       element.data({ 'isCenterable': true });
     } else {
       element.attr({ path: pathData, ...attrs });

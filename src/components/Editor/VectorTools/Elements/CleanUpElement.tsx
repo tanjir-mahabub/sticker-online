@@ -21,12 +21,13 @@ const CleanUpElement: React.FC<CleanUpElementProps> = () => {
             const elements = new Set(); // Use a Set to ensure uniqueness
             paper.forEach((el: any) => {
                 const { data } = el.data()
-                if ((el.type === "image" || el.type === "text" || el.type === "path") && data !== "dieCutImage") {
+                // console.log(el);
+                if ((el.type === "image" || el.type === "path") && data !== "dieCutImage") {
                     elements.add(el); // Add elements to the Set
                 }
             });
 
-            console.log('stackOrder', elements);
+            console.log('stackOrder', textPreviews, elements);
             elements && setStackOrder(Array.from(elements)); // Convert Set back to array and set the stack order
         }
     }, [paper, setStackOrder, imagePreviews, textPreviews]);

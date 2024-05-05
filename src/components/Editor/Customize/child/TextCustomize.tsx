@@ -47,6 +47,7 @@ const TextCustomize: React.FC = () => {
             fontFamily: customizeFonts.find(font => font.id === selectedFont)?.fontName || '',
             text: text,
             type: 'text',
+            category: 'text',
             fontSize: fontSize,
             fill: selectedColor,
             rotation: 0, // Add default rotation if necessary

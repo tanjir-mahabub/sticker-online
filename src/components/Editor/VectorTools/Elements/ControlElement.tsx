@@ -7,21 +7,14 @@ import { useTransformUtils } from "@/hooks/useTransformUtils";
 import { deleteImage } from "@/redux/features/imagePreviewSlice";
 import { removeText } from "@/redux/features/textSlice";
 import { deleteHistoryById } from "@/redux/features/historySlice";
-import { useCallback, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { isElementInsideFrame } from "../elementUtils";
 import { useAppSelector } from "@/redux/store";
-import { fontDieCutFunction } from "@/components/Utils/fontDieCutFunction";
-import { imageDieCutFunction } from "@/components/Utils/imageDieCutFunction";
-import { convertTextToPath, generateSVGJoin, generateSVGImageData, pixelsToCm, generateContours } from "@/components/Utils/vectorFunction";
-import { setCanvasProperties } from "@/redux/features/canvasSlice";
-import { setBreddDefaultValue, setHojdDefaultValue } from "@/redux/features/formSlice";
-import { BoundingBox } from "@/types/types";
-import * as d3 from 'd3';
-import { fontMapping } from "@/store/customizeFontStore";
-import opentype from "opentype.js";
+import { generateSVGImageData } from "@/components/Utils/DieCutFunction";
 
 const ControlElement = () => {
-    const { paper, selectedItem, setSelectedItem, lastAddedElement, setLastAddedElement, stackOrder, setStackOrder, currentFtRef, isLoading, setIsLoading } = usePaper();
+    const [dieCutResult, setDieCutResult] = useState<string | null>(null);
+    const { paper, selectedItem, setSelectedItem, stackOrder, setStackOrder, currentFtRef, setIsLoading } = usePaper();
 
     const StickerSelected = useAppSelector(state => state.sticker);
     const CanvasProperties = useAppSelector(state => state.canvas);
@@ -71,7 +64,7 @@ const ControlElement = () => {
 
     const handleSendBack = () => {
         if (selectedItem && paper && stackOrder.length > 0) {
-            console.log(selectedItem, stackOrder);
+            //console.log(selectedItem, stackOrder);
             if (selectedItem.type !== "rect" && selectedItem.type !== "circle") {
                 const currentIndex = stackOrder.indexOf(selectedItem);
                 if (currentIndex > 0) {
@@ -139,9 +132,9 @@ const ControlElement = () => {
             }
 
             // console.log("Deleting item with ID:", selectedItem.id);
-
+            const { category } = selectedItem.data()
             selectedItem.type === "image" && dispatch(deleteImage(selectedItem.id)) && dispatch(deleteHistoryById(selectedItem.id))
-            selectedItem.type === "text" && dispatch(removeText(selectedItem.id)) && dispatch(deleteHistoryById(selectedItem.id))
+            category === "text" && dispatch(removeText(selectedItem.id)) && dispatch(deleteHistoryById(selectedItem.id))
 
 
             selectedItem.remove(); // Remove the element            
@@ -206,143 +199,102 @@ const ControlElement = () => {
     };
 
 
+    const extractDAttributeValue = async (svgUrl: string): Promise<string | null> => {
+        try {
+            // Fetch SVG content from the Blob URL
+            const response = await fetch(svgUrl);
+            const svgString = await response.text();
 
-    // const handleDieCut = async () => {
-    //     deselect()
-    //     setIsLoading(true);
+            // Ensure the SVG string starts with "<svg>" tag
+            const formattedSvgString = svgString.startsWith("<svg>") ? svgString : `<svg xmlns="http://www.w3.org/2000/svg">${svgString}</svg>`;
 
-    //     try {
-    //         const imageUrl: string = selectedItem.attrs.src;
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(formattedSvgString, "image/svg+xml");
 
-    //         // Generate SVG image data with the specified growth factor
-    //         // const svgImageData: string = await generateSVGImageData(imageUrl, frameWidth, frameHeight, grow);
-    //         const svgImageData: string = paper.toSVG(centerX - frameWidth / 2, centerY - frameHeight / 2, frameWidth, frameHeight);
-
-    //         // Calculate the position for centering the dieCutImage within the frame
-    //         const dieCutX: number = centerX - frameWidth / 2;
-    //         const dieCutY: number = centerY - frameHeight / 2;
-
-    //         // Create the dieCutImage using the generated SVG image data
-    //         const dieCutImage = paper?.image("data:image/svg+xml," + encodeURIComponent(svgImageData), dieCutX, dieCutY, frameWidth, frameHeight);
-
-    //         // Set additional attributes for the dieCutImage
-    //         dieCutImage?.attr({
-    //             opacity: selectedItem.attr('opacity'), // Set opacity
-    //             // Add any other necessary attributes
-    //         });
-
-    //         paper.forEach((element: any) => {
-    //             const { data } = element.data();
-    //             const isRectOrCircle = data === "frame-rect" || data === "frame-circle";
-    //             const isCircle = data === "frame-circle";
-
-    //             console.log('testing', isRectOrCircle, isCircle);
-
-    //             if (isRectOrCircle) {
-    //                 dieCutImage.insertAfter(element);
-
-    //             }
-    //         })
-    //         const bbox = dieCutImage.getBBox();
-
-    //         console.log(bbox);
-
-
-    //         // Set the canvas properties width and height to match the dieCutImage dimensions
-    //         // dispatch(setCanvasProperties({ frameWidth: dieCutWidth, frameHeight: dieCutHeight }));
-
-    //         const dpi = 96; // Example DPI value
-    //         const widthInCm = pixelsToCm(bbox.width, dpi);
-    //         const heightInCm = pixelsToCm(bbox.height, dpi);
-    //         console.log(`${bbox.width} pixels is approximately ${widthInCm.toFixed(1)} cm at ${dpi} DPI.`);
-    //         console.log(`${bbox.height} pixels is approximately ${heightInCm.toFixed(1)} cm at ${dpi} DPI.`);
-
-    //         dispatch(setBreddDefaultValue(widthInCm))
-    //         dispatch(setHojdDefaultValue(heightInCm))
-
-
-    //         // Set loading state to false after completion
-    //         setIsLoading(false);
-    //     } catch (error: any) {
-    //         console.error('Error:', error);
-    //     }
-    // }
+            const pathElement = doc.querySelector('path');
+            return pathElement ? pathElement.getAttribute('d') : null;
+        } catch (error) {
+            console.error('Error parsing SVG:', error);
+            return null;
+        }
+    };
 
 
     const handleDieCut = async () => {
         deselect()
         setIsLoading(true);
-        // console.log('grow', grow);
 
         try {
-            const svgData = await paper.toSVG(centerX - frameWidth / 2, centerY - frameHeight / 2, frameWidth, frameHeight);
-            // console.log(svgData);
-            // const svgNode = await generateContours(svgData, frameWidth, frameHeight, grow, backgroundColor);
+            const svgData = await paper.toSVG(centerX - frameWidth / 2, centerY - frameHeight / 2, frameWidth, frameHeight, "", true);
 
-            // Create a Blob from the SVG data
             if (svgData) {
 
-
-                // const svgDataUrl = "data:image/svg+xml;base64," + btoa(new XMLSerializer().serializeToString(svgNode));
-
-                // Display the SVG image using the data URL
-                // const testImage = paper?.image(svgDataUrl, centerX - paper.width / 2, centerY - paper.height / 2, paper.width, paper.height);
-
-                // const joinedSVG = await generateSVGJoin(svgData, frameWidth, frameHeight, 1, backgroundColor)
-                // console.log(joinedSVG);
-                // const svgString = new XMLSerializer().serializeToString(svgNode);
-
-                // console.log(svgString, svgData);
-
                 const modifiedSVG = await generateSVGImageData(svgData, frameWidth, frameHeight, grow, backgroundColor)
-                // console.log(modifiedSVG);
-                // paper?.image(modifiedSVG, centerX - frameWidth / 2, centerY - frameHeight / 2, frameWidth, frameHeight);
 
-                const dieCutX: number = centerX - frameWidth / 2;
-                const dieCutY: number = centerY - frameHeight / 2;
+                const dAttributeValue = await extractDAttributeValue(modifiedSVG);
 
-                // Remove existing dieCutImage if it exists
-                paper?.forEach((element: any) => {
-                    const { data } = element.data();
-                    if (data === "dieCutImage") {
-                        element.remove();
-                    }
-                });
+                if (dAttributeValue) {
+                    //console.log(dAttributeValue);
 
-                // Create the dieCutImage using the generated SVG image data
-                const dieCutImage = paper?.image(modifiedSVG, dieCutX, dieCutY, frameWidth, frameHeight);
+                    setDieCutResult(dAttributeValue)
 
-                //Set data attribute to identify as dieCutImage
-                dieCutImage?.data('data', 'dieCutImage');
-
-                // Set additional attributes for the dieCutImage
-                dieCutImage?.attr({
-                    opacity: selectedItem?.attr('opacity'), // Set opacity
-                    // Add any other necessary attributes
-                });
-
-                paper.forEach((element: any) => {
-                    const { data } = element.data();
-                    const isRectOrCircle = data === "frame-rect" || data === "frame-circle";
-                    const isCircle = data === "frame-circle";
-
-                    // console.log('testing', isRectOrCircle, isCircle);
-
-                    if (isRectOrCircle) {
-                        dieCutImage.insertAfter(element);
-                        // testImage.insertAfter(element);
-
-                    }
-                })
-                // const bbox = dieCutImage.getBBox();
-
-                // console.log(bbox);
-                setIsLoading(false);
+                    setIsLoading(false);
+                }
             }
         } catch (error: any) {
             console.error('Error:', error);
         }
     }
+
+    useEffect(() => {
+
+        if (paper && dieCutResult && backgroundColor) {
+            const dieCutX: number = centerX - frameWidth / 2;
+            const dieCutY: number = centerY - frameHeight / 2;
+
+            // Remove existing dieCutImage if it exists
+            paper?.forEach((element: any) => {
+                const { data } = element.data();
+                if (data === "dieCutImage") {
+                    element.remove();
+                }
+            });
+
+            // Create the dieCutImage using the generated SVG image data                    
+            const dieCutImage = paper.path(dieCutResult)
+
+            const strokeColor = "rgba(0,0,0,0.3)";
+
+            dieCutImage?.attr({
+                fill: backgroundColor,
+                stroke: strokeColor
+            })
+
+            dieCutImage.translate(dieCutX, dieCutY);
+
+            dieCutImage?.data('data', 'dieCutImage');
+
+            paper.forEach((element: any) => {
+                const { data } = element.data();
+                const isRectOrCircle = data === "frame-rect" || data === "frame-circle";
+                const isCircle = data === "frame-circle";
+
+                if (isRectOrCircle) {
+                    dieCutImage.insertAfter(element);
+                    // testImage.insertAfter(element);
+
+                }
+            })
+        }
+    }, [dieCutResult, backgroundColor, centerX, centerY, frameWidth, frameHeight, paper])
+
+    // const dimension = dieCutImage.getBBox()
+
+    //         if (dimension) {
+    //             console.log(dimension);
+    //             dispatch(setBreddDefaultValue(dimension.width)); // Set default value for bredd input
+    //             dispatch(setHojdDefaultValue(dimension.height));
+    //         }
 
     /**
      * Svg export function
@@ -352,8 +304,9 @@ const ControlElement = () => {
 
         if (paper) {
 
+            const strokeColor = "rgba(255,0,255, 1)";
             // Proceed with SVG export and download
-            const svgData = paper.toSVG(centerX - frameWidth / 2, centerY - frameHeight / 2, frameWidth, frameHeight);
+            const svgData = paper.toSVG(centerX - frameWidth / 2, centerY - frameHeight / 2, frameWidth, frameHeight, strokeColor, false);
 
             // Create a Blob from the SVG data
             const blob = new Blob([svgData], { type: 'image/svg+xml' });
@@ -375,9 +328,6 @@ const ControlElement = () => {
             window.URL.revokeObjectURL(url);
         }
     };
-
-
-
 
 
     useEffect(() => {
@@ -436,12 +386,12 @@ const ControlElement = () => {
                 {(StickerSelected.id) && (
                     <div className="absolute bottom-0 left-0 w-fit mx-auto h-3 flex justify-start items-end gap-5 z-50">
                         <div className="flex gap-3 p-4 space-y-3 w-60">
-                            <RangeSlider minValue={1} maxValue={100} step={1} defaultValue={grow} label="Kantlinje" />
+                            <RangeSlider minValue={20} maxValue={120} step={1} defaultValue={grow} label="Kantlinje" />
                             <Tooltip message='Die Cut Effect'>
                                 <button onClick={handleDieCut} className='text-sm font-semibold bg-white hover:bg-so-deep-gray cursor-pointer border border-black/20 hover:border-black/50 shadow-sm hover:shadow-lg rounded-full px-2 pt-1 pb-1.5'>Apply</button>
                             </Tooltip>
 
-                            {/* <button onClick={handleDownloadSVG} className='text-sm font-semibold bg-white hover:bg-so-deep-gray cursor-pointer border border-black/20 hover:border-black/50 shadow-sm hover:shadow-lg rounded-full px-2 pt-1 pb-1.5'>Download</button> */}
+                            <button onClick={handleDownloadSVG} className='text-sm font-semibold bg-white hover:bg-so-deep-gray cursor-pointer border border-black/20 hover:border-black/50 shadow-sm hover:shadow-lg rounded-full px-2 pt-1 pb-1.5'>Download</button>
 
                         </div>
                     </div>
