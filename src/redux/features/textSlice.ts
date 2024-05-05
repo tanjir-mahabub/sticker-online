@@ -6,6 +6,8 @@ interface TextElement {
   text: string;
   x: number;
   y: number;
+  type: string;
+  category: string;
   fontSize: number;
   fontFamily: string;
   fill: string;
@@ -45,7 +47,8 @@ const textSlice = createSlice({
 
     // Remove a text element by its ID
     removeText: (state, action: PayloadAction<string>) => {
-      state.texts = state.texts.filter(text => text.id !== action.payload);
+      const id = action.payload;
+      state.texts = state.texts.filter(text => text.id !== id);
     },
 
     // Clear all text elements

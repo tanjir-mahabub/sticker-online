@@ -4,71 +4,6 @@ import * as d3 from "d3";
 import opentype from 'opentype.js';
 import { fontMapping } from "@/store/customizeFontStore";
 
-const svgCreate = async (svgElement: SVGElement, width: number, height: number, grow: number, backgroundColor: string) => {
-    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-
-    const xAttr = svgElement.getAttribute("x");
-    const yAttr = svgElement.getAttribute("y");
-    const widthAttr = svgElement.getAttribute("width");
-    const heightAttr = svgElement.getAttribute("height");
-
-    // Perform null checks before parsing attribute values
-    const x = xAttr ? parseFloat(xAttr) : 0;
-    const y = yAttr ? parseFloat(yAttr) : 0;
-    // const width = widthAttr ? parseFloat(widthAttr) : 100;
-    // const height = heightAttr ? parseFloat(heightAttr) : 100;
-
-    svg.setAttribute("x", "0")
-    svg.setAttribute("y", "0")
-    // svg.setAttribute("x", "0")
-    // svg.setAttribute("x", "0")
-
-    // Set attributes for the SVG container
-    svg.setAttribute("viewport", `0 0 ${width} ${height}`);
-
-
-    const matrix = `matrix(1,0,0,1, -${x / 2}, -${y / 2})`;
-    console.log(matrix);
-    svgElement.setAttribute("transform", matrix);
-
-    // svgElement.removeAttribute("width");
-    // svgElement.removeAttribute("height");
-    console.log(svgElement);
-    svg.appendChild(svgElement);
-    const svgString = new XMLSerializer().serializeToString(svg);
-    // const modified = await svgModification(svgString, 280, 385, 20, "red", "red");
-    // console.log('modified', modified);
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(svgString, 'image/svg+xml');
-    const svgNode = doc.children[0];
-    console.log(svgNode);
-    return svgNode;
-}
-
-// Define a cache to store the path data for each text element
-export const generateContours = async (svgString: string, width: number, height: number, grow: number, backgroundColor: string) => {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(svgString, 'image/svg+xml');
-    const elements = Array.from(doc.children[0].childNodes);
-
-
-    const modifiedSvgStrings: string[] = [];
-    for (const element of elements) {
-        const svgElement = element as SVGElement;
-        if (svgElement.nodeName === "image") {
-            const svgString = await svgCreate(svgElement, width, height, grow, backgroundColor)
-            // console.log(svgString);
-            return svgString;
-        }
-        // const modifiedSvgString = await generateContoursFromElement(svgElement);
-        // modifiedSvgStrings.push(modifiedSvgString);
-    }
-
-    // return modifiedSvgStrings;
-};
-
-
-
 const pathDataCache = new Map();
 
 export function convertTextToPath(element: any): Promise<void> {
@@ -138,185 +73,146 @@ export const pixelsToCm = (pixels: number, dpi: number): number => {
 }
 
 
-export const generateSVGJoin = async (svgData: string, width: number, height: number, grow: number, backgroundColor: string): Promise<string> => {
+// export const generateSVGImageData = async (svgData: string, width: number, height: number, grow: number, backgroundColor: string): Promise<string> => {
 
-    const newWidth: number = width;
-    const newHeight: number = height;
+//     const newWidth: number = width;
+//     const newHeight: number = height;
 
-    const serializer = new XMLSerializer();
+//     const serializer = new XMLSerializer();
 
-    const modifiedSVG = await svgJoining(svgData, newWidth, newHeight, grow, backgroundColor, backgroundColor);
-    // console.log(modifiedSVG);
-    // Check if modifiedSVG is a valid Node object
-    if (modifiedSVG && modifiedSVG instanceof Node) {
-        const svgString = serializer.serializeToString(modifiedSVG);
-        return svgString;
-    } else {
-        throw new Error('Invalid SVG node');
-    }
-}
+//     const modifiedSVG = await svgModification(svgData, newWidth, newHeight, grow, backgroundColor, backgroundColor);
 
-export const generateSVGImageTest = async (imageNode: SVGImageElement | SVGPathElement, width: number, height: number, grow: number, backgroundColor: string): Promise<string> => {
+//     // const svgString = serializer.serializeToString(modifiedSVG);
 
-    const newWidth: number = width;
-    const newHeight: number = height;
+//     //const reModifiedSVG = await svgModification(svgString, newWidth, newHeight, 1, backgroundColor, 'rgba(0,0,0,0.3)');
 
-    const serializer = new XMLSerializer();
+//     const TsvgString = serializer.serializeToString(modifiedSVG);
 
-    // Create a new SVG document
-    const svgNS = 'http://www.w3.org/2000/svg';
-    const svgNode = document.createElementNS(svgNS, 'svg');
+//     // Create a Blob from the serialized SVG string
+//     const blob = new Blob([TsvgString], { type: 'image/svg+xml' });
 
-    // Set SVG attributes like width, height, and background color
-    svgNode.setAttribute('width', String(newWidth));
-    svgNode.setAttribute('height', String(newHeight));
+//     // Create a URL for the Blob
+//     const url = window.URL.createObjectURL(blob);
 
-    // Create a new image element if imageNode is SVGImageElement
-    if (imageNode instanceof SVGImageElement) {
-        const newImage = document.createElementNS(svgNS, 'image');
-        newImage.setAttribute('xlink:href', imageNode.href.baseVal);
-        newImage.setAttribute('width', String(imageNode.width.baseVal));
-        newImage.setAttribute('height', String(imageNode.height.baseVal));
-        svgNode.appendChild(newImage);
-    }
-    // Clone the path element if imageNode is SVGPathElement
-    else if (imageNode instanceof SVGPathElement) {
-        svgNode.appendChild(imageNode.cloneNode(true));
-    }
-
-    // Serialize the SVG document into a string
-    const svgString = serializer.serializeToString(svgNode);
-
-    // Create a Blob from the serialized SVG string
-    const blob = new Blob([svgString], { type: 'image/svg+xml' });
-
-    // Create a URL for the Blob
-    const url = window.URL.createObjectURL(blob);
-
-    return url;
-};
+//     return url;
+// };
 
 
-export const generateSVGImageData = async (svgData: string, width: number, height: number, grow: number, backgroundColor: string): Promise<string> => {
+// const svgModification = async (svg: string, newWidth: number, newHeight: number, grow: number, backgroundColor: string, strokeColor: string): Promise<any> => {
+//     return new Promise((resolve, reject) => {
+//         const canvas = document.createElement('canvas');
+//         canvas.width = newWidth;
+//         canvas.height = newHeight;
+//         const ctx = canvas.getContext('2d', {
+//             willReadFrequently: true
+//         });
 
-    const newWidth: number = width;
-    const newHeight: number = height;
+//         const img = new Image();
+//         img.src = `data:image/svg+xml;base64,${btoa(svg)}`;
 
-    const serializer = new XMLSerializer();
+//         img.onload = async () => {
+//             try {
+//                 if (!ctx) throw new Error('Canvas context is null');
 
-    const modifiedSVG = await svgModification(svgData, newWidth, newHeight, grow, backgroundColor, backgroundColor);
+//                 ctx.imageSmoothingEnabled = true;
+//                 ctx.imageSmoothingQuality = 'high';
+//                 ctx.drawImage(img, 0, 0, newWidth, newHeight);
+//                 const imageData = ctx.getImageData(0, 0, newWidth, newHeight);
+//                 const pixels = imageData.data;
 
-    const svgString = serializer.serializeToString(modifiedSVG);
+//                 // Array to store non-transparent pixels
+//                 const nonTransparentPixels = [];
 
-    const reModifiedSVG = await svgModification(svgString, newWidth, newHeight, 1, backgroundColor, 'rgba(0,0,0,0.3)');
+//                 // Iterate over the pixel data
+//                 for (let i = 0; i < pixels.length; i += 1) {
+//                     // Check the alpha value of the pixel
+//                     const alpha = pixels[i + 3];
 
-    const TsvgString = serializer.serializeToString(reModifiedSVG);
+//                     // If alpha > 0, consider the pixel as non-transparent
+//                     if (alpha > 0) {
+//                         // Get the RGBA values of the non-transparent pixel
+//                         const r = pixels[i] = 255;
+//                         const g = pixels[i + 1] = 0;
+//                         const b = pixels[i + 2] = 0;
+//                         const a = alpha;
 
-    // Create a Blob from the serialized SVG string
-    const blob = new Blob([TsvgString], { type: 'image/svg+xml' });
+//                         // Store the pixel information
+//                         nonTransparentPixels.push({ x: (i / 4) % canvas.width, y: Math.floor((i / 4) / canvas.width), r, g, b, a });
+//                     }
+//                 }
 
-    // Create a URL for the Blob
-    const url = window.URL.createObjectURL(blob);
+//                 const nonTransparentCoordinates = nonTransparentPixels.map(pixel => [pixel.x, pixel.y]);
 
-    return url;
-};
+//                 const modifiedPoints = generateModifiedPoints(nonTransparentCoordinates, 0)
+//                 // console.log('nonTransparentCoordinates', nonTransparentCoordinates);
 
-const svgJoining = async (svg: string, newWidth: number, newHeight: number, grow: number, backgroundColor: string, strokeColor: string): Promise<any> => {
-    return new Promise((resolve, reject) => {
-        const canvas = document.createElement('canvas');
-        canvas.width = newWidth;
-        canvas.height = newHeight;
-        const ctx = canvas.getContext('2d', {
-            willReadFrequently: true
-        });
+//                 // console.log(imageData);
+//                 //  const grid = (x: number, y: number) => {
+//                 //     const index = (y * imageData.width + x) * 4;
+//                 //     const alpha = imageData.data[index + 3];
+//                 //     return alpha > 0;
+//                 // };
+//                 // console.log(grid);
 
-        const img = new Image();
-        img.src = `data:image/svg+xml;base64,${btoa(svg)}`;
-
-        img.onload = async () => {
-            try {
-                if (!ctx) throw new Error('Canvas context is null');
-
-                ctx.imageSmoothingEnabled = true;
-                ctx.imageSmoothingQuality = 'high';
-                ctx.drawImage(img, 0, 0, newWidth, newHeight);
-                const imageData = ctx.getImageData(0, 0, newWidth, newHeight);
-
-
-                const contourFinderInstance = new ContourFinder();
-                contourFinderInstance.init(canvas);
-
-                // Find contours
-                contourFinderInstance.findContours();
-
-                // Convert contours to the desired format
-                const formattedContours = contourFinderInstance.allContours.flatMap(contour =>
-                    contour.map(point => [point.x, point.y])
-                );
-
-                const modifiedContours = await redraw(formattedContours, newWidth, newHeight, grow, backgroundColor, strokeColor);
-
-                resolve(modifiedContours);
-            } catch (error) {
-                reject(error);
-            }
-        };
-
-        img.onerror = (error) => {
-            reject(new Error('Failed to load SVG image: ' + error));
-        };
-    });
-};
-
-const svgModification = async (svg: string, newWidth: number, newHeight: number, grow: number, backgroundColor: string, strokeColor: string): Promise<any> => {
-    return new Promise((resolve, reject) => {
-        const canvas = document.createElement('canvas');
-        canvas.width = newWidth;
-        canvas.height = newHeight;
-        const ctx = canvas.getContext('2d', {
-            willReadFrequently: true
-        });
-
-        const img = new Image();
-        img.src = `data:image/svg+xml;base64,${btoa(svg)}`;
-
-        img.onload = async () => {
-            try {
-                if (!ctx) throw new Error('Canvas context is null');
-
-                ctx.imageSmoothingEnabled = true;
-                ctx.imageSmoothingQuality = 'high';
-                ctx.drawImage(img, 0, 0, newWidth, newHeight);
-                const imageData = ctx.getImageData(0, 0, newWidth, newHeight);
-                // console.log(imageData);
-                const grid = (x: number, y: number) => {
-                    const index = (y * imageData.width + x) * 4;
-                    const alpha = imageData.data[index + 3];
-                    return alpha > 0;
-                };
+//                 // const contours = geom.contour(grid);
+//                 // console.log(contours);
 
 
-                const contours = geom.contour(grid);
-                // console.log(contours);
-
-                const modifiedContours = await redraw(contours, newWidth, newHeight, grow, backgroundColor, strokeColor);
-
-                resolve(modifiedContours);
-            } catch (error) {
-                reject(error);
-            }
-        };
-
-        img.onerror = (error) => {
-            reject(new Error('Failed to load SVG image: ' + error));
-        };
-    });
-};
+//                 // Now 'contours' contains the generated contour paths
+//                 // console.log('modifiedPoints', contours);
 
 
-const generateModifiedPoints = (points: any, offset: number) => {
-    return points.map((point: any) => [point[0], point[1] + offset]);
-}
+//                 const modifiedContours = await drawSVG(nonTransparentPixels, newWidth, newHeight, grow, backgroundColor, strokeColor);
+//                 console.log(modifiedContours);
+
+//                 resolve(modifiedContours);
+//             } catch (error) {
+//                 reject(error);
+//             }
+//         };
+
+//         img.onerror = (error) => {
+//             reject(new Error('Failed to load SVG image: ' + error));
+//         };
+//     });
+// };
+
+// const drawSVG = (pixels: { x: number; y: number; r: number; g: number; b: number; }[], newWidth: number, newHeight: number, grow: number, backgroundColor: string, strokeColor: string): SVGSVGElement => {
+//     // Create a new SVG element
+//     const svgRoot = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+//     svgRoot.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+//     svgRoot.setAttribute("width", newWidth.toString());
+//     svgRoot.setAttribute("height", newHeight.toString());
+//     // svgRoot.setAttribute("style", `background-color:${backgroundColor};`);
+
+//     // Draw each non-transparent pixel as a rectangle
+//     pixels.forEach(pixel => {
+//         // Create a rectangle element for each pixel
+//         const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+//         rect.setAttribute("x", pixel.x.toString());
+//         rect.setAttribute("y", pixel.y.toString());
+//         rect.setAttribute("width", "1");
+//         rect.setAttribute("height", "1");
+//         rect.setAttribute("fill", `${backgroundColor}`);
+//         rect.setAttribute("stroke", strokeColor);
+//         rect.setAttribute("stroke-width", `${grow}`);
+//         rect.setAttribute("stroke-linejoin", "round")
+//         rect.setAttribute("stroke-linecap", "round");
+//         rect.setAttribute("vector-effect", "non-scaling-stroke");
+
+//         // Append the rectangle to the SVG root element
+//         svgRoot.appendChild(rect);
+//     });
+
+//     return svgRoot;
+// };
+
+
+
+
+// const generateModifiedPoints = (points: any, offset: number) => {
+//     return points.map((point: any) => [point[0], point[1] + offset]);
+// }
 
 import { Selection } from 'd3-selection';
 import { line } from 'd3-shape';
@@ -358,27 +254,27 @@ const redraw = (points: any[], width: number, height: number, grow: number, back
         const lineGenerator = line<any>()
             .x(d => d[0])
             .y(d => d[1])
-            .curve(d3.curveBasisClosed);
+            .curve(d3.curveBasis);
 
         // Manually close the path by connecting the last point to the first point
         const closedPoints = [...connectedPoints, connectedPoints[0]];
 
-        const clipPathId = `clipPath${Date.now()}`;
-        const clipPath = d3.select(svgNode)
-            .append("defs")
-            .append("clipPath")
-            .attr("id", clipPathId);
+        // const clipPathId = `clipPath${Date.now()}`;
+        // const clipPath = d3.select(svgNode)
+        //     .append("defs")
+        //     .append("clipPath")
+        //     .attr("id", clipPathId);
 
         // Append clipPath with a background rectangle
-        clipPath.append("rect")
-            .attr("width", width)
-            .attr("height", height)
-            .attr("fill", backgroundColor);
+        // clipPath.append("rect")
+        //     .attr("width", width)
+        //     .attr("height", height)
+        //     .attr("fill", backgroundColor);
 
         // Draw the modified path for stroke
         const strokePath: Selection<SVGPathElement, any, any, any> = d3.select(svgNode)
             .append("g")
-            .attr("clip-path", `url(#${clipPathId})`)
+            // .attr("clip-path", `url(#${clipPathId})`)
             .append("path")
             .attr("fill", backgroundColor)  // No fill
             .attr("stroke", strokeColor)  // Use stroke
