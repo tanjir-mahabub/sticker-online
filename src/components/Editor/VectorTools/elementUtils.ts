@@ -1,4 +1,4 @@
-import { calculateFrameEdges, isObjectInsideFrame } from "@/components/Utils/functions";
+import { calculateFrameEdges, isObjectInsideFrame } from "@/components/Utils/vectorFunction";
 import { BoundingBox, Frame } from "@/types/types";
 
 export const isElementInsideFrame = (

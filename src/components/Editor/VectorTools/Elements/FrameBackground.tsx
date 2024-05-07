@@ -1,7 +1,7 @@
 import { usePaper } from "@/context/PaperContext";
 import { useTransformUtils } from "@/hooks/useTransformUtils";
 import { useAppSelector } from "@/redux/store";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 
 const FrameBackground = () => {
@@ -80,7 +80,7 @@ const FrameBackground = () => {
         }
     }, [paper, deselect, centerX, centerY, frameWidth, frameHeight, circleEl, rectEl, rectElBlank, StickerSelected]);
 
-    return null; // Return null or the JSX of your component
+    return null;
 }
 
 export default FrameBackground;

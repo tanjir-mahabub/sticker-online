@@ -1,11 +1,11 @@
 import ImageUpload from "@/components/Utils/ImageUploader";
 import ImagePreview from "@/components/Utils/ImagePreview";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { addImage, clearImages } from "@/redux/features/imagePreviewSlice";
 import { RootState, useAppSelector } from "@/redux/store";
 import Image from "next/image";
-import { generateUniqueId } from "@/components/Utils/functions";
 import { deleteAllHistoriesByCategory } from "@/redux/features/historySlice";
+import { generateUniqueId } from "@/components/Utils/vectorFunction";
 
 const BilderCustomize = () => {
     const dispatch = useDispatch();

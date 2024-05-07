@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import MaterialDropdown from './MaterialDropdown';
 import DimensionInput from './DimensionInput';
 import AntalDropdown from './AntalDropdown';
