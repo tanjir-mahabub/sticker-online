@@ -11,10 +11,13 @@ import { useEffect, useState } from "react";
 import { isElementInsideFrame } from "../elementUtils";
 import { useAppSelector } from "@/redux/store";
 import { generateSVGImageData } from "@/components/Utils/DieCutFunction";
+import { convertJpgToBase64 } from "@/components/Utils/vectorFunction";
+import materialStore from '@/store/materialStore';
 
 const ControlElement = () => {
     const [dieCutResult, setDieCutResult] = useState<string | null>(null);
     const { paper, selectedItem, setSelectedItem, stackOrder, setStackOrder, currentFtRef, setIsLoading } = usePaper();
+    const materialDefault = useAppSelector(state => state.formValues.materialLastSelected);
 
     const StickerSelected = useAppSelector(state => state.sticker);
     const CanvasProperties = useAppSelector(state => state.canvas);
@@ -219,7 +222,6 @@ const ControlElement = () => {
         }
     };
 
-
     const handleDieCut = async () => {
         deselect()
         setIsLoading(true);
@@ -229,7 +231,7 @@ const ControlElement = () => {
 
             if (svgData) {
 
-                const modifiedSVG = await generateSVGImageData(svgData, frameWidth, frameHeight, grow, backgroundColor)
+                const modifiedSVG = await generateSVGImageData(svgData, frameWidth, frameHeight, grow, "white")
 
                 const dAttributeValue = await extractDAttributeValue(modifiedSVG);
 
@@ -248,7 +250,7 @@ const ControlElement = () => {
 
     useEffect(() => {
 
-        if (paper && dieCutResult && backgroundColor) {
+        if (paper && dieCutResult && backgroundColor && materialDefault) {
             const dieCutX: number = centerX - frameWidth / 2;
             const dieCutY: number = centerY - frameHeight / 2;
 
@@ -266,13 +268,28 @@ const ControlElement = () => {
             const strokeColor = "rgba(0,0,0,0.3)";
 
             dieCutImage?.attr({
-                fill: backgroundColor,
                 stroke: strokeColor
             })
 
             dieCutImage.translate(dieCutX, dieCutY);
 
             dieCutImage?.data('data', 'dieCutImage');
+
+            const selectedMaterial = materialStore.find(material => material.id === materialDefault);
+            // console.log(selectedMaterial);
+
+            //pattern add
+            selectedMaterial && selectedMaterial.src ? convertJpgToBase64(selectedMaterial.src)
+                .then((base64Data) => {
+                    // console.log('Base64-encoded data:', base64Data);
+                    // Handle the base64-encoded data as needed
+                    dieCutImage.attr({ fill: `url(${base64Data})` });
+                })
+                .catch((error) => {
+                    console.error('Error converting JPG to base64:', error);
+                }) : (
+                (selectedMaterial?.value === "clear") ? dieCutImage.attr({ fill: "transparent" }) : dieCutImage.attr({ fill: backgroundColor })
+            )
 
             paper.forEach((element: any) => {
                 const { data } = element.data();
@@ -286,7 +303,7 @@ const ControlElement = () => {
                 }
             })
         }
-    }, [dieCutResult, backgroundColor, centerX, centerY, frameWidth, frameHeight, paper])
+    }, [dieCutResult, backgroundColor, centerX, centerY, frameWidth, frameHeight, paper, materialDefault])
 
     // const dimension = dieCutImage.getBBox()
 

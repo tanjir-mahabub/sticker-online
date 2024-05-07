@@ -3,7 +3,7 @@ import Image from 'next/image';
 import AntalOptions, { AntalOption } from './child/AntalOptions';
 import { useDispatch } from 'react-redux';
 import { setCalculation } from '@/redux/features/calculationSlice';
-import { setAntalLastSelected, setMaterialLastSelected } from '@/redux/features/formSlice';
+import { setAntalLastSelected } from '@/redux/features/formSlice';
 import { useAppSelector } from '@/redux/store';
 
 const antalOptions = [

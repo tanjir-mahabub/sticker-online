@@ -1,6 +1,5 @@
 import dynamic from 'next/dynamic';
 import { useRef, useEffect, useState } from 'react';
-import Loading from '../Utils/Loading';
 import { useAppSelector } from '@/redux/store';
 import { useDispatch } from 'react-redux';
 import { setCanvasProperties } from '@/redux/features/canvasSlice';

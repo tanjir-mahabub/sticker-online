@@ -4,10 +4,10 @@ import { upsertText, removeText, clearTexts } from "@/redux/features/textSlice";
 import ColorInput from './Input/ColorInput';
 import { customizeFonts } from "@/store/customizeFontStore"; // Adjust the import path as necessary
 import TextInput from './Input/TextInput';
-import { generateUniqueId } from '@/components/Utils/functions';
 import { useAppSelector } from "@/redux/store"; // Adjust the import path as necessary
 import Image from 'next/image';
 import { deleteAllHistoriesByCategory } from '@/redux/features/historySlice';
+import { generateUniqueId } from '@/components/Utils/vectorFunction';
 
 const TextCustomize: React.FC = () => {
     const dispatch = useDispatch();

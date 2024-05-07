@@ -5,8 +5,8 @@ import Image from "next/image";
 import { useDispatch } from "react-redux";
 import { addImage, clearImages } from "@/redux/features/imagePreviewSlice";
 import { RootState, useAppSelector } from "@/redux/store";
-import { generateUniqueId } from "@/components/Utils/functions";
 import { deleteAllHistoriesByCategory } from "@/redux/features/historySlice";
+import { generateUniqueId } from "@/components/Utils/vectorFunction";
 
 const MotivCustomize = () => {
     const [selectedMotiveCategory, setSelectedMotiveCategory] = useState('Populära');

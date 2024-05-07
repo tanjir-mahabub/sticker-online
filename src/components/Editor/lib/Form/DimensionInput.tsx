@@ -3,10 +3,10 @@ import BreddInput from './BreddInput';
 import HojdInput from './HojdInput';
 import { useDispatch } from 'react-redux';
 import { setCanvasProperties } from '@/redux/features/canvasSlice';
-import { cmToPixel } from '@/components/Utils/functions';
 import { setCalculation } from '@/redux/features/calculationSlice';
 import { setBreddDefaultValue, setHojdDefaultValue } from '@/redux/features/formSlice';
 import { useAppSelector } from '@/redux/store';
+import { cmToPixel } from '@/components/Utils/vectorFunction';
 
 const DimensionInput = () => {
     const dispatch = useDispatch();

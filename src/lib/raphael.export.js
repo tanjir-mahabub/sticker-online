@@ -220,53 +220,6 @@
             }
         },
 
-        // 'text': function (node) {
-        //     var style = extractStyle(node),
-        //         tags = [],
-        //         textLines = node.attrs['text'].toString().split('\n'),
-        //         totalLines = textLines.length;
-
-        //     map(textLines, function (text, line) {
-        //         var attrs = reduce(
-        //             node.attrs,
-        //             function (initial, value, name) {
-        //                 if (name !== 'text' && name !== 'w' && name !== 'h') {
-        //                     if (name === 'font-size') value = parseInt(value) + 'px';
-        //                     if (name === 'stroke') {
-        //                         value = convertToHexColor(value);
-        //                     }
-        //                     initial[name] = escapeXML(value.toString());
-        //                 }
-        //                 return initial;
-        //             },
-        //             { style: styleToString(style) + ';' }
-        //         );
-
-        //         // Check if font-family attribute exists and add it to attrs
-        //         if (node.attrs['font-family']) {
-        //             attrs['font-family'] = escapeXML(node.attrs['font-family']);
-        //         }
-
-        //         /**
-        //          * if text node has a class set, apply it to the attrs object
-        //         */
-        //         if (node.node.className.baseVal != "" && node.node.className.baseVal !== undefined) {
-        //             attrs["class"] = node.node.className.baseVal;
-        //         }
-
-        //         tags.push(tag(
-        //             'text',
-        //             attrs,
-        //             node.matrix,
-        //             tag('tspan', { dy: computeTSpanDy(style.font.size, line + 1, totalLines) }, null, text.replace(/&/g, "&amp;"))
-        //         ));
-        //     });
-
-        //     return tags;
-        // },
-
-
-
         'text': function (node) {
 
             var textPathData = node.data('textPath'); // Get textPath data from node
@@ -276,10 +229,6 @@
                 console.error("textPath is empty for text element:", node);
                 return ''; // Return empty string or handle the error as appropriate
             }
-
-
-            // console.log('testing', node);
-            // console.log('testing', node.matrix);
 
             return tag(
                 'path',
@@ -315,6 +264,10 @@
                             value = convertToHexColor(value);
                         }
 
+                        if (name === 'fill' && node.pattern) {
+                            value = "url(#" + node.pattern.id + ")";
+                        }
+
                         initial[name] = value.toString();
 
                         return initial;
@@ -339,6 +292,20 @@
 
         //          // Start the group
         // svg += '<g>';
+
+        if (paper.defs) {
+            const removePattern = paper.defs.querySelectorAll('#rotateImageFill');
+            // Get the HTML content of the defs element
+            var defsHTML = paper.defs.innerHTML;
+
+            // Remove nodes matching removePattern from defsHTML
+            removePattern?.forEach(node => {
+                defsHTML = defsHTML.replace(node.outerHTML, ''); // Remove the node's outerHTML
+            });
+
+            // Append modified defs content to the SVG string
+            svg += "<defs>" + defsHTML + "</defs>";
+        }
 
         for (var node = paper.bottom; node != null; node = node.next) {
             if (node.node.style.display === 'none') continue;

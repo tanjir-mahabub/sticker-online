@@ -6,6 +6,7 @@ const materialStore = [
         value: "vinyl",
         cost: 37,
         icon: "/materials/vinyl.png",
+        src: "/materials-background/vinyl.jpg",
         popup: {
             title: "Vinyl",
             imgSrc: "/Holo.png",
@@ -18,6 +19,7 @@ const materialStore = [
         value: "holografisk",
         cost: 32,
         icon: "/materials/holographic.png",
+        src: "/materials-background/holographic.jpg",
         popup: {
             title: "Holografisk",
             imgSrc: "/Holo.png",
@@ -30,6 +32,7 @@ const materialStore = [
         value: "glitter",
         cost: 43,
         icon: "/materials/glitter.png",
+        src: "/materials-background/glitter.jpg",
         popup: {
             title: "Glitter",
             imgSrc: "/Holo.png",
@@ -42,8 +45,10 @@ const materialStore = [
         value: "clear",
         cost: 15,
         icon: "/materials/clear.png",
+        // src: "/materials-background/",
+        src: "",
         popup: {
-            title:"Clear",
+            title: "Clear",
             imgSrc: "/Holo.png",
             content: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Suscipit assumenda delectus hic officia iure necessitatibus excepturi laudantium, sunt eligendi, maiores velit tempora aliquam exercitationem a expedita odio facere modi sequi?"
         }
@@ -54,8 +59,9 @@ const materialStore = [
         value: "mirror",
         cost: 33,
         icon: "/materials/mirror.png",
+        src: "",
         popup: {
-            title:"Mirror",
+            title: "Mirror",
             imgSrc: "/Holo.png",
             content: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Suscipit assumenda delectus hic officia iure necessitatibus excepturi laudantium, sunt eligendi, maiores velit tempora aliquam exercitationem a expedita odio facere modi sequi?"
         }
@@ -66,8 +72,9 @@ const materialStore = [
         value: "pixie-dust",
         cost: 51,
         icon: "/materials/pixie-dust.png",
+        src: "",
         popup: {
-            title:"Pixie Dust",
+            title: "Pixie Dust",
             imgSrc: "/Holo.png",
             content: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Suscipit assumenda delectus hic officia iure necessitatibus excepturi laudantium, sunt eligendi, maiores velit tempora aliquam exercitationem a expedita odio facere modi sequi?"
         }
@@ -78,6 +85,7 @@ const materialStore = [
         value: "prismatic",
         cost: 48,
         icon: "/materials/prismatic.png",
+        src: "",
         popup: {
             title: "Prismatic",
             imgSrc: "/Holo.png",
@@ -90,12 +98,13 @@ const materialStore = [
         value: "brushed-alloy",
         cost: 49,
         icon: "/materials/burshed-alloy.png",
+        src: "",
         popup: {
             title: "Brushed Alloy",
             imgSrc: "/Holo.png",
             content: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Suscipit assumenda delectus hic officia iure necessitatibus excepturi laudantium, sunt eligendi, maiores velit tempora aliquam exercitationem a expedita odio facere modi sequi?"
         }
-    }    
+    }
 ]
 
 

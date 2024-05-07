@@ -46,7 +46,6 @@ const TextElement = () => {
                             const elCenter = { x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 };
                             const translation = { x: paperCenter.x - elCenter.x, y: paperCenter.y - elCenter.y };
 
-                            // element.attr({ x: translation.x, y: translation.y, width: bbox.width, height: bbox.height });
                             element.translate(translation.x, translation.y)
 
                             element.click(() => handleElementInteraction(element));

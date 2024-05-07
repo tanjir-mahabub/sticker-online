@@ -2,7 +2,7 @@ import Raphael from 'raphael';
 import '@/lib/raphael.export';
 import '@/lib/raphael.free_transform';
 import { usePaper } from "@/context/PaperContext";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import VectorFrame from './CanvasFrame';
 import Spinner from '@/components/Utils/Spinner';
 import FrameBackground from './Elements/FrameBackground';

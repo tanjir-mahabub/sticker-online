@@ -1,10 +1,11 @@
-import { generateUniqueId } from '@/components/Utils/functions';
+
+import { generateUniqueId } from '@/components/Utils/vectorFunction';
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
 interface MotivState {
-    id: string;
-    file: string;
-  }
+  id: string;
+  file: string;
+}
 
 const motivSlice = createSlice({
   name: 'motivs',
@@ -17,8 +18,8 @@ const motivSlice = createSlice({
       return state.filter(file => file.id !== action.payload);
     },
     deleteAllMotiv: () => {
-        return [];
-      },
+      return [];
+    },
   },
 });
 
