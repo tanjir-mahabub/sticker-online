@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { upsertText, removeText, clearTexts } from "@/redux/features/textSlice"; // Adjust the import path as necessary
+import { upsertText, clearTexts } from "@/redux/features/textSlice"; // Adjust the import path as necessary
 import ColorInput from './Input/ColorInput';
 import { customizeFonts } from "@/store/customizeFontStore"; // Adjust the import path as necessary
 import TextInput from './Input/TextInput';
@@ -8,6 +8,7 @@ import { useAppSelector } from "@/redux/store"; // Adjust the import path as nec
 import Image from 'next/image';
 import { deleteAllHistoriesByCategory } from '@/redux/features/historySlice';
 import { generateUniqueId } from '@/components/Utils/vectorFunction';
+import { setCategoryToRemove } from '@/redux/features/categoryToRemove';
 
 const TextCustomize: React.FC = () => {
     const dispatch = useDispatch();
@@ -56,13 +57,16 @@ const TextCustomize: React.FC = () => {
         };
 
         // Dispatch the upsertText action to add or update the text in the store
-        newTextEntry && dispatch(upsertText(newTextEntry));
+        if (newTextEntry) {
+            dispatch(upsertText(newTextEntry))
+        }
     };
 
     // Implement a function to remove a text element if needed
     const handleClearTexts = () => {
+        dispatch(setCategoryToRemove("text"))
         dispatch(clearTexts());
-        dispatch(deleteAllHistoriesByCategory("text"))
+        dispatch(deleteAllHistoriesByCategory("textPath"))
     };
 
     return (

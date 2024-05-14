@@ -1,12 +1,13 @@
 import { usePaper } from "@/context/PaperContext";
 import { useRaphaelElements } from "@/hooks/useRaphaelElements";
 import { useTransformUtils } from "@/hooks/useTransformUtils";
+import { addStackElement } from "@/redux/features/stackOrderSlice";
 import { useAppSelector } from "@/redux/store";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 
 const ImageElements = () => {
-    const { paper, lastAddedElement, setSelectedItem, setLastAddedElement, setStackOrder, currentFtRef, isLoading } = usePaper();
+    const { paper, lastAddedElement, setSelectedItem, setLastAddedElement, currentFtRef, isLoading } = usePaper();
     const { addImageElement } = useRaphaelElements(paper);
 
     const dispatch = useDispatch();
@@ -39,19 +40,21 @@ const ImageElements = () => {
 
                     element.attr({ x: translation.x, y: translation.y });
 
-                    element.click(() => handleElementInteraction(element));
+                    // element.click(() => handleElementInteraction(element));
+
 
                     setLastAddedElement(element);
+                    dispatch(addStackElement(element.id))
                 }
             });
         }
-    }, [paper, setLastAddedElement, imagePreviews, addImageElement, handleElementInteraction]);
+    }, [paper, setLastAddedElement, imagePreviews, addImageElement, handleElementInteraction, dispatch]);
 
     useEffect(() => {
         if (lastAddedElement) {
             setSelectedItem(lastAddedElement)
-            handleElementInteraction(lastAddedElement);
-            reapplyFreeTransform(lastAddedElement)
+            // handleElementInteraction(lastAddedElement);
+            // reapplyFreeTransform(lastAddedElement)
         }
     }, [lastAddedElement, setSelectedItem, handleElementInteraction, reapplyFreeTransform]);
 

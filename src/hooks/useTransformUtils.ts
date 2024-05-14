@@ -9,6 +9,9 @@ export const useTransformUtils = (dispatch: any, currentFtRef: any, setSelectedI
         setSelectedItem(el);
         // el.toFront();
         const ft = CustomTransform(el, {}, dispatch);
+        ft.apply()
+
+        ft.updateHandles();
         currentFtRef.current = ft;
     }, [dispatch, setSelectedItem, currentFtRef]);
 
@@ -22,6 +25,9 @@ export const useTransformUtils = (dispatch: any, currentFtRef: any, setSelectedI
             currentFtRef.current.unplug(); // Remove current free transform
         }
         const ft = CustomTransform(el, {}, dispatch); // Reapply with new settings
+        ft.apply()
+
+        ft.updateHandles();
         currentFtRef.current = ft;
     }, [dispatch, currentFtRef]);
 

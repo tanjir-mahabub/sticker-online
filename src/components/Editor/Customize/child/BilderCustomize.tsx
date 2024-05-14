@@ -6,6 +6,7 @@ import { RootState, useAppSelector } from "@/redux/store";
 import Image from "next/image";
 import { deleteAllHistoriesByCategory } from "@/redux/features/historySlice";
 import { generateUniqueId } from "@/components/Utils/vectorFunction";
+import { setCategoryToRemove } from "@/redux/features/categoryToRemove";
 
 const BilderCustomize = () => {
     const dispatch = useDispatch();
@@ -42,6 +43,7 @@ const BilderCustomize = () => {
     };
 
     const handleDeleteBTN = () => {
+        dispatch(setCategoryToRemove("image"))
         dispatch(clearImages("image"));
         dispatch(deleteAllHistoriesByCategory("image"))
     };

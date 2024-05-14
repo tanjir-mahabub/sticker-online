@@ -23,11 +23,11 @@ export const imagePreviewSlice = createSlice({
     },
     // Action to add multiple images with unique IDs
     addImages: (state, action: PayloadAction<ImageInfo[]>) => {
-      const uniqueImages = action.payload.filter(newImage => 
+      const uniqueImages = action.payload.filter(newImage =>
         !state.images.some(existingImage => existingImage.id === newImage.id));
       state.images.push(...uniqueImages);
     },
-    updateImages: (state, action: PayloadAction<{id: string; attrs: Partial<ImageInfo>}>) => {
+    updateImages: (state, action: PayloadAction<{ id: string; attrs: Partial<ImageInfo> }>) => {
       const { id, attrs } = action.payload;
       const imageIndex = state.images.findIndex(image => image.id === id);
       if (imageIndex !== -1) {
@@ -42,33 +42,33 @@ export const imagePreviewSlice = createSlice({
     deleteImage: (state, action: PayloadAction<string>) => {
       const id = action.payload;
       // Filter out images that match the given category
-      state.images = state.images.filter(image => image.id !== id);  
+      state.images = state.images.filter(image => image.id !== id);
     },
-    
+
     // Action to clear all images
     clearImages: (state, action: PayloadAction<string>) => {
       const category = action.payload;
       // Filter out images that match the given category
-      state.images = state.images.filter(image => image.category !== category);      
+      state.images = state.images.filter(image => image.category !== category);
     },
-     
+
     updateImagePosition: (state, action: PayloadAction<{ id: string; x: number; y: number; width?: number; height?: number }>) => {
       const { id, x, y, width, height } = action.payload;
       const index = state.images.findIndex(image => image.id === id);
       if (index !== -1) {
-        state.images[index] = { ...state.images[index], x, y,width, height };
+        state.images[index] = { ...state.images[index], x, y, width, height };
       }
     },
 
     // Inside your imagePreviewSlice reducers:
 
-updateElementAttributes: (state, action: PayloadAction<{ id: string; attributes: Partial<ImageInfo> }>) => {
-  const { id, attributes } = action.payload;
-  const index = state.images.findIndex(image => image.id === id);
-  if (index !== -1) {
-    state.images[index] = { ...state.images[index], ...attributes };
-  }
-},
+    updateElementAttributes: (state, action: PayloadAction<{ id: string; attributes: Partial<ImageInfo> }>) => {
+      const { id, attributes } = action.payload;
+      const index = state.images.findIndex(image => image.id === id);
+      if (index !== -1) {
+        state.images[index] = { ...state.images[index], ...attributes };
+      }
+    },
 
 
   },

@@ -1,7 +1,6 @@
 import { addedToHistory } from '@/redux/features/historySlice';
 import { updateElementAttributes } from "@/redux/features/imagePreviewSlice";
 
-
 export const CustomTransform = (element: any, options = {}, dispatch?: any) => {
     if (!element) {
         return {
@@ -27,11 +26,12 @@ export const CustomTransform = (element: any, options = {}, dispatch?: any) => {
     const transformOptions = { ...defaultOptions, ...options };
 
     const onTransform = (ft: any, events: any) => {
+        console.log(element, ft, events);
         if (events.includes('scale end') || events.includes('rotate end')) {
             const bbox: any = ft.subject.getBBox();
-            // console.log('drag start', bbox);
+            console.log('drag start', bbox);
 
-            // console.log('applied', ft.subject.transform());
+            console.log('applied', ft.subject.transform());
 
             const matrix = ft.subject.transform();
 
@@ -98,12 +98,13 @@ export const CustomTransform = (element: any, options = {}, dispatch?: any) => {
         }
     };
 
-
+    console.log(element);
 
     const ft = element?.paper?.freeTransform(element, transformOptions, onTransform);
 
     ft.subject.node.addEventListener('mouseup', () => {
         // Check if the current event is a drag end event (consider checking for 'dragmove' before to ensure it's a drag)
+        console.log(ft);
         if (ft.subject) {
             const bbox: any = ft.subject.getBBox();
 
@@ -215,9 +216,7 @@ export const CustomTransform = (element: any, options = {}, dispatch?: any) => {
 
 
 
-    ft.apply()
 
-    ft.updateHandles();
 
     return ft;
 };

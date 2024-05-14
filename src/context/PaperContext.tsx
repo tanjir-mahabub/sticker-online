@@ -7,12 +7,11 @@ interface PaperContextType {
     setSelectedItem: React.Dispatch<React.SetStateAction<any>>;
     isLoading: boolean;
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
-    stackOrder: any[];
-    setStackOrder: React.Dispatch<React.SetStateAction<any[]>>;
     currentFtRef: React.MutableRefObject<any>;
     lastAddedElement: any;
     setLastAddedElement: React.Dispatch<React.SetStateAction<any>>;
-
+    elementActive: any,
+    setElementActive: React.Dispatch<React.SetStateAction<any>>;
 }
 
 // Create a context
@@ -23,12 +22,12 @@ export const PaperProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     const [paper, setPaper] = useState<any>(null); // Set the initial state of paper to null
     const [selectedItem, setSelectedItem] = useState<any>(null); // Set the initial state of selectedItem to null
     const [isLoading, setIsLoading] = useState<boolean>(false); // Set the initial state of isLoading to false
-    const [stackOrder, setStackOrder] = useState<any[]>([]);
+    const [elementActive, setElementActive] = useState<any[]>([]);
     const currentFtRef = useRef<any>(null);
     const [lastAddedElement, setLastAddedElement] = useState<any>(null);
 
     return (
-        <PaperContext.Provider value={{ paper, setPaper, selectedItem, setSelectedItem, isLoading, setIsLoading, stackOrder, setStackOrder, currentFtRef, lastAddedElement, setLastAddedElement }}>
+        <PaperContext.Provider value={{ paper, setPaper, selectedItem, setSelectedItem, isLoading, setIsLoading, currentFtRef, lastAddedElement, setLastAddedElement, elementActive, setElementActive }}>
             {children}
         </PaperContext.Provider>
     );

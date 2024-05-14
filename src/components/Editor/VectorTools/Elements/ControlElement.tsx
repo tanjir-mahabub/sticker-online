@@ -13,28 +13,32 @@ import { useAppSelector } from "@/redux/store";
 import { generateSVGImageData } from "@/components/Utils/DieCutFunction";
 import { convertJpgToBase64 } from "@/components/Utils/vectorFunction";
 import materialStore from '@/store/materialStore';
+import { addStackElement, clearStackOrder, removeStackElement, sendBack, sendBackward, sendForward, sendFront } from "@/redux/features/stackOrderSlice";
+import { setCategoryToRemove } from "@/redux/features/categoryToRemove";
+
 
 const ControlElement = () => {
     const [dieCutResult, setDieCutResult] = useState<string | null>(null);
-    const { paper, selectedItem, setSelectedItem, stackOrder, setStackOrder, currentFtRef, setIsLoading } = usePaper();
+    const { paper, selectedItem, setSelectedItem, currentFtRef, setIsLoading, lastAddedElement, elementActive, setElementActive } = usePaper();
+
     const materialDefault = useAppSelector(state => state.formValues.materialLastSelected);
+    const stackOrder = useAppSelector(state => state.stackOrder);
 
     const StickerSelected = useAppSelector(state => state.sticker);
     const CanvasProperties = useAppSelector(state => state.canvas);
+    const CategoryToRemove = useAppSelector(state => state.categoryToRemove);
     const { centerX, centerY, frameWidth, frameHeight, grow, backgroundColor } = CanvasProperties;
 
     const dispatch = useDispatch();
 
-    const { reapplyFreeTransform } = useTransformUtils(dispatch, currentFtRef, setSelectedItem);
-
-    const { deselect } = useTransformUtils(dispatch, currentFtRef, setSelectedItem);
+    const { deselect, reapplyFreeTransform, handleElementInteraction } = useTransformUtils(dispatch, currentFtRef, setSelectedItem);
 
     const handleFlipX = () => {
         if (selectedItem && paper) {
             const bbox = selectedItem.getBBox(true);
             // Apply flipping by scaling
             selectedItem.transform(`...s-1,1,${bbox.x + bbox.width / 2},${bbox.y + bbox.height / 2}`);
-            reapplyFreeTransform(selectedItem); // Reapply free transform
+            //reapplyFreeTransform(selectedItem); // Reapply free transform
         }
     };
 
@@ -42,24 +46,23 @@ const ControlElement = () => {
         if (selectedItem && paper) {
             const bbox = selectedItem.getBBox(true);
             selectedItem.transform(`...s1,-1,${bbox.x + bbox.width / 2},${bbox.y + bbox.height / 2}`);
-            reapplyFreeTransform(selectedItem);
+            // reapplyFreeTransform(selectedItem);
+
+
         }
     };
 
     const handleSendFront = () => {
         if (selectedItem && paper && stackOrder.length > 0) {
             if (selectedItem.type !== "rect" && selectedItem.type !== "circle") {
-                const currentIndex = stackOrder.indexOf(selectedItem);
+                dispatch(sendFront(selectedItem.id));
+                const currentIndex = stackOrder.indexOf(selectedItem.id);
+                console.log(currentIndex);
                 if (currentIndex < stackOrder.length - 1) {
                     const lastElement = stackOrder[stackOrder.length - 1];
-                    selectedItem?.insertAfter(lastElement);
-                    setStackOrder(prevOrder => {
-                        const newOrder = [...prevOrder];
-                        newOrder.splice(currentIndex, 1); // Remove selectedItem from its current position
-                        newOrder.push(selectedItem); // Append selectedItem to the end of the array
-                        return newOrder;
-                    });
-                    reapplyFreeTransform(selectedItem);
+                    const element = elementActive.filter((el: any) => el.id === lastElement)
+                    selectedItem?.insertAfter(element);
+
                 }
             }
         }
@@ -69,37 +72,32 @@ const ControlElement = () => {
         if (selectedItem && paper && stackOrder.length > 0) {
             //console.log(selectedItem, stackOrder);
             if (selectedItem.type !== "rect" && selectedItem.type !== "circle") {
-                const currentIndex = stackOrder.indexOf(selectedItem);
+                dispatch(sendBack(selectedItem.id));
+                const currentIndex = stackOrder.indexOf(selectedItem.id);
+                console.log(currentIndex);
                 if (currentIndex > 0) {
                     const firstElement = stackOrder[0];
-                    selectedItem?.insertBefore(firstElement);
-                    setStackOrder(prevOrder => {
-                        const newOrder = [...prevOrder];
-                        newOrder.splice(currentIndex, 1); // Remove selectedItem from its current position
-                        newOrder.unshift(selectedItem); // Add selectedItem to the beginning of the array
-                        return newOrder;
-                    });
-                    reapplyFreeTransform(selectedItem);
+                    console.log(firstElement);
+                    const element = elementActive.filter((el: any) => el.id === firstElement);
+                    selectedItem?.insertBefore(element);
+                    // dispatch(sendBack(selectedItem.id));                    
                 }
             }
         }
     };
 
-
     const handleSendForward = () => {
         if (selectedItem && paper && stackOrder.length > 0) {
             if (selectedItem.type !== "rect" && selectedItem.type !== "circle") {
-                const currentIndex = stackOrder.indexOf(selectedItem);
+                dispatch(sendForward(selectedItem.id));
+                const currentIndex = stackOrder.indexOf(selectedItem.id);
+                console.log(stackOrder[currentIndex]);
                 if (currentIndex < stackOrder.length - 1) {
                     const nextElement = stackOrder[currentIndex + 1];
-                    selectedItem.insertAfter(nextElement);
-                    setStackOrder(prevOrder => {
-                        const newOrder = [...prevOrder];
-                        newOrder.splice(currentIndex, 1); // Remove from current position
-                        newOrder.splice(currentIndex + 1, 0, selectedItem); // Insert after next element
-                        return newOrder;
-                    });
-                    reapplyFreeTransform(selectedItem);
+                    console.log(nextElement);
+                    const element = elementActive.filter((el: any) => el.id === nextElement);
+                    console.log(element);
+                    selectedItem.insertAfter(element);
                 }
             }
         }
@@ -108,24 +106,18 @@ const ControlElement = () => {
     const handleSendBackward = () => {
         if (selectedItem && paper && stackOrder.length > 0) {
             if (selectedItem.type !== "rect" && selectedItem.type !== "circle") {
-                const currentIndex = stackOrder.indexOf(selectedItem);
+                dispatch(sendBackward(selectedItem.id));
+                const currentIndex = stackOrder.indexOf(selectedItem.id);
                 if (currentIndex > 0) {
                     const prevElement = stackOrder[currentIndex - 1];
-                    selectedItem.insertBefore(prevElement);
-                    setStackOrder(prevOrder => {
-                        const newOrder = [...prevOrder];
-                        newOrder.splice(currentIndex, 1); // Remove from current position
-                        newOrder.splice(currentIndex - 1, 0, selectedItem); // Insert before previous element
-                        return newOrder;
-                    });
-                    reapplyFreeTransform(selectedItem);
+                    console.log(prevElement);
+                    const element = elementActive.filter((el: any) => el.id === prevElement);
+                    console.log(element);
+                    selectedItem.insertBefore(element);
                 }
             }
         }
     };
-
-
-
 
 
     const handleDelete = () => {
@@ -134,15 +126,16 @@ const ControlElement = () => {
                 currentFtRef.current.unplug(); // Proper cleanup
             }
 
-            // console.log("Deleting item with ID:", selectedItem.id);
             const { category } = selectedItem.data()
             selectedItem.type === "image" && dispatch(deleteImage(selectedItem.id)) && dispatch(deleteHistoryById(selectedItem.id))
             category === "text" && dispatch(removeText(selectedItem.id)) && dispatch(deleteHistoryById(selectedItem.id))
 
+            selectedItem?.freeTransform.unplug()
+            dispatch(removeStackElement(selectedItem.id));
+            setElementActive((prev: any) => prev.filter((item: any) => item.id !== selectedItem.id));
 
             selectedItem.remove(); // Remove the element            
-            dispatch(deleteHistoryById(selectedItem.id)) // delete history
-            deselect();
+            dispatch(deleteHistoryById(selectedItem.id)) // delete history   
             setSelectedItem(null); // Reset selection
         }
     };
@@ -158,7 +151,7 @@ const ControlElement = () => {
                     const elCenter = { x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 };
                     const translation = { x: paperCenter.x - elCenter.x, y: paperCenter.y - elCenter.y };
 
-                    el.transform(`...T${translation.x},${translation.y}`);
+                    el.transform(`...T${translation.x}, ${translation.y}`);
 
                     if (isElementInsideFrame(el, centerX, centerY, frameWidth, frameHeight)) {
                         el.attr({ opacity: 1 })
@@ -169,7 +162,7 @@ const ControlElement = () => {
                     }
 
 
-                    reapplyFreeTransform(el)
+                    // reapplyFreeTransform(el)
                 }
             });
         }
@@ -186,7 +179,7 @@ const ControlElement = () => {
                 const translation = { x: paperCenter.x - elCenter.x, y: paperCenter.y - elCenter.y };
 
                 // Apply translation to center the element
-                el.transform(`...T${translation.x},${translation.y}`);
+                el.transform(`...T${translation.x}, ${translation.y}`);
 
                 // Check if the element is inside the frame and adjust opacity accordingly
                 if (isElementInsideFrame(el, centerX, centerY, frameWidth, frameHeight)) {
@@ -196,11 +189,10 @@ const ControlElement = () => {
                 }
 
                 // Reapply free transformation if necessary
-                reapplyFreeTransform(el);
+                // reapplyFreeTransform(el);
             }
         }
     };
-
 
     const extractDAttributeValue = async (svgUrl: string): Promise<string | null> => {
         try {
@@ -209,7 +201,7 @@ const ControlElement = () => {
             const svgString = await response.text();
 
             // Ensure the SVG string starts with "<svg>" tag
-            const formattedSvgString = svgString.startsWith("<svg>") ? svgString : `<svg xmlns="http://www.w3.org/2000/svg">${svgString}</svg>`;
+            const formattedSvgString = svgString.startsWith("<svg>") ? svgString : `< svg xmlns = "http://www.w3.org/2000/svg" > ${svgString}</ > `;
 
             const parser = new DOMParser();
             const doc = parser.parseFromString(formattedSvgString, "image/svg+xml");
@@ -223,7 +215,6 @@ const ControlElement = () => {
     };
 
     const handleDieCut = async () => {
-        deselect()
         setIsLoading(true);
 
         try {
@@ -305,6 +296,51 @@ const ControlElement = () => {
         }
     }, [dieCutResult, backgroundColor, centerX, centerY, frameWidth, frameHeight, paper, materialDefault])
 
+
+    useEffect(() => {
+        lastAddedElement && stackOrder?.forEach((id: string) => {
+            const element = paper?.getById(id);
+            if (element) {
+                const isUnique = !elementActive.some((item: any) => item.id === element.id);
+                if (isUnique) {
+                    setElementActive((prev: any) => [...prev, element]);
+                }
+            }
+        });
+        console.log(elementActive, 'stackOrder', stackOrder);
+    }, [paper, stackOrder, elementActive, setElementActive, lastAddedElement]);
+
+
+    useEffect(() => {
+        const newStack: any = [];
+        if (CategoryToRemove) {
+            console.log(CategoryToRemove, stackOrder);
+            stackOrder?.forEach((id: any) => {
+                const element = paper?.getById(id);
+                const { data } = element?.data();
+                if (data === CategoryToRemove) {
+                    //console.log(element);
+                    newStack.push(element.id);
+                    setElementActive((prev: any) => prev.filter((item: any) => item.id !== element.id));
+                }
+            });
+
+            newStack?.forEach((id: any) => {
+                const item = paper?.getById(id);
+                item?.freeTransform.unplug();
+                setSelectedItem(null)
+                dispatch(removeStackElement(id));
+
+            });
+            //console.log('newStack', newStack, stackOrder);
+        }
+        return () => {
+            dispatch(setCategoryToRemove(""))
+        };
+    }, [paper, stackOrder, CategoryToRemove, dispatch, setElementActive, setSelectedItem]);
+
+
+
     // const dimension = dieCutImage.getBBox()
 
     //         if (dimension) {
@@ -347,42 +383,187 @@ const ControlElement = () => {
     };
 
 
+    // useEffect(() => {
+    //     if (selectedItem && paper) {
+    //         if (selectedItem && currentFtRef.current && paper) {
+
+    //             // Define drag functions
+    //             const onMove = function (dx: number, dy: number) {
+
+    //             };
+
+    //             const onStart = function () {
+
+    //             };
+
+    //             const onEnd = function () {
+    //                 // console.log('Drag end');
+
+    //                 if (isElementInsideFrame(selectedItem, centerX, centerY, frameWidth, frameHeight)) {
+    //                     selectedItem.attr({ opacity: 1 })
+    //                     // console.log(selectedItem);
+
+    //                     // console.log("The element is inside the frame.");
+    //                 } else {
+    //                     selectedItem.attr({ opacity: 0.3 })
+    //                     currentFtRef.current.opts.attrs.opacity = 0.3
+    //                     // currentFtRef.current.attrs({ opacity: 0.3 })
+    //                     // console.log("The element is outside the frame.");
+    //                 }
+    //             };
+
+
+    //             selectedItem.drag(onMove, onStart, onEnd);
+    //         }
+
+    //     }
+    // }, [paper, currentFtRef, selectedItem, centerX, centerY, frameWidth, frameHeight]);
+
+
     useEffect(() => {
-        if (selectedItem && paper) {
-            if (selectedItem && currentFtRef.current && paper) {
+        if (paper && lastAddedElement) {
+            paper?.forEach((el: any) => {
+                if (el) {
+                    const { data } = el.data();
+                    if (data === "image" || data === "text") {
+                        const dragStart = function (this: any) {
+                            setSelectedItem(null)
+                        };
 
-                // Define drag functions
-                const onMove = function (dx: number, dy: number) {
+                        const dragMove = function (this: any, dx: number, dy: number) {
+                        };
 
-                };
+                        const dragEnd = function (this: any) {
+                            setSelectedItem(this)
+                            // console.log('this is : ', this);
+                        };
 
-                const onStart = function () {
+                        el?.drag(dragMove, dragStart, dragEnd)
 
-                };
 
-                const onEnd = function () {
-                    // console.log('Drag end');
-
-                    if (isElementInsideFrame(selectedItem, centerX, centerY, frameWidth, frameHeight)) {
-                        selectedItem.attr({ opacity: 1 })
-                        // console.log(selectedItem);
-
-                        // console.log("The element is inside the frame.");
-                    } else {
-                        selectedItem.attr({ opacity: 0.3 })
-                        currentFtRef.current.opts.attrs.opacity = 0.3
-                        // currentFtRef.current.attrs({ opacity: 0.3 })
-                        // console.log("The element is outside the frame.");
                     }
-                };
-
-
-                selectedItem.drag(onMove, onStart, onEnd);
-            }
+                }
+            });
 
         }
-    }, [paper, currentFtRef, selectedItem, centerX, centerY, frameWidth, frameHeight]);
+        // console.log('lastAddedElement', lastAddedElement);
+    }, [paper, lastAddedElement, setSelectedItem]);
 
+    useEffect(() => {
+
+        const defaultOptions = {
+            keepRatio: true,
+            rotate: true,
+            scale: true,
+            drag: true,
+            distance: 1.35,
+            size: 7,
+            round: 100,
+            draw: ['bbox'],
+            attrs: {
+                fill: '#fff',
+                stroke: '#000'
+            },
+        };
+
+        const handleFreeTransform = (ft: any, events: any) => {
+            // console.log(ft, events);          
+            if (events.includes('drag start')) {
+                ft.subject.paper.forEach((el: any) => {
+                    if (el.node.classList.contains('freeTransform')) {
+                        el.node.style.visibility = "hidden"
+                    }
+                })
+            }
+            if (events.includes('drag end')) {
+                ft.handles.center.disc.node.style.visibility = "visible"
+                ft.handles.x.disc.node.style.visibility = "visible"
+                ft.handles.x.line.node.style.visibility = "visible"
+                ft.handles.y.disc.node.style.visibility = "visible"
+                ft.handles.y.line.node.style.visibility = "visible"
+                ft.bbox.node.style.visibility = "visible"
+                ft.handles.bbox.forEach((item: any) => item.element.node.style.visibility = "visible")
+                setSelectedItem(ft.subject);
+            }
+        }
+
+        elementActive?.map((el: any) => {
+            const ft = paper?.freeTransform(el, `freeTransform stickerHandle-${el.id}`, defaultOptions, handleFreeTransform);
+
+            ft?.showHandles();
+
+
+            if (ft && ft.handles && typeof window !== "undefined" && document) {
+
+                const items = document.querySelectorAll(`.stickerHandle-${el.id}`);
+                items?.forEach((item: any) => item.style.visibility = "hidden")
+
+                if (ft.handles) {
+                    if (ft.handles.x.line) ft.handles.x.line.hide();
+
+                    if (ft.handles.x.disc) ft.handles.x.disc.hide();
+                }
+
+                const svgNS = "http://www.w3.org/2000/svg";
+                const svgElement = document.querySelector("svg");
+
+                if (svgElement) {
+                    const pattern = document.createElementNS(svgNS, "pattern");
+                    // Pattern attributes
+                    pattern.setAttribute("id", "rotateImageFill");
+                    pattern.setAttribute("patternUnits", "objectBoundingBox");
+                    pattern.setAttribute("width", "100%");
+                    pattern.setAttribute("height", "100%");
+
+                    const image = document.createElementNS(svgNS, "image");
+                    // Image attributes
+                    image.setAttributeNS("http://www.w3.org/1999/xlink", "href", "/rotateIcon.svg");
+                    image.setAttribute("width", "22");
+                    image.setAttribute("height", "22");
+
+                    pattern.appendChild(image);
+
+                    // Append pattern to defs
+                    let defs = svgElement.querySelector("defs");
+                    if (!defs) {
+                        defs = document.createElementNS(svgNS, "defs");
+                        svgElement.appendChild(defs);
+                    }
+                    defs.appendChild(pattern);
+                }
+            }
+
+            ft?.updateHandles();
+
+            ft?.apply();
+        });
+
+    }, [paper, elementActive, setSelectedItem])
+
+    useEffect(() => {
+        // if (selectedItem) {
+        //     const ft = selectedItem?.freeTransform
+        //     if (ft) {
+        //         ft.handles.center.disc.node.style.visibility = "visible"
+        //         ft.handles.x.disc.node.style.visibility = "visible"
+        //         ft.handles.x.line.node.style.visibility = "visible"
+        //         ft.handles.y.disc.node.style.visibility = "visible"
+        //         ft.handles.y.line.node.style.visibility = "visible"
+        //         ft.bbox.node.style.visibility = "visible"
+        //         ft.handles.bbox.forEach((item: any) => item.element.node.style.visibility = "visible")
+        //     }
+        // }
+
+    }, [selectedItem]);
+
+    useEffect(() => {
+        if (stackOrder) {
+            const lastEL = stackOrder[stackOrder.length - 1];
+            const item = paper?.getById(lastEL);
+            console.log('item', item);
+            setSelectedItem(item)
+        }
+    })
 
 
     const buttons = [
