@@ -14,6 +14,7 @@ import CleanUpElement from './Elements/CleanUpElement';
 import { useTransformUtils } from '@/hooks/useTransformUtils';
 import { useDispatch } from 'react-redux';
 import { useAppSelector } from '@/redux/store';
+import FreeTransform from './Elements/FreeTransform';
 
 const VectorStencil = () => {
     const objectHistories = useAppSelector((state) => state.history.objectHistories);
@@ -74,6 +75,7 @@ const VectorStencil = () => {
             <TextElement />
             <ControlElement />
             <CleanUpElement />
+            <FreeTransform />
         </div>
     );
 };
