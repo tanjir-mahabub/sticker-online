@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 import { isElementInsideFrame } from "../elementUtils";
 import { useAppSelector } from "@/redux/store";
 import { generateSVGImageData } from "@/components/Utils/DieCutFunction";
-import { convertJpgToBase64 } from "@/components/Utils/vectorFunction";
+import { convertJpgToBase64, defaultOptions, handleFreeTransform } from "@/components/Utils/vectorFunction";
 import materialStore from '@/store/materialStore';
 import { addStackElement, clearStackOrder, removeStackElement, sendBack, sendBackward, sendForward, sendFront } from "@/redux/features/stackOrderSlice";
 import { setCategoryToRemove } from "@/redux/features/categoryToRemove";
@@ -24,6 +24,7 @@ const ControlElement = () => {
     const materialDefault = useAppSelector(state => state.formValues.materialLastSelected);
     const stackOrder = useAppSelector(state => state.stackOrder);
     const StickerSelected = useAppSelector(state => state.sticker);
+    const ImagePreview = useAppSelector(state => state.imagePreview);
     const CanvasProperties = useAppSelector(state => state.canvas);
     const CategoryToRemove = useAppSelector(state => state.categoryToRemove);
 
@@ -43,7 +44,21 @@ const ControlElement = () => {
             const bbox = selectedItem.getBBox(true);
             // Apply flipping by scaling
             selectedItem.transform(`...s-1,1,${bbox.x + bbox.width / 2},${bbox.y + bbox.height / 2}`);
-            //reapplyFreeTransform(selectedItem); // Reapply free transform
+            
+            const oldFt = selectedItem.freeTransform
+            oldFt.unplug()
+           
+            const handleTransform = (ft: any, events: any) => {
+                const transformedItem = handleFreeTransform(ft, events);
+    
+                transformedItem && setSelectedItem(transformedItem)
+            }
+            const newFt = paper?.freeTransform(selectedItem, `freeTransform stickerHandle-${selectedItem.id}`, defaultOptions, handleTransform);
+            if (newFt.handles) {
+                if (newFt.handles.x.line) newFt.handles.x.line.hide();
+
+                if (newFt.handles.x.disc) newFt.handles.x.disc.hide();
+            }
         }
     };
 
@@ -51,8 +66,21 @@ const ControlElement = () => {
         if (selectedItem && paper) {
             const bbox = selectedItem.getBBox(true);
             selectedItem.transform(`...s1,-1,${bbox.x + bbox.width / 2},${bbox.y + bbox.height / 2}`);
-            // reapplyFreeTransform(selectedItem);
+            
+            const oldFt = selectedItem.freeTransform
+            oldFt.unplug()
+           
+            const handleTransform = (ft: any, events: any) => {
+                const transformedItem = handleFreeTransform(ft, events);
+    
+                transformedItem && setSelectedItem(transformedItem)
+            }
+            const newFt = paper?.freeTransform(selectedItem, `freeTransform stickerHandle-${selectedItem.id}`, defaultOptions, handleTransform);
+            if (newFt.handles) {
+                if (newFt.handles.x.line) newFt.handles.x.line.hide();
 
+                if (newFt.handles.x.disc) newFt.handles.x.disc.hide();
+            }
 
         }
     };
@@ -135,13 +163,21 @@ const ControlElement = () => {
             selectedItem.type === "image" && dispatch(deleteImage(selectedItem.id)) && dispatch(deleteHistoryById(selectedItem.id))
             category === "text" && dispatch(removeText(selectedItem.id)) && dispatch(deleteHistoryById(selectedItem.id))
 
-            selectedItem?.freeTransform.unplug()
+            const oldFt = selectedItem.freeTransform
+            oldFt.unplug()
+
             dispatch(removeStackElement(selectedItem.id));
             setElementActive((prev: any) => prev.filter((item: any) => item.id !== selectedItem.id));
 
             selectedItem.remove(); // Remove the element            
+            dispatch(deleteImage(selectedItem.id)) // delete history   
             dispatch(deleteHistoryById(selectedItem.id)) // delete history   
-            setSelectedItem(null); // Reset selection
+            
+            elementActive?.forEach((el: any) => {
+                const oldFt = el?.freeTransform
+                oldFt?.unplug()
+            })
+            
         }
     };
 
@@ -162,7 +198,7 @@ const ControlElement = () => {
                         el.attr({ opacity: 1 })
                         // console.log("The element is inside the frame.");
                     } else {
-                        el.attr({ opacity: 0.3 })
+                        el.attr({ opacity: 1 }) // 0.3
                         // console.log("The element is outside the frame.");
                     }
 
@@ -183,14 +219,30 @@ const ControlElement = () => {
                 const elCenter = { x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 };
                 const translation = { x: paperCenter.x - elCenter.x, y: paperCenter.y - elCenter.y };
 
-                // Apply translation to center the element
+                // Apply translation to center the element                
+                
                 el.transform(`...T${translation.x}, ${translation.y}`);
+
+                const oldFt = el.freeTransform
+                oldFt.unplug()
+               
+                const handleTransform = (ft: any, events: any) => {
+                    const transformedItem = handleFreeTransform(ft, events);
+        
+                    transformedItem && setSelectedItem(transformedItem)
+                }
+                const newFt = paper?.freeTransform(el, `freeTransform stickerHandle-${el.id}`, defaultOptions, handleTransform);
+                if (newFt.handles) {
+                    if (newFt.handles.x.line) newFt.handles.x.line.hide();
+
+                    if (newFt.handles.x.disc) newFt.handles.x.disc.hide();
+                }
 
                 // Check if the element is inside the frame and adjust opacity accordingly
                 if (isElementInsideFrame(el, centerX, centerY, frameWidth, frameHeight)) {
                     el.attr({ opacity: 1 });
                 } else {
-                    el.attr({ opacity: 0.3 });
+                    el.attr({ opacity: 1 }); //0.3
                 }
 
                 // Reapply free transformation if necessary
@@ -206,7 +258,7 @@ const ControlElement = () => {
             const svgString = await response.text();
 
             // Ensure the SVG string starts with "<svg>" tag
-            const formattedSvgString = svgString.startsWith("<svg>") ? svgString : `< svg xmlns = "http://www.w3.org/2000/svg" > ${svgString}</ > `;
+            const formattedSvgString = svgString.startsWith("<svg>") ? svgString : `<svg xmlns="http://www.w3.org/2000/svg"> ${svgString}</>`;
 
             const parser = new DOMParser();
             const doc = parser.parseFromString(formattedSvgString, "image/svg+xml");
@@ -424,6 +476,36 @@ const ControlElement = () => {
     //     }
     // }, [paper, currentFtRef, selectedItem, centerX, centerY, frameWidth, frameHeight]);
 
+    // useEffect(() => {
+    //     if(lastAddedElement && paper) {            
+    //         const paperCenter: { x: number, y: number } = { x: paper.width / 2, y: paper.height / 2 };
+    //         const bbox = lastAddedElement?.getBBox();
+    //         console.log(bbox);
+    //                 const elCenter = { x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 };
+    //                 const translation = { x: paperCenter.x - elCenter.x, y: paperCenter.y - elCenter.y };
+
+    //                 lastAddedElement?.attr({ x: translation.x, y: translation.y });
+    //                 if(lastAddedElement) {
+
+    //                 // const oldFt = lastAddedElement?.freeTransform
+    //                 //     oldFt.unplug()
+                    
+    //                 const handleTransform = (ft: any, events: any) => {
+    //                     const transformedItem = handleFreeTransform(ft, events);
+                        
+    //                     transformedItem && setSelectedItem(transformedItem)
+    //                 }
+    //                 const newFt = paper?.freeTransform(lastAddedElement, `freeTransform stickerHandle-${lastAddedElement.id}`, defaultOptions, handleTransform);
+    //                 if (newFt.handles) {
+    //                     if (newFt.handles.x.line) newFt.handles.x.line.hide();
+                        
+    //                     if (newFt.handles.x.disc) newFt.handles.x.disc.hide();
+    //                 }
+
+    //                 newFt.apply()
+    //             }
+    //     }
+    // })
 
     
     useEffect(() =>{

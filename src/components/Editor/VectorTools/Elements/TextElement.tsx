@@ -13,9 +13,7 @@ const TextElement = () => {
 
     const dispatch = useDispatch();
 
-    const textPreviews = useAppSelector((state) => state.text.texts);
-
-    const { handleElementInteraction, reapplyFreeTransform } = useTransformUtils(dispatch, currentFtRef, setSelectedItem);
+    const textPreviews = useAppSelector((state) => state.text.texts);    
 
     useEffect(() => {
         if (paper) {
@@ -58,11 +56,8 @@ const TextElement = () => {
                             const translation = { x: paperCenter.x - elCenter.x, y: paperCenter.y - elCenter.y };
 
                             pathElement.translate(translation.x, translation.y)
-
-                            //pathElement.click(() => handleElementInteraction(pathElement));
-
-                            setLastAddedElement(pathElement);
-                            // reapplyFreeTransform(textElement)
+                           
+                            setLastAddedElement(pathElement);                            
                         }
 
                     })
@@ -75,16 +70,14 @@ const TextElement = () => {
 
             });
         }
-    }, [paper, setLastAddedElement, textPreviews, addTextElement, addPathElement, handleElementInteraction, reapplyFreeTransform, dispatch]);
+    }, [paper, setLastAddedElement, textPreviews, addTextElement, addPathElement, dispatch]);
 
 
     useEffect(() => {
         if (lastAddedElement) {
-            setSelectedItem(lastAddedElement)
-            // handleElementInteraction(lastAddedElement);
-            // reapplyFreeTransform(lastAddedElement)
+            setSelectedItem(lastAddedElement)           
         }
-    }, [lastAddedElement, setSelectedItem, handleElementInteraction, reapplyFreeTransform]);
+    }, [lastAddedElement, setSelectedItem]);
 
 
     return null

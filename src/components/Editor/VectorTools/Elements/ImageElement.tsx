@@ -12,9 +12,7 @@ const ImageElements = () => {
 
     const dispatch = useDispatch();
 
-    const imagePreviews = useAppSelector((state) => state.imagePreview.images);
-
-    const { handleElementInteraction, reapplyFreeTransform } = useTransformUtils(dispatch, currentFtRef, setSelectedItem);
+    const imagePreviews = useAppSelector((state) => state.imagePreview.images);   
 
 
     useEffect(() => {
@@ -39,24 +37,19 @@ const ImageElements = () => {
                     const translation = { x: paperCenter.x - elCenter.x, y: paperCenter.y - elCenter.y };
 
                     element.attr({ x: translation.x, y: translation.y });
-
-                    // element.click(() => handleElementInteraction(element));
-
-
+                    
                     setLastAddedElement(element);
                     dispatch(addStackElement(element.id))
                 }
             });
         }
-    }, [paper, setLastAddedElement, imagePreviews, addImageElement, handleElementInteraction, dispatch]);
+    }, [paper, setLastAddedElement, imagePreviews, addImageElement, dispatch]);
 
     useEffect(() => {
         if (lastAddedElement) {
-            setSelectedItem(lastAddedElement)
-            // handleElementInteraction(lastAddedElement);
-            // reapplyFreeTransform(lastAddedElement)
+            setSelectedItem(lastAddedElement)            
         }
-    }, [lastAddedElement, setSelectedItem, handleElementInteraction, reapplyFreeTransform]);
+    }, [lastAddedElement, setSelectedItem]);
 
     return null
 }

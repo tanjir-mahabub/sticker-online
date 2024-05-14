@@ -147,3 +147,43 @@ export const convertJpgToBase64 = (imageURL: string) => {
         img.src = imageURL;
     });
 }
+
+
+export const defaultOptions = {
+    keepRatio: true,
+    rotate: true,
+    scale: true,
+    drag: true,
+    distance: 1.35,
+    size: 7,
+    round: 100,
+    draw: ['bbox'],
+    attrs: {
+        fill: '#fff',
+        stroke: '#000'
+    },
+};
+
+export const handleFreeTransform = (ft: any, events: any) => {
+    // console.log(ft, events);          
+    if (events.includes('drag start')) {
+        ft.subject.paper.forEach((el: any) => {
+            if (el.node.classList.contains('freeTransform')) {
+                el.node.style.visibility = "hidden"
+            }
+        })
+    }
+    if (events.includes('drag end')) {
+        ft.handles.center.disc.node.style.visibility = "visible"
+        ft.handles.x.disc.node.style.visibility = "visible"
+        ft.handles.x.line.node.style.visibility = "visible"
+        ft.handles.y.disc.node.style.visibility = "visible"
+        ft.handles.y.line.node.style.visibility = "visible"
+        ft.bbox.node.style.visibility = "visible"
+        ft.handles.bbox.forEach((item: any) => {
+            item.element.node.style.visibility = "visible";
+            item.element.node.style.opacity = "0.5"
+        })
+        return ft.subject;
+    }
+}

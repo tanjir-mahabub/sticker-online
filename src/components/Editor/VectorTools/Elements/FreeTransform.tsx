@@ -1,3 +1,4 @@
+import { defaultOptions, handleFreeTransform } from "@/components/Utils/vectorFunction";
 import { usePaper } from "@/context/PaperContext";
 import { useEffect } from "react";
 
@@ -37,48 +38,20 @@ const FreeTransform = () => {
 
     useEffect(() => {
 
-        const defaultOptions = {
-            keepRatio: true,
-            rotate: true,
-            scale: true,
-            drag: true,
-            distance: 1.35,
-            size: 7,
-            round: 100,
-            draw: ['bbox'],
-            attrs: {
-                fill: '#fff',
-                stroke: '#000'
-            },
-        };
+        const handleTransform = (ft: any, events: any) => {
+            const transformedItem = handleFreeTransform(ft, events);
 
-        const handleFreeTransform = (ft: any, events: any) => {
-            // console.log(ft, events);          
-            if (events.includes('drag start')) {
-                ft.subject.paper.forEach((el: any) => {
-                    if (el.node.classList.contains('freeTransform')) {
-                        el.node.style.visibility = "hidden"
-                    }
-                })
-            }
-            if (events.includes('drag end')) {
-                ft.handles.center.disc.node.style.visibility = "visible"
-                ft.handles.x.disc.node.style.visibility = "visible"
-                ft.handles.x.line.node.style.visibility = "visible"
-                ft.handles.y.disc.node.style.visibility = "visible"
-                ft.handles.y.line.node.style.visibility = "visible"
-                ft.bbox.node.style.visibility = "visible"
-                ft.handles.bbox.forEach((item: any) => {
-                    item.element.node.style.visibility = "visible";
-                    item.element.node.style.opacity = "0.5"
-                })
-                setSelectedItem(ft.subject);
-            }
+            transformedItem && setSelectedItem(transformedItem)
         }
 
-        elementActive?.map((el: any) => {
-            const ft = paper?.freeTransform(el, `freeTransform stickerHandle-${el.id}`, defaultOptions, handleFreeTransform);
-
+        elementActive && elementActive?.map((el: any) => {
+            if(el.freeTransform) {
+                const oldFt = el.freeTransform
+                oldFt.unplug()
+            }
+               
+            const ft = paper?.freeTransform(el, `freeTransform stickerHandle-${el.id}`, defaultOptions, handleTransform)
+            
             ft?.showHandles();
 
 
@@ -140,10 +113,44 @@ const FreeTransform = () => {
                 ft.handles.y.line.node.style.visibility = "visible"
                 ft.bbox.node.style.visibility = "visible"
                 ft.handles.bbox.forEach((item: any) => item.element.node.style.visibility = "visible")
+                console.log('newft', ft);
             }
         }
 
     }, [selectedItem]);
+
+    // useEffect(() => {
+    //     if (elementActive && paper) {
+    //         const paperCenter: { x: number, y: number } = { x: paper.width / 2, y: paper.height / 2 };
+    //         elementActive?.forEach((element: any) => {
+    //              const bbox = element.getBBox();
+    //                 const elCenter = { x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 };
+    //                 const translation = { x: paperCenter.x - elCenter.x, y: paperCenter.y - elCenter.y };
+
+    //                 element.attr({ x: translation.x, y: translation.y });
+
+    //                 if(element) {
+    //                     const oldFt = element.freeTransform
+    //                     oldFt.unplug()
+                    
+    //                     const handleTransform = (ft: any, events: any) => {
+    //                         const transformedItem = handleFreeTransform(ft, events);
+                
+    //                         transformedItem && setSelectedItem(transformedItem)
+    //                     }
+    //                     const newFt = paper?.freeTransform(element, `freeTransform stickerHandle-${element.id}`, defaultOptions, handleTransform);
+    //                     if (newFt.handles) {
+    //                         if (newFt.handles.x.line) newFt.handles.x.line.hide();
+        
+    //                         if (newFt.handles.x.disc) newFt.handles.x.disc.hide();
+    //                     }
+    //                 }
+                    
+
+    //         })
+    //     }
+
+    // }, [elementActive, paper, setSelectedItem]);
 
     return null;
 }
