@@ -427,14 +427,14 @@ const ControlElement = () => {
                     const { data } = el.data();
                     if (data === "image" || data === "text") {
                         const dragStart = function (this: any) {
-                            setSelectedItem(null)
+                            setSelectedItem(this)
                         };
 
                         const dragMove = function (this: any, dx: number, dy: number) {
                         };
 
                         const dragEnd = function (this: any) {
-                            setSelectedItem(this)
+                            
                             // console.log('this is : ', this);
                         };
 
@@ -541,38 +541,78 @@ const ControlElement = () => {
     }, [paper, elementActive, setSelectedItem])
 
     useEffect(() => {
-        // if (selectedItem) {
-        //     const ft = selectedItem?.freeTransform
-        //     if (ft) {
-        //         ft.handles.center.disc.node.style.visibility = "visible"
-        //         ft.handles.x.disc.node.style.visibility = "visible"
-        //         ft.handles.x.line.node.style.visibility = "visible"
-        //         ft.handles.y.disc.node.style.visibility = "visible"
-        //         ft.handles.y.line.node.style.visibility = "visible"
-        //         ft.bbox.node.style.visibility = "visible"
-        //         ft.handles.bbox.forEach((item: any) => item.element.node.style.visibility = "visible")
-        //     }
-        // }
+        if (selectedItem) {
+            const ft = selectedItem?.freeTransform
+            if (ft) {
+                ft.handles.center.disc.node.style.visibility = "visible"
+                ft.handles.x.disc.node.style.visibility = "visible"
+                ft.handles.x.line.node.style.visibility = "visible"
+                ft.handles.y.disc.node.style.visibility = "visible"
+                ft.handles.y.line.node.style.visibility = "visible"
+                ft.bbox.node.style.visibility = "visible"
+                ft.handles.bbox.forEach((item: any) => item.element.node.style.visibility = "visible")
+            }
+        }
 
     }, [selectedItem]);
 
-    useEffect(() => {
-        if (stackOrder) {
-            const lastEL = stackOrder[stackOrder.length - 1];
-            const item = paper?.getById(lastEL);
-            console.log('item', item);
-            setSelectedItem(item)
-        }
-    })
+    // useEffect(() => {
+    //     if (stackOrder) {
+    //         const lastEL = stackOrder[stackOrder.length - 1];
+    //         const item = paper?.getById(lastEL);
+    //         console.log('item', item);
+    //        item && setSelectedItem(item)
+    //     }
+    // })
 
+    
+    const [sendFrontBTN, setSendFrontBTN] = useState(true)
+    const [sendBackBTN, setSendBackBTN] = useState(true)
+    const [sendForwardBTN, setSendForwardBTN] = useState(true)
+    const [sendBackwardBTN, setSendBackwardBTN] = useState(true)
+    
+    useEffect(() =>{
+        if(selectedItem) {
+            if(stackOrder.length === 1 && selectedItem) {
+                setSendFrontBTN(true)
+                setSendBackBTN(true)
+                setSendForwardBTN(true)
+                setSendBackwardBTN(true)
+            }
+    
+            if (stackOrder[0] === selectedItem.id && stackOrder.length !== 1) {
+                setSendFrontBTN(false)
+                setSendBackBTN(true)
+                setSendForwardBTN(false)
+                setSendBackwardBTN(true)
+            }
+            
+            const lastIndex = stackOrder.length - 1;
+            if(stackOrder[lastIndex] === selectedItem.id && stackOrder.length !== 1) {
+                setSendFrontBTN(true)
+                setSendBackBTN(false)
+                setSendForwardBTN(true)
+                setSendBackwardBTN(false)
+            }
+
+            if (stackOrder[0] !== selectedItem.id && stackOrder[lastIndex] !== selectedItem.id && stackOrder.length !== 1) {              
+                setSendFrontBTN(false)
+                setSendBackBTN(false)
+                setSendForwardBTN(false)
+                setSendBackwardBTN(false)
+            }                              
+            
+        }
+
+    }, [stackOrder, selectedItem])
 
     const buttons = [
         { onClick: handleFlipY, iconSrc: "/mirrorUpDownIcon.svg", tooltip: "Flip Vertically", borderClasses: "border-r-0 border-black/20 rounded-l-full", borderRadiusClasses: "pl-3 pr-1" },
         { onClick: handleFlipX, iconSrc: "/mirrorSideIcon.svg", tooltip: "Flip Horizontally", borderClasses: "border-x-0 border-black/20", borderRadiusClasses: "px-1.5" },
-        { onClick: handleSendFront, disabled: stackOrder.length === 1 && true, iconSrc: "/sendFront.svg", tooltip: "Send to Front", borderClasses: "border-x-0 border-black/20", borderRadiusClasses: "px-1.5" },
-        { onClick: handleSendBack, disabled: stackOrder.length === 1 && true, iconSrc: "/sendBack.svg", tooltip: "Send to Back", borderClasses: "border-x-0 border-black/20", borderRadiusClasses: "px-1.5" },
-        { onClick: handleSendForward, disabled: stackOrder.length === 1 && true, iconSrc: "/forward.svg", tooltip: "Send Forward", borderClasses: "border-x-0 border-black/20", borderRadiusClasses: "px-1.5" },
-        { onClick: handleSendBackward, disabled: stackOrder.length === 1 && true, iconSrc: "/backward.svg", tooltip: "Send Backward", borderClasses: "border-x-0 border-black/20", borderRadiusClasses: "px-1.5" },
+        { onClick: handleSendFront, disabled: sendFrontBTN, iconSrc: "/sendFront.svg", tooltip: "Send to Front", borderClasses: "border-x-0 border-black/20", borderRadiusClasses: "px-1.5" },
+        { onClick: handleSendBack, disabled: sendBackBTN, iconSrc: "/sendBack.svg", tooltip: "Send to Back", borderClasses: "border-x-0 border-black/20", borderRadiusClasses: "px-1.5" },
+        { onClick: handleSendForward, disabled: sendForwardBTN, iconSrc: "/forward.svg", tooltip: "Send Forward", borderClasses: "border-x-0 border-black/20", borderRadiusClasses: "px-1.5" },
+        { onClick: handleSendBackward, disabled: sendBackwardBTN, iconSrc: "/backward.svg", tooltip: "Send Backward", borderClasses: "border-x-0 border-black/20", borderRadiusClasses: "px-1.5" },
         { onClick: handleCenterEL, iconSrc: "/centerIcon.svg", tooltip: "Center Element", borderClasses: "border-x-0 border-black/20", borderRadiusClasses: "px-1.5" },
         { onClick: handleDelete, iconSrc: "/trash.svg", tooltip: "Delete Element", borderClasses: "border-l-0 border-black/20 rounded-r-full", borderRadiusClasses: "pr-3 pl-1" },
     ];
