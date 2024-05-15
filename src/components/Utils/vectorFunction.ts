@@ -184,6 +184,15 @@ export const handleFreeTransform = (ft: any, events: any) => {
             item.element.node.style.visibility = "visible";
             item.element.node.style.opacity = "0.5"
         })
+
+        console.log('drag end from vector', ft);
+        
+        return ft.subject;
+    }
+
+    if (events.includes('scale end') || events.includes('rotate end')) {
+
+        console.log('transform end from vector', ft);
         return ft.subject;
     }
 }

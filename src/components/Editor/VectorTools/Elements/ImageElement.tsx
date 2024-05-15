@@ -13,6 +13,7 @@ const ImageElements = () => {
     const dispatch = useDispatch();
 
     const imagePreviews = useAppSelector((state) => state.imagePreview.images);   
+    const History = useAppSelector((state) => state.history);   
 
 
     useEffect(() => {
@@ -36,14 +37,18 @@ const ImageElements = () => {
                     const elCenter = { x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 };
                     const translation = { x: paperCenter.x - elCenter.x, y: paperCenter.y - elCenter.y };
 
-                    element.attr({ x: translation.x, y: translation.y });
+                    if(!element.x && !element.y) {
+                        element.attr({ x: translation.x, y: translation.y });
+                    }
+
+                    console.log(History);
                     
                     setLastAddedElement(element);
                     dispatch(addStackElement(element.id))
                 }
             });
         }
-    }, [paper, setLastAddedElement, imagePreviews, addImageElement, dispatch]);
+    }, [paper, setLastAddedElement, imagePreviews, addImageElement, dispatch, History]);
 
     useEffect(() => {
         if (lastAddedElement) {
