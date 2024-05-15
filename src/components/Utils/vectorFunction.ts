@@ -185,14 +185,79 @@ export const handleFreeTransform = (ft: any, events: any) => {
             item.element.node.style.opacity = "0.5"
         })
 
-        console.log('drag end from vector', ft);
-        
-        return ft.subject;
+        // console.log('drag end from vector', ft);
+        const paper: any = ft.subject?.paper;
+        const paperCenter: { x: number, y: number } = { x: paper.width / 2, y: paper.height / 2 };
+        const bbox: any = ft.subject?.getBBox();
+        const elCenter = { x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 };
+        const translation = { x: paperCenter.x - elCenter.x, y: paperCenter.y - elCenter.y };
+
+            const matrix = ft.subject?.transform();
+console.log('ft.attrs',translation.x, translation.y);
+             let x = translation.x;
+            let y = translation.y;
+           
+            return {
+                subject: ft.subject,
+                attrs: {
+                    x: x,
+                    y: y,                   
+                }
+            };
     }
 
     if (events.includes('scale end') || events.includes('rotate end')) {
+        
+        const paper: any = ft.subject?.paper;
+        const paperCenter: { x: number, y: number } = { x: paper.width / 2, y: paper.height / 2 };
+        const bbox: any = ft.subject?.getBBox();
+        const elCenter = { x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 };
+        const translation = { x: paperCenter.x - elCenter.x, y: paperCenter.y - elCenter.y };
 
-        console.log('transform end from vector', ft);
-        return ft.subject;
+            const matrix = ft.subject?.transform();
+          
+            let x = translation.x;
+            let y = translation.y;
+            console.log('scale---', ft);
+            let scaleX = ft.attrs.scale.x;
+            let scaleY = ft.attrs.scale.y;          
+            let rotate = ft.attrs.scale.rotate;
+          
+            matrix.forEach(([operation, ...params]: any) => {
+                switch (operation) {
+                    case "T":
+                        // x = params[0];
+                        // y = params[1];
+                        break;
+                    case "S":
+                        scaleX = params[0];
+                        scaleY = params[1];
+                        break;
+                    case "R":                        
+                        rotate = params[0];
+                        break;
+                }
+            });
+
+            // Log transformation values
+            // console.log(ft.subject?.id);
+
+          
+            console.log("Drag end ScaleX:", scaleX);
+            console.log("Drag end ScaleY:", scaleY);            
+            console.log("Drag end Rotate:", rotate);
+
+        return {
+            subject: ft.subject,
+            attrs: {      
+                x: x,
+                y: y,         
+                scaleX: scaleX,
+                scaleY: scaleY,
+                // width: width,
+                // height: height,
+                rotate: rotate
+            }
+        };
     }
 }

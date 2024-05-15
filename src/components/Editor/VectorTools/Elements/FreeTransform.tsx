@@ -1,6 +1,7 @@
 import { defaultOptions, handleFreeTransform } from "@/components/Utils/vectorFunction";
 import { usePaper } from "@/context/PaperContext";
 import { addedToHistory } from "@/redux/features/historySlice";
+import { updateElementAttributes, updateImages } from "@/redux/features/imagePreviewSlice";
 import { useAppSelector } from "@/redux/store";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
@@ -45,75 +46,20 @@ const FreeTransform = () => {
 
         const handleTransform = (ft: any, events: any) => {
             const transformedItem = handleFreeTransform(ft, events);
-
-            //console.log('main drag area', transformedItem?.getBBox());
+            
            if(transformedItem) {
-            // const bbox: any = transformedItem?.getBBox();
+                const itemID =  transformedItem.subject.id;
+                const category =  transformedItem.subject.data().data;
 
-            // const matrix = transformedItem?.transform();
+                console.log('transformedItem', itemID, category);
+                dispatch(updateElementAttributes( {id: itemID, attributes: {...transformedItem.attrs}}))
+                dispatch(addedToHistory({
+                    objectId: itemID,
+                    category: category || '',
+                    position: {...transformedItem.attrs}
+                }));
 
-            // let x = bbox.x;
-            // let y = bbox.y;
-            // let scaleX = 1;
-            // let scaleY = 1;
-            // let width = bbox.width;
-            // let height = bbox.height;
-            // let rotate = 0;
-
-            // // Capture initial position before any transformation
-            // const initialPosition = { x: bbox.x, y: bbox.y };
-            // // console.log('initialPosition', initialPosition);
-
-            // // Extract transformation values from the transformation matrix
-            // matrix.forEach(([operation, ...params]: any) => {
-            //     switch (operation) {
-            //         case "T":
-            //             x = params[0];
-            //             y = params[1];
-            //             break;
-            //         case "S":
-            //             scaleX = params[0];
-            //             scaleY = params[1];
-            //             break;
-            //         case "R":
-            //             // If rotation is present, extract the angle from params[0]
-            //             rotate = params[0];
-            //             break;
-            //     }
-            // });
-
-            // // Calculate width and height based on original dimensions and scaling
-            // const originalWidth = 651; // Example original width
-            // const originalHeight = 416; // Example original height
-            // width = originalWidth * scaleX;
-            // height = originalHeight * scaleY;
-
-            // // Log transformation values
-            // console.log(transformedItem?.id);
-
-            // console.log("Drag end X:", bbox.x);
-            // console.log("Drag end Y:", bbox.y);
-            // console.log("Drag end ScaleX:", scaleX);
-            // console.log("Drag end ScaleY:", scaleY);
-            // console.log("Drag end Width:", width);
-            // console.log("Drag end Height:", height);
-            // console.log("Drag end Rotate:", rotate);
-
-            // dispatch(addedToHistory({
-            //     objectId: transformedItem.id,
-            //     category: transformedItem.data().data || '',
-            //     position: {
-            //         x: bbox.x, // Use initial position instead of bbox.x
-            //         y: bbox.y, // Use initial position instead of bbox.y
-            //         width: width,
-            //         height: height,
-            //         scaleX: scaleX,
-            //         scaleY: scaleY,
-            //         rotation: rotate
-            //     }
-            // }));
-
-            transformedItem && setSelectedItem(transformedItem)
+                transformedItem && setSelectedItem(transformedItem.subject)
            }
         }
 
@@ -173,7 +119,7 @@ const FreeTransform = () => {
             ft?.apply();
         });
 
-    }, [paper, elementActive, setSelectedItem])
+    }, [paper, elementActive, setSelectedItem, dispatch])
 
     useEffect(() => {
         if (selectedItem) {
@@ -192,7 +138,9 @@ const FreeTransform = () => {
 
     }, [selectedItem]);
     
-   
+   useEffect(() => {
+    console.log(History);
+   })
 
 //     useEffect(() => {
 //       elementActive?.forEach((el: any) => {

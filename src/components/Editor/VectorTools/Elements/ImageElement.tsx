@@ -13,7 +13,7 @@ const ImageElements = () => {
     const dispatch = useDispatch();
 
     const imagePreviews = useAppSelector((state) => state.imagePreview.images);   
-    const History = useAppSelector((state) => state.history);   
+    const histories = useAppSelector((state) => state.history.objectHistories);   
 
 
     useEffect(() => {
@@ -41,14 +41,21 @@ const ImageElements = () => {
                         element.attr({ x: translation.x, y: translation.y });
                     }
 
-                    console.log(History);
+                    console.log('image element', element);
+                    // if(histories && element.x) {
+                    //     histories.forEach((history: any) => {
+                    //         if(history.objectId === element.id) {
+                    //             element.attr(history.history[history.historyStep])
+                    //         }
+                    //     })
+                    // }
                     
                     setLastAddedElement(element);
                     dispatch(addStackElement(element.id))
                 }
             });
         }
-    }, [paper, setLastAddedElement, imagePreviews, addImageElement, dispatch, History]);
+    }, [paper, setLastAddedElement, imagePreviews, addImageElement, dispatch, histories]);
 
     useEffect(() => {
         if (lastAddedElement) {
