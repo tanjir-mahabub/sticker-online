@@ -261,3 +261,18 @@ console.log('ft.attrs',translation.x, translation.y);
         };
     }
 }
+
+
+export const FTitemVisible = (selectedItem: any) => {
+    const ft = selectedItem?.freeTransform
+            if (ft) {
+                ft.handles.center.disc.node.style.visibility = "visible"
+                ft.handles.x.disc.node.style.visibility = "visible"
+                ft.handles.x.line.node.style.visibility = "visible"
+                ft.handles.y.disc.node.style.visibility = "visible"
+                ft.handles.y.line.node.style.visibility = "visible"
+                ft.bbox.node.style.visibility = "visible"
+                ft.handles.bbox.forEach((item: any) => item.element.node.style.visibility = "visible")
+                console.log('newft', ft);                          
+            }    
+}

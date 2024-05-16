@@ -49,7 +49,7 @@ const Header = () => {
             </div>
 
             <div className="flex-auto flex justify-center items-center gap-2">
-                <div onClick={handleUndo} className={`group flex flex-col justify-center items-center gap-2 p-2 rounded-md cursor-pointer select-none ${isDisabledUndo ? 'opacity-50 pointer-events-none' : ''}`}>
+                <div onClick={handleUndo} className={`group flex flex-col justify-center items-center gap-2 p-2 rounded-md cursor-pointer select-none ${isDisabledUndo ? 'opacity-30 pointer-events-none' : ''}`}>
                     <Image
                         src="/editor/icon/undo.svg"
                         alt="undo-icon"
@@ -59,7 +59,7 @@ const Header = () => {
                     />
                     <span className={`text-xs ${isDisabledUndo ? 'text-gray-500' : 'group-hover:text-so-black'}`}>Undo</span>
                 </div>
-                <div onClick={handleRedo} className={`group flex flex-col justify-center items-center gap-2 p-2 rounded-md cursor-pointer select-none ${isDisabledRedo ? 'opacity-50 pointer-events-none' : ''}`}>
+                <div onClick={handleRedo} className={`group flex flex-col justify-center items-center gap-2 p-2 rounded-md cursor-pointer select-none ${isDisabledRedo ? 'opacity-30 pointer-events-none' : ''}`}>
                     <Image
                         src="/editor/icon/redo.svg"
                         alt="redo-icon"

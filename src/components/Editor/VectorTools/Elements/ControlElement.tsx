@@ -4,14 +4,14 @@ import ButtonControl from "../../lib/ButtonControll"
 import { usePaper } from "@/context/PaperContext";
 import { useDispatch } from "react-redux";
 import { useTransformUtils } from "@/hooks/useTransformUtils";
-import { deleteImage } from "@/redux/features/imagePreviewSlice";
+import { deleteImage, updateElementAttributes } from "@/redux/features/imagePreviewSlice";
 import { removeText } from "@/redux/features/textSlice";
-import { deleteHistoryById } from "@/redux/features/historySlice";
+import { addedToHistory, deleteHistoryById } from "@/redux/features/historySlice";
 import { useEffect, useState } from "react";
 import { isElementInsideFrame } from "../elementUtils";
 import { useAppSelector } from "@/redux/store";
 import { generateSVGImageData } from "@/components/Utils/DieCutFunction";
-import { convertJpgToBase64, defaultOptions, handleFreeTransform } from "@/components/Utils/vectorFunction";
+import { convertJpgToBase64, defaultOptions, FTitemVisible, handleFreeTransform } from "@/components/Utils/vectorFunction";
 import materialStore from '@/store/materialStore';
 import { addStackElement, clearStackOrder, removeStackElement, sendBack, sendBackward, sendForward, sendFront } from "@/redux/features/stackOrderSlice";
 import { setCategoryToRemove } from "@/redux/features/categoryToRemove";
@@ -45,22 +45,66 @@ const ControlElement = () => {
             // Apply flipping by scaling
             selectedItem.transform(`...s-1,1,${bbox.x + bbox.width / 2},${bbox.y + bbox.height / 2}`);
             
-            const oldFt = selectedItem.freeTransform
-            oldFt.unplug()
+            const oldFT = selectedItem.freeTransform
+            oldFT.unplug()
+            elementActive.forEach((el:any) => {
+                el?.freeTransform?.unplug()
+            })      
+            
+            
+            const handleTransform = (ft: any, events: any) => {                
+                // const transformedItem = handleFreeTransform(ft, events);
+               
+                // if(transformedItem) {
+                //     const itemID =  transformedItem.subject.id;
+                //     const category =  transformedItem.subject.data().data;
+                    
+                //    // dispatch(updateElementAttributes( {id: itemID, attributes: {...transformedItem.subject.attrs}}))
+                //     dispatch(addedToHistory({
+                //         objectId: itemID,
+                //         category: category || '',
+                //         position: {...transformedItem.subject.attrs}
+                //     }));
+                //     transformedItem && setSelectedItem(transformedItem.subject)
+                // }
+            }
            
-            const handleTransform = (ft: any, events: any) => {
-                const transformedItem = handleFreeTransform(ft, events);
-    
-                transformedItem && setSelectedItem(transformedItem)
-            }
-            const newFt = paper?.freeTransform(selectedItem, `freeTransform stickerHandle-${selectedItem.id}`, defaultOptions, handleTransform);
-            if (newFt.handles) {
-                if (newFt.handles.x.line) newFt.handles.x.line.hide();
+                        
+            elementActive?.forEach((el: any) => {
+                const newFT = paper?.freeTransform(el, `freeTransform stickerHandle-${el.id}`, defaultOptions, handleTransform);
+                
 
-                if (newFt.handles.x.disc) newFt.handles.x.disc.hide();
-            }
+                if (newFT && newFT.handles && typeof window !== "undefined" && document) {
+                    if (newFT.handles) {
+                        if (newFT.handles.x.line) newFT.handles.x.line.hide();
+        
+                        if (newFT.handles.x.disc) newFT.handles.x.disc.hide();
+                    }
+               
+                    const items = document.querySelectorAll(`.stickerHandle-${el.id}`);
+                    
+                    items?.forEach((item: any) => item.style.visibility = "hidden")
+                }
+                
+                if(oldFT.subject.id === el.id) {
+                    setSelectedItem(newFT.subject)
+                    FTitemVisible(selectedItem)                }
+            })
         }
     };
+/// working tomorrow
+    // useEffect(() => {
+    //     if(selectedItem?.freeTransform) {
+    //         console.log('selectedItem', selectedItem);
+    //               dispatch(updateElementAttributes( {id: selectedItem.id, attributes: {...selectedItem.freeTransform.attrs}}))
+    //               console.log('selectedItem.subject.attrs', selectedItem.freeTransform.attrs);
+    //                 dispatch(addedToHistory({
+    //                     objectId: selectedItem.freeTransform.id,
+    //                     category: selectedItem.data().data || '',
+    //                     position: {...selectedItem.freeTransform.attrs}
+    //                 }));
+    //     }
+    // }, [selectedItem, dispatch])
 
     const handleFlipY = () => {
         if (selectedItem && paper) {
