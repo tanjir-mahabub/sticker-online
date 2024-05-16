@@ -41,7 +41,7 @@ const ImageElements = () => {
                         element.attr({ x: translation.x, y: translation.y });
                     }
 
-                    console.log('image element', element);
+                    //console.log('image element', element);
                     // if(histories && element.x) {
                     //     histories.forEach((history: any) => {
                     //         if(history.objectId === element.id) {

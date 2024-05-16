@@ -52,21 +52,8 @@ const ControlElement = () => {
             })      
             
             
-            const handleTransform = (ft: any, events: any) => {                
-                // const transformedItem = handleFreeTransform(ft, events);
+            const handleTransform = (ft: any, events: any) => {
                
-                // if(transformedItem) {
-                //     const itemID =  transformedItem.subject.id;
-                //     const category =  transformedItem.subject.data().data;
-                    
-                //    // dispatch(updateElementAttributes( {id: itemID, attributes: {...transformedItem.subject.attrs}}))
-                //     dispatch(addedToHistory({
-                //         objectId: itemID,
-                //         category: category || '',
-                //         position: {...transformedItem.subject.attrs}
-                //     }));
-                //     transformedItem && setSelectedItem(transformedItem.subject)
-                // }
             }
            
                         
@@ -408,7 +395,7 @@ const ControlElement = () => {
                 }
             }
         });
-        console.log(elementActive, 'stackOrder', stackOrder);
+        //console.log(elementActive, 'stackOrder', stackOrder);
     }, [paper, stackOrder, elementActive, setElementActive, lastAddedElement]);
 
 

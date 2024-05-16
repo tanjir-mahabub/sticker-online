@@ -250,13 +250,13 @@ console.log('ft.attrs',translation.x, translation.y);
         return {
             subject: ft.subject,
             attrs: {      
-                x: x,
-                y: y,         
-                scaleX: scaleX,
-                scaleY: scaleY,
-                // width: width,
-                // height: height,
-                rotate: rotate
+                // x: x,
+                // y: y,         
+                // scaleX: scaleX,
+                // scaleY: scaleY,
+                // // width: width,
+                // // height: height,
+                // rotate: rotate
             }
         };
     }
