@@ -7,11 +7,11 @@ import { useTransformUtils } from "@/hooks/useTransformUtils";
 import { deleteImage, updateElementAttributes } from "@/redux/features/imagePreviewSlice";
 import { removeText } from "@/redux/features/textSlice";
 import { addedToHistory, deleteHistoryById } from "@/redux/features/historySlice";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { isElementInsideFrame } from "../elementUtils";
 import { useAppSelector } from "@/redux/store";
 import { generateSVGImageData } from "@/components/Utils/DieCutFunction";
-import { convertJpgToBase64, defaultOptions, FTitemVisible, handleFreeTransform } from "@/components/Utils/vectorFunction";
+import { convertJpgToBase64, defaultOptions, FTitemVisibility, handleFreeTransform, hideFreeTransform, showFreeTransform } from "@/components/Utils/vectorFunction";
 import materialStore from '@/store/materialStore';
 import { addStackElement, clearStackOrder, removeStackElement, sendBack, sendBackward, sendForward, sendFront } from "@/redux/features/stackOrderSlice";
 import { setCategoryToRemove } from "@/redux/features/categoryToRemove";
@@ -19,7 +19,7 @@ import { setCategoryToRemove } from "@/redux/features/categoryToRemove";
 
 const ControlElement = () => {
     const [dieCutResult, setDieCutResult] = useState<string | null>(null);
-    const { paper, selectedItem, setSelectedItem, currentFtRef, setIsLoading, lastAddedElement, elementActive, setElementActive } = usePaper();
+    const { paper, selectedItem, setSelectedItem, currentFtRef, setIsLoading, lastAddedElement, setLastAddedElement, elementActive, setElementActive } = usePaper();
 
     const materialDefault = useAppSelector(state => state.formValues.materialLastSelected);
     const stackOrder = useAppSelector(state => state.stackOrder);
@@ -32,12 +32,11 @@ const ControlElement = () => {
     const [sendBackBTN, setSendBackBTN] = useState(true)
     const [sendForwardBTN, setSendForwardBTN] = useState(true)
     const [sendBackwardBTN, setSendBackwardBTN] = useState(true)
+    const [isFirstLoad, setIsFirstLoad] = useState(true);
 
     const { centerX, centerY, frameWidth, frameHeight, grow, backgroundColor } = CanvasProperties;
 
     const dispatch = useDispatch();
-
-    const { deselect, reapplyFreeTransform, handleElementInteraction } = useTransformUtils(dispatch, currentFtRef, setSelectedItem);
 
     const handleFlipX = () => {
         if (selectedItem && paper) {
@@ -45,38 +44,22 @@ const ControlElement = () => {
             // Apply flipping by scaling
             selectedItem.transform(`...s-1,1,${bbox.x + bbox.width / 2},${bbox.y + bbox.height / 2}`);
             
-            const oldFT = selectedItem.freeTransform
-            oldFT.unplug()
-            elementActive.forEach((el:any) => {
-                el?.freeTransform?.unplug()
-            })      
-            
-            
-            const handleTransform = (ft: any, events: any) => {
-               
-            }
+            const oldFt = selectedItem.freeTransform
+            oldFt.unplug()
            
-                        
-            elementActive?.forEach((el: any) => {
-                const newFT = paper?.freeTransform(el, `freeTransform stickerHandle-${el.id}`, defaultOptions, handleTransform);
-                
-
-                if (newFT && newFT.handles && typeof window !== "undefined" && document) {
-                    if (newFT.handles) {
-                        if (newFT.handles.x.line) newFT.handles.x.line.hide();
-        
-                        if (newFT.handles.x.disc) newFT.handles.x.disc.hide();
-                    }
-               
-                    const items = document.querySelectorAll(`.stickerHandle-${el.id}`);
-                    
-                    items?.forEach((item: any) => item.style.visibility = "hidden")
+            const ft = paper?.freeTransform(selectedItem, `freeTransform stickerHandle-${selectedItem.id}`, defaultOptions, (ft: any, events: any) => {
+                                            
+                if(events.includes("drag start")) {                                                    
+                    ft && hideFreeTransform(ft, paper)
                 }
-                
-                if(oldFT.subject.id === el.id) {
-                    setSelectedItem(newFT.subject)
-                    FTitemVisible(selectedItem)                }
+
+                if(events.includes("drag end")) {                                                    
+                    ft && setSelectedItem(ft.subject)
+                    ft && showFreeTransform(ft)
+                }
             })
+            ft && hideFreeTransform(ft)                  
+            ft && showFreeTransform(ft)
         }
     };
 /// working tomorrow
@@ -101,32 +84,35 @@ const ControlElement = () => {
             const oldFt = selectedItem.freeTransform
             oldFt.unplug()
            
-            const handleTransform = (ft: any, events: any) => {
-                const transformedItem = handleFreeTransform(ft, events);
-    
-                transformedItem && setSelectedItem(transformedItem)
-            }
-            const newFt = paper?.freeTransform(selectedItem, `freeTransform stickerHandle-${selectedItem.id}`, defaultOptions, handleTransform);
-            if (newFt.handles) {
-                if (newFt.handles.x.line) newFt.handles.x.line.hide();
+            const ft = paper?.freeTransform(selectedItem, `freeTransform stickerHandle-${selectedItem.id}`, defaultOptions, (ft: any, events: any) => {
+                                            
+                if(events.includes("drag start")) {                                                    
+                    ft && hideFreeTransform(ft, paper)
+                }
 
-                if (newFt.handles.x.disc) newFt.handles.x.disc.hide();
-            }
+                if(events.includes("drag end")) {                                                    
+                    ft && setSelectedItem(ft.subject)
+                    ft && showFreeTransform(ft)
+                }
+            })
+            ft && hideFreeTransform(ft)                  
+            ft && showFreeTransform(ft)
 
         }
     };
 
     const handleSendFront = () => {
         if (selectedItem && paper && stackOrder.length > 0) {
-            if (selectedItem.type !== "rect" && selectedItem.type !== "circle") {
-                dispatch(sendFront(selectedItem.id));
+            if (selectedItem.type !== "rect" && selectedItem.type !== "circle") {                
+                const presentItem = elementActive?.find((item: any) => item.id === selectedItem.id)
                 const currentIndex = stackOrder.indexOf(selectedItem.id);
                 console.log(currentIndex);
                 if (currentIndex < stackOrder.length - 1) {
                     const lastElement = stackOrder[stackOrder.length - 1];
-                    const element = elementActive.filter((el: any) => el.id === lastElement)
-                    selectedItem?.insertAfter(element);
-
+                    const element = elementActive?.find((el: any) => el.id === lastElement)
+                    selectedItem?.insertAfter(element);                    
+                    dispatch(sendFront(selectedItem.id));
+                    // setSelectedItem(presentItem)
                 }
             }
         }
@@ -134,17 +120,21 @@ const ControlElement = () => {
 
     const handleSendBack = () => {
         if (selectedItem && paper && stackOrder.length > 0) {
-            //console.log(selectedItem, stackOrder);
-            if (selectedItem.type !== "rect" && selectedItem.type !== "circle") {
-                dispatch(sendBack(selectedItem.id));
-                const currentIndex = stackOrder.indexOf(selectedItem.id);
-                console.log(currentIndex);
+            console.log("from send back", selectedItem, stackOrder);
+            if (selectedItem.type !== "rect" && selectedItem.type !== "circle") {                
+                const presentItem = elementActive?.find((item: any) => item.id === selectedItem.id)
+                const currentIndex = stackOrder.indexOf(selectedItem.id);                
+                console.log(currentIndex, presentItem);
                 if (currentIndex > 0) {
                     const firstElement = stackOrder[0];
-                    console.log(firstElement);
-                    const element = elementActive.filter((el: any) => el.id === firstElement);
+                    const element = elementActive?.find((el: any) => el.id === firstElement);
+                    console.log('present element', presentItem);
                     selectedItem?.insertBefore(element);
-                    // dispatch(sendBack(selectedItem.id));                    
+                    dispatch(sendBack(selectedItem.id));                    
+                    // setSelectedItem(presentItem)
+                    // elementActive?.forEach((el: any) => {
+                    //     hideFreeTransform(el.freeTransform)
+                    // })
                 }
             }
         }
@@ -153,35 +143,40 @@ const ControlElement = () => {
     const handleSendForward = () => {
         if (selectedItem && paper && stackOrder.length > 0) {
             if (selectedItem.type !== "rect" && selectedItem.type !== "circle") {
-                dispatch(sendForward(selectedItem.id));
                 const currentIndex = stackOrder.indexOf(selectedItem.id);
                 console.log(stackOrder[currentIndex]);
                 if (currentIndex < stackOrder.length - 1) {
-                    const nextElement = stackOrder[currentIndex + 1];
+                    const nextElementId = stackOrder[currentIndex + 1];
+                    console.log(nextElementId);
+                    const nextElement = elementActive.find((el: any) => el.id === nextElementId);
                     console.log(nextElement);
-                    const element = elementActive.filter((el: any) => el.id === nextElement);
-                    console.log(element);
-                    selectedItem.insertAfter(element);
+                    if (nextElement) {
+                        selectedItem.insertAfter(nextElement);
+                        dispatch(sendForward(selectedItem.id));
+                    }
                 }
             }
         }
     };
-
+    
     const handleSendBackward = () => {
         if (selectedItem && paper && stackOrder.length > 0) {
             if (selectedItem.type !== "rect" && selectedItem.type !== "circle") {
-                dispatch(sendBackward(selectedItem.id));
                 const currentIndex = stackOrder.indexOf(selectedItem.id);
                 if (currentIndex > 0) {
-                    const prevElement = stackOrder[currentIndex - 1];
+                    const prevElementId = stackOrder[currentIndex - 1];
+                    console.log(prevElementId);
+                    const prevElement = elementActive.find((el: any) => el.id === prevElementId);
                     console.log(prevElement);
-                    const element = elementActive.filter((el: any) => el.id === prevElement);
-                    console.log(element);
-                    selectedItem.insertBefore(element);
+                    if (prevElement) {
+                        selectedItem.insertBefore(prevElement);
+                        dispatch(sendBackward(selectedItem.id));
+                    }
                 }
             }
         }
     };
+    
 
 
     const handleDelete = () => {
@@ -231,10 +226,7 @@ const ControlElement = () => {
                     } else {
                         el.attr({ opacity: 1 }) // 0.3
                         // console.log("The element is outside the frame.");
-                    }
-
-
-                    // reapplyFreeTransform(el)
+                    }                    
                 }
             });
         }
@@ -248,36 +240,33 @@ const ControlElement = () => {
             if (el.data('isCenterable')) {
                 const bbox = el.getBBox();
                 const elCenter = { x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 };
-                const translation = { x: paperCenter.x - elCenter.x, y: paperCenter.y - elCenter.y };
-
-                // Apply translation to center the element                
+                const translation = { x: paperCenter.x - elCenter.x, y: paperCenter.y - elCenter.y };            
                 
                 el.transform(`...T${translation.x}, ${translation.y}`);
 
                 const oldFt = el.freeTransform
                 oldFt.unplug()
                
-                const handleTransform = (ft: any, events: any) => {
-                    const transformedItem = handleFreeTransform(ft, events);
-        
-                    transformedItem && setSelectedItem(transformedItem)
-                }
-                const newFt = paper?.freeTransform(el, `freeTransform stickerHandle-${el.id}`, defaultOptions, handleTransform);
-                if (newFt.handles) {
-                    if (newFt.handles.x.line) newFt.handles.x.line.hide();
+                const ft = paper?.freeTransform(el, `freeTransform stickerHandle-${el.id}`, defaultOptions, (ft: any, events: any) => {
+                                                
+                    if(events.includes("drag start")) {                                                    
+                        ft && hideFreeTransform(ft, paper)
+                    }
 
-                    if (newFt.handles.x.disc) newFt.handles.x.disc.hide();
-                }
-
+                    if(events.includes("drag end")) {                                                    
+                        ft && setSelectedItem(ft.subject)
+                        ft && showFreeTransform(ft)
+                    }
+                })
+                ft && hideFreeTransform(ft)                  
+                ft && showFreeTransform(ft)
+                
                 // Check if the element is inside the frame and adjust opacity accordingly
                 if (isElementInsideFrame(el, centerX, centerY, frameWidth, frameHeight)) {
                     el.attr({ opacity: 1 });
                 } else {
                     el.attr({ opacity: 1 }); //0.3
-                }
-
-                // Reapply free transformation if necessary
-                // reapplyFreeTransform(el);
+                }                
             }
         }
     };
@@ -302,30 +291,32 @@ const ControlElement = () => {
         }
     };
 
-    const handleDieCut = async () => {
-        setIsLoading(true);
-
-        try {
-            const svgData = await paper.toSVG(centerX - frameWidth / 2, centerY - frameHeight / 2, frameWidth, frameHeight, "", true);
-
-            if (svgData) {
-
-                const modifiedSVG = await generateSVGImageData(svgData, frameWidth, frameHeight, grow, "white")
-
-                const dAttributeValue = await extractDAttributeValue(modifiedSVG);
-
-                if (dAttributeValue) {
-                    //console.log(dAttributeValue);
-
-                    setDieCutResult(dAttributeValue)
-
-                    setIsLoading(false);
+    const handleDieCut = useCallback(() => {
+        async () => {
+            setIsLoading(true);
+            elementActive?.forEach((el: any) => el?.freeTransform?.hideHandles({ undrag: false }))
+            try {
+                const svgData = await paper.toSVG(centerX - frameWidth / 2, centerY - frameHeight / 2, frameWidth, frameHeight, "", true);
+    
+                if (svgData) {
+    
+                    const modifiedSVG = await generateSVGImageData(svgData, frameWidth, frameHeight, grow, "white")
+    
+                    const dAttributeValue = await extractDAttributeValue(modifiedSVG);
+    
+                    if (dAttributeValue) {
+                        //console.log(dAttributeValue);
+    
+                        setDieCutResult(dAttributeValue)
+    
+                        setIsLoading(false);
+                    }
                 }
+            } catch (error: any) {
+                console.error('Error:', error);
             }
-        } catch (error: any) {
-            console.error('Error:', error);
         }
-    }
+    }, [elementActive, grow, setIsLoading, centerX, centerY, frameWidth, frameHeight, paper])
 
     useEffect(() => {
 
@@ -385,23 +376,24 @@ const ControlElement = () => {
     }, [dieCutResult, backgroundColor, centerX, centerY, frameWidth, frameHeight, paper, materialDefault])
 
 
-    useEffect(() => {
-        lastAddedElement && stackOrder?.forEach((id: string) => {
-            const element = paper?.getById(id);
-            if (element) {
-                const isUnique = !elementActive.some((item: any) => item.id === element.id);
-                if (isUnique) {
-                    setElementActive((prev: any) => [...prev, element]);
-                }
-            }
-        });
-        //console.log(elementActive, 'stackOrder', stackOrder);
-    }, [paper, stackOrder, elementActive, setElementActive, lastAddedElement]);
+    // useEffect(() => {
+    //     lastAddedElement && stackOrder?.forEach((id: string) => {
+    //         const element = paper?.getById(id);
+    //         if (element) {
+    //             const isUnique = !elementActive.some((item: any) => item.id === element.id);
+    //             if (isUnique) {
+    //                 setElementActive((prev: any) => [...prev, element]);
+    //             }
+    //         }
+    //     });
+    //     //console.log(elementActive, 'stackOrder', stackOrder);
+    // }, [paper, stackOrder, elementActive, setElementActive, lastAddedElement]);
 
 
     useEffect(() => {
         const newStack: any = [];
         if (CategoryToRemove) {
+            // dispatch(clearStackOrder())
             console.log(CategoryToRemove, stackOrder);
             stackOrder?.forEach((id: any) => {
                 const element = paper?.getById(id);
@@ -440,10 +432,11 @@ const ControlElement = () => {
     /**
      * Svg export function
      */
-    const handleDownloadSVG = async (): Promise<void> => {
-        deselect();
+    const handleDownloadSVG = async (): Promise<void> => {        
 
         if (paper) {
+
+            elementActive?.forEach((el: any) => el?.freeTransform?.hideHandles({ undrag: false }))
 
             const strokeColor = "rgba(255,0,255, 1)";
             // Proceed with SVG export and download
@@ -470,6 +463,12 @@ const ControlElement = () => {
         }
     };
 
+    // useEffect(() => {
+    //     if (stackOrder && elementActive) {
+    //         const lastElement = elementActive.find((item: any) => item.id === stackOrder[stackOrder.length - 1]) 
+    //         setSelectedItem(lastElement)                 
+    //     }
+    // }, [stackOrder, elementActive, setSelectedItem]);
 
     // useEffect(() => {
     //     if (selectedItem && paper) {
@@ -574,6 +573,47 @@ const ControlElement = () => {
 
     }, [stackOrder, selectedItem])
 
+    useEffect(() => {
+        if (stackOrder && paper) {
+            const newElementActive = stackOrder
+                .map((id) => paper?.getById(id))
+                .filter(Boolean); 
+            setElementActive(newElementActive);
+        }
+    }, [stackOrder, paper, setElementActive]);
+
+    
+    useEffect(() => {
+        if (elementActive.length > 0) {
+            elementActive.forEach((el: any, index: number) => {
+                if (index === 0) {
+                    el.toFront(); 
+                } else {
+                    const prevElement = elementActive[index - 1];
+                    el.insertAfter(prevElement); 
+                }
+                el.show(); 
+            });
+        }
+    }, [elementActive]);
+
+    // useEffect(() => {
+    //     if(stackOrder && elementActive) {
+    //         handleDieCut()
+    //     }
+    // }, [elementActive, stackOrder, handleDieCut]);
+
+    useEffect(() => {
+        if (isFirstLoad && stackOrder.length > 0 && paper) {
+            const lastElementId = stackOrder[stackOrder.length - 1];
+            const lastElement = paper.getById(lastElementId);
+            if (lastElement) {
+                setSelectedItem(lastElement)
+                setIsFirstLoad(false);
+            }
+        }
+    }, [isFirstLoad, stackOrder, paper, setSelectedItem, setIsFirstLoad]);
+
     const buttons = [
         { onClick: handleFlipY, iconSrc: "/mirrorUpDownIcon.svg", tooltip: "Flip Vertically", borderClasses: "border-r-0 border-black/20 rounded-l-full", borderRadiusClasses: "pl-3 pr-1" },
         { onClick: handleFlipX, iconSrc: "/mirrorSideIcon.svg", tooltip: "Flip Horizontally", borderClasses: "border-x-0 border-black/20", borderRadiusClasses: "px-1.5" },
@@ -588,7 +628,7 @@ const ControlElement = () => {
 
     return (
         <>
-            <div className='absolute z-50 left-0 bottom-0 w-full h-fit'>
+            <div className='absolute z-50 left-0 bottom-0 w-full h-fit transition duration-500 delay-300 ease-in-out'>
                 {(StickerSelected.id) && (
                     <div className="absolute bottom-0 left-0 w-fit mx-auto h-3 flex justify-start items-end gap-5 z-50">
                         <div className="flex gap-3 p-4 space-y-3 w-60">

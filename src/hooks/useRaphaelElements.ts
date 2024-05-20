@@ -5,12 +5,13 @@ export const useRaphaelElements = (paper: any) => {
   const addImageElement = useCallback((image: any) => {
     if (!paper) return null;
 
-    const { id, src, x, y, width, height, attrs, scaleX, scaleY, rotation, type } = image;
+    const { id, src, x, y, width, height, attrs, scaleX, scaleY, rotation, type, stackNum } = image;
     let element = paper.getById(id);
     if (!element) {
       element = paper.image(src, x, y, width, height).attr(attrs);
       element.id = id;
       element.data({ 'data': type });
+      element.data({ 'stackNum': stackNum });
       element.data({ 'isCenterable': true });
     } else {
       element.attr({ src, x, y, width, height, ...attrs });

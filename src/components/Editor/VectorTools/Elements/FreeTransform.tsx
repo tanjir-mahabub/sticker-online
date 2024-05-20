@@ -1,4 +1,4 @@
-import { defaultOptions, FTitemVisible, handleFreeTransform } from "@/components/Utils/vectorFunction";
+import { defaultOptions, FTitemVisibility, handleFreeTransform } from "@/components/Utils/vectorFunction";
 import { usePaper } from "@/context/PaperContext";
 import { addedToHistory } from "@/redux/features/historySlice";
 import { updateElementAttributes, updateImages } from "@/redux/features/imagePreviewSlice";
@@ -8,129 +8,172 @@ import { useDispatch } from "react-redux";
 
 
 const FreeTransform = () => {
-    const { paper, selectedItem, setSelectedItem, lastAddedElement, elementActive } = usePaper();
+    const { paper, selectedItem, setSelectedItem, lastAddedElement, elementActive, setElementActive } = usePaper();
     
     const History = useAppSelector((state) => state.history);  
-    const dispatch = useDispatch();
+    const dispatch = useDispatch();    
 
-    useEffect(() => {
-        if (paper) {
-            paper?.forEach((el: any) => {
-                if (el) {
-                    const { data } = el.data();
-                    if (data === "image" || data === "text") {
-                        const dragStart = function (this: any) {                                                        
-                            setSelectedItem(this)
-                        };
+    // useEffect(() => {
+    //     if (paper) {
+    //         paper?.forEach((el: any) => {
+    //             if (el) {
+    //                 const { data } = el.data();
+    //                 if (data === "image" || data === "text") {
+    //                     const dragStart = function (this: any) {                                                        
+    //                         setSelectedItem(this)
+    //                     };
 
-                        const dragMove = function (this: any, dx: number, dy: number) {
-                        };
+    //                     const dragMove = function (this: any, dx: number, dy: number) {
+    //                     };
 
-                        const dragEnd = function (this: any) {      
-                            // console.log("drag end", this);  
-                            console.log('test');                                        
-                        };
+    //                     const dragEnd = function (this: any) {      
+    //                         // console.log("drag end", this);  
+    //                         console.log('test');                                        
+    //                     };
 
-                        el?.drag(dragMove, dragStart, dragEnd)
+    //                     el?.drag(dragMove, dragStart, dragEnd)
 
 
-                    }
-                }
-            });
+    //                 }
+    //             }
+    //         });
 
-        }
-        // console.log('lastAddedElement', lastAddedElement);
-    }, [paper, setSelectedItem, dispatch]);
+    //     }
+    //     // console.log('lastAddedElement', lastAddedElement);
+    // }, [paper, setSelectedItem, dispatch]);
 
-    useEffect(() => {
+    // useEffect(() => {
 
-        const handleTransform = (ft: any, events: any) => {
-            const transformedItem = handleFreeTransform(ft, events);
+    //     const handleTransform = (ft: any, events: any) => {
+    //     //     const transformedItem = handleFreeTransform(ft, events);
             
-           if(transformedItem) {
-                const itemID =  transformedItem.subject.id;
-                const category =  transformedItem.subject.data().data;
+    //     //    if(transformedItem) {
+    //     //         const itemID =  transformedItem.subject.id;
+    //     //         const category =  transformedItem.subject.data().data;
 
-                console.log('transformedItem', itemID, category);
-                dispatch(updateElementAttributes( {id: itemID, attributes: {...transformedItem.attrs}}))
-                dispatch(addedToHistory({
-                    objectId: itemID,
-                    category: category || '',
-                    position: {...transformedItem.attrs}
-                }));
+    //     //         // console.log('transformedItem', itemID, category);
+    //     //         // dispatch(updateElementAttributes( {id: itemID, attributes: {...transformedItem.attrs}}))
+    //     //         // dispatch(addedToHistory({
+    //     //         //     objectId: itemID,
+    //     //         //     category: category || '',
+    //     //         //     position: {...transformedItem.attrs}
+    //     //         // }));
+    //     //         console.log('transformedItem', transformedItem.subject.getBBox());
+    //     //         console.log('transformedItem', transformedItem.subject.getBBox());
 
-                transformedItem && setSelectedItem(transformedItem.subject)
-           }
-        }
+    //     //         transformedItem && setSelectedItem(transformedItem.subject)
+    //     //    }
 
-        elementActive && elementActive?.map((el: any) => {
-            if(el.freeTransform) {
-                const oldFt = el.freeTransform
-                oldFt.unplug()
-            }
+    //     const itemID =  ft.subject.id;
+    //             const category =  ft.subject.data().data;
+
+    //         if (events.includes('drag start')) {
+    //             ft.subject.paper.forEach((el: any) => {
+    //                 if (el.node.classList.contains('freeTransform')) {
+    //                     el.node.style.visibility = "hidden"
+    //                 }
+    //             })
+    //         }
+
+    //         if(events.includes("drag end")) {
+    //             console.log('transformedItem', ft.subject.getBBox(), ft.subject);
+    //                     console.log('transformedItem', itemID, category);
+    //             // dispatch(updateElementAttributes( {id: itemID, attributes: {}}))
+    //             // dispatch(addedToHistory({
+    //             //     objectId: itemID,
+    //             //     category: category || '',
+    //             //     position: {...transformedItem.attrs}
+    //             // }));
+    //             FTitemVisibility(ft.subject, "visible")
+    //             ft?.updateHandles();
+    //             ft.subject && setSelectedItem(ft.subject)
+    //         }
+
+    //         if(events.includes("scale end") || events.includes("rotate end")) {
+    //             console.log('transformedItem', ft.subject);
+    //                     console.log('transformedItem', itemID, category);
+    //             // dispatch(updateElementAttributes( {id: itemID, attributes: {...transformedItem.attrs}}))
+    //             // dispatch(addedToHistory({
+    //             //     objectId: itemID,
+    //             //     category: category || '',
+    //             //     position: {...transformedItem.attrs}
+    //             // }));
+    //             FTitemVisibility(ft.subject, "visible")
+    //             ft?.updateHandles();
+    //             ft.subject && setSelectedItem(ft.subject)
+    //         }
+    //     }
+
+    //     elementActive && elementActive?.map((el: any) => {
+    //         if(el.freeTransform) {
+    //             const oldFt = el.freeTransform
+    //             oldFt.unplug()
+    //         }
                
-            const ft = paper?.freeTransform(el, `freeTransform stickerHandle-${el.id}`, defaultOptions, handleTransform)
+    //         const ft = paper?.freeTransform(el, `freeTransform stickerHandle-${el.id}`, defaultOptions, handleTransform)
             
-            ft?.showHandles();
+    //         ft?.showHandles();
 
 
-            if (ft && ft.handles && typeof window !== "undefined" && document) {
+    //         if (ft && ft.handles && typeof window !== "undefined" && document) {
 
-                const items = document.querySelectorAll(`.stickerHandle-${el.id}`);
-                items?.forEach((item: any) => item.style.visibility = "hidden")
+    //             const items = document.querySelectorAll(`.stickerHandle-${el.id}`);
+    //             items?.forEach((item: any) => item.style.visibility = "hidden")
+    //             console.log(items);
 
-                if (ft.handles) {
-                    if (ft.handles.x.line) ft.handles.x.line.hide();
+    //             if (ft.handles) {
+    //                 if (ft.handles.x.line) ft.handles.x.line.hide();
 
-                    if (ft.handles.x.disc) ft.handles.x.disc.hide();
-                }
+    //                 if (ft.handles.x.disc) ft.handles.x.disc.hide();
+    //             }
 
-                const svgNS = "http://www.w3.org/2000/svg";
-                const svgElement = document.querySelector("svg");
+    //             const svgNS = "http://www.w3.org/2000/svg";
+    //             const svgElement = document.querySelector("svg");
 
-                if (svgElement) {
-                    const pattern = document.createElementNS(svgNS, "pattern");
-                    // Pattern attributes
-                    pattern.setAttribute("id", "rotateImageFill");
-                    pattern.setAttribute("patternUnits", "objectBoundingBox");
-                    pattern.setAttribute("width", "100%");
-                    pattern.setAttribute("height", "100%");
+    //             if (svgElement) {
+    //                 const pattern = document.createElementNS(svgNS, "pattern");
+    //                 // Pattern attributes
+    //                 pattern.setAttribute("id", "rotateImageFill");
+    //                 pattern.setAttribute("patternUnits", "objectBoundingBox");
+    //                 pattern.setAttribute("width", "100%");
+    //                 pattern.setAttribute("height", "100%");
 
-                    const image = document.createElementNS(svgNS, "image");
-                    // Image attributes
-                    image.setAttributeNS("http://www.w3.org/1999/xlink", "href", "/rotateIcon.svg");
-                    image.setAttribute("width", "22");
-                    image.setAttribute("height", "22");
+    //                 const image = document.createElementNS(svgNS, "image");
+    //                 // Image attributes
+    //                 image.setAttributeNS("http://www.w3.org/1999/xlink", "href", "/rotateIcon.svg");
+    //                 image.setAttribute("width", "22");
+    //                 image.setAttribute("height", "22");
 
-                    pattern.appendChild(image);
+    //                 pattern.appendChild(image);
 
-                    // Append pattern to defs
-                    let defs = svgElement.querySelector("defs");
-                    if (!defs) {
-                        defs = document.createElementNS(svgNS, "defs");
-                        svgElement.appendChild(defs);
-                    }
-                    defs.appendChild(pattern);
-                }
-            }
+    //                 // Append pattern to defs
+    //                 let defs = svgElement.querySelector("defs");
+    //                 if (!defs) {
+    //                     defs = document.createElementNS(svgNS, "defs");
+    //                     svgElement.appendChild(defs);
+    //                 }
+    //                 defs.appendChild(pattern);
+    //             }
+    //         }
 
-            ft?.updateHandles();
+    //         ft?.updateHandles();
 
-            ft?.apply();
-        });
+    //         ft?.apply();
+    //     });
 
-    }, [paper, elementActive, setSelectedItem, dispatch])
+    // }, [paper, elementActive, setSelectedItem, dispatch])
 
-    useEffect(() => {
-        if (selectedItem) {
-            FTitemVisible(selectedItem)
-        }
+    // useEffect(() => {
+    //     if (selectedItem) {
+    //         FTitemVisibility(selectedItem, "visible")
+    //     }
 
-    }, [selectedItem]);
+    // }, [selectedItem]);
     
-   useEffect(() => {
-    console.log(History);
-   })
+//    useEffect(() => {
+//     console.log(History);
+//     paper && console.log(paper);        
+//    })
 
 //     useEffect(() => {
 //       elementActive?.forEach((el: any) => {

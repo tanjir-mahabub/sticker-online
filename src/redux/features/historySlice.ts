@@ -8,6 +8,7 @@ interface Position {
   scaleX?: number;
   scaleY?: number;
   rotation?: number;
+  matrix?: any;
 }
 
 interface ObjectHistory {

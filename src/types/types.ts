@@ -32,6 +32,7 @@ export interface ImageInfo {
   scaleX?: number;
   scaleY?: number;
   rotate?: number;
+  stackNum?: number;
 }
 
 export interface ExtendedRaphaelPaper {

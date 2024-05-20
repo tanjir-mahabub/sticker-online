@@ -11,11 +11,7 @@ const CleanUpElement: React.FC<CleanUpElementProps> = () => {
     const { paper, selectedItem, setSelectedItem, currentFtRef, isLoading } = usePaper();
     const imagePreviews = useAppSelector((state) => state.imagePreview.images);
     const textPreviews = useAppSelector((state) => state.text.texts);
-    const { centerX, centerY, frameWidth, frameHeight } = useAppSelector((state) => state.canvas);
-
-
-    const dispatch = useDispatch();
-    const { deselect } = useTransformUtils(dispatch, currentFtRef, setSelectedItem);
+    const { centerX, centerY, frameWidth, frameHeight } = useAppSelector((state) => state.canvas); 
 
 
     useEffect(() => {
@@ -32,16 +28,16 @@ const CleanUpElement: React.FC<CleanUpElementProps> = () => {
 
             const isVisible = isElementInsideFrame(element, centerX, centerY, frameWidth, frameHeight);
 
-            element.attr({ opacity: isVisible ? 1 : 0.3 });
+            // element.attr({ opacity: isVisible ? 1 : 0.3 });
 
             if ((isImageOrMotiv && !newImageIds.has(element.id)) || (isText && !newTextIds.has(element.id))) {
                 elementsToRemove.push(element);
             }
         });
 
-        elementsToRemove.forEach((el) => el.remove());
-        deselect();
-    }, [paper, centerX, centerY, frameWidth, frameHeight, imagePreviews, textPreviews, isLoading, deselect]);
+        elementsToRemove.forEach((el) => el.remove());       
+        console.log('deleted', elementsToRemove); 
+    }, [paper, centerX, centerY, frameWidth, frameHeight, imagePreviews, textPreviews, isLoading]);
 
 
     return null;

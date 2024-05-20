@@ -164,6 +164,64 @@ export const defaultOptions = {
     },
 };
 
+export const showFreeTransform = (ft: any) => {
+    if(ft) {
+        ft.showHandles()
+        if(ft.handles) {
+            if (ft.handles.x.line) ft.handles.x.line.hide();
+    
+            if (ft.handles.x.disc) ft.handles.x.disc.hide();
+            
+            if (ft.handles.center.disc) ft.handles.center.disc.node.setAttribute("pointer-events", "none")
+            
+        }
+
+        const svgNS = "http://www.w3.org/2000/svg";
+        const svgElement = document.querySelector("svg");
+
+        if (svgElement) {
+            const pattern = document.createElementNS(svgNS, "pattern");
+            // Pattern attributes
+            pattern.setAttribute("id", "rotateImageFill");
+            pattern.setAttribute("patternUnits", "objectBoundingBox");
+            pattern.setAttribute("width", "100%");
+            pattern.setAttribute("height", "100%");
+
+            const image = document.createElementNS(svgNS, "image");
+            // Image attributes
+            image.setAttributeNS("http://www.w3.org/1999/xlink", "href", "/rotateIcon.svg");
+            image.setAttribute("width", "22");
+            image.setAttribute("height", "22");
+
+            pattern.appendChild(image);
+
+            // Append pattern to defs
+            let defs = svgElement.querySelector("defs");
+            if (!defs) {
+                defs = document.createElementNS(svgNS, "defs");
+                svgElement.appendChild(defs);
+            }
+            defs.appendChild(pattern);
+        }
+    }
+
+    ft?.updateHandles();
+
+    ft?.apply();    
+}
+
+export const hideFreeTransform = (ft: any, paper?: any) => {
+    ft && ft?.hideHandles({ undrag: false})
+    if(paper) {
+        paper?.forEach((el: any) => {
+            if(el.type === "image" && el.id !== ft.subject.id) {                                    
+                el.freeTransform && el.freeTransform.hideHandles({ undrag: false})
+            }
+        })
+    }
+}
+
+
 export const handleFreeTransform = (ft: any, events: any) => {
     // console.log(ft, events);          
     if (events.includes('drag start')) {
@@ -208,71 +266,71 @@ console.log('ft.attrs',translation.x, translation.y);
 
     if (events.includes('scale end') || events.includes('rotate end')) {
         
-        const paper: any = ft.subject?.paper;
-        const paperCenter: { x: number, y: number } = { x: paper.width / 2, y: paper.height / 2 };
-        const bbox: any = ft.subject?.getBBox();
-        const elCenter = { x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 };
-        const translation = { x: paperCenter.x - elCenter.x, y: paperCenter.y - elCenter.y };
+    }  
 
-            const matrix = ft.subject?.transform();
+    // if (events.includes('scale end') || events.includes('rotate end')) {
+        
+    //     // const paper: any = ft.subject?.paper;
+    //     // const paperCenter: { x: number, y: number } = { x: paper.width / 2, y: paper.height / 2 };
+    //     // const bbox: any = ft.subject?.getBBox();
+    //     // const elCenter = { x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 };
+    //     // const translation = { x: paperCenter.x - elCenter.x, y: paperCenter.y - elCenter.y };
+
+    //     //     const matrix = ft.subject?.matrix;
+
+    //     //     console.log(matrix);
           
-            let x = translation.x;
-            let y = translation.y;
-            console.log('scale---', ft);
-            let scaleX = ft.attrs.scale.x;
-            let scaleY = ft.attrs.scale.y;          
-            let rotate = ft.attrs.scale.rotate;
+    //     //     let x = translation.x;
+    //     //     let y = translation.y;
+    //     //     console.log('scale---', ft);
+    //     //     let scaleX = ft.attrs.scale.x;
+    //     //     let scaleY = ft.attrs.scale.y;          
+    //     //     let rotate = ft.attrs.scale.rotate;
           
-            matrix.forEach(([operation, ...params]: any) => {
-                switch (operation) {
-                    case "T":
-                        // x = params[0];
-                        // y = params[1];
-                        break;
-                    case "S":
-                        scaleX = params[0];
-                        scaleY = params[1];
-                        break;
-                    case "R":                        
-                        rotate = params[0];
-                        break;
-                }
-            });
+    //     //     // matrix.forEach(([operation, ...params]: any) => {
+    //     //     //     switch (operation) {
+    //     //     //         case "T":
+    //     //     //             // x = params[0];
+    //     //     //             // y = params[1];
+    //     //     //             break;
+    //     //     //         case "S":
+    //     //     //             scaleX = params[0];
+    //     //     //             scaleY = params[1];
+    //     //     //             break;
+    //     //     //         case "R":                        
+    //     //     //             rotate = params[0];
+    //     //     //             break;
+    //     //     //     }
+    //     //     // });
 
-            // Log transformation values
-            // console.log(ft.subject?.id);
+    //     //     // Log transformation values
+    //     //     // console.log(ft.subject?.id);
 
           
-            console.log("Drag end ScaleX:", scaleX);
-            console.log("Drag end ScaleY:", scaleY);            
-            console.log("Drag end Rotate:", rotate);
+    //         // console.log("Drag end ScaleX:", scaleX);
+    //         // console.log("Drag end ScaleY:", scaleY);            
+    //         // console.log("Drag end Rotate:", rotate);
 
-        return {
-            subject: ft.subject,
-            attrs: {      
-                // x: x,
-                // y: y,         
-                // scaleX: scaleX,
-                // scaleY: scaleY,
-                // // width: width,
-                // // height: height,
-                // rotate: rotate
-            }
-        };
-    }
+    //     return {
+    //         subject: ft.subject,
+    //         attrs: {      
+    //         //    matrix: matrix
+    //         }
+    //     };
+    // }
 }
 
 
-export const FTitemVisible = (selectedItem: any) => {
+export const FTitemVisibility = (selectedItem: any, status: string) => {
     const ft = selectedItem?.freeTransform
-            if (ft) {
-                ft.handles.center.disc.node.style.visibility = "visible"
-                ft.handles.x.disc.node.style.visibility = "visible"
-                ft.handles.x.line.node.style.visibility = "visible"
-                ft.handles.y.disc.node.style.visibility = "visible"
-                ft.handles.y.line.node.style.visibility = "visible"
-                ft.bbox.node.style.visibility = "visible"
-                ft.handles.bbox.forEach((item: any) => item.element.node.style.visibility = "visible")
+            if (ft && status) {
+                ft.handles.center.disc.node.style.visibility = status
+                ft.handles.x.disc.node.style.visibility = status
+                ft.handles.x.line.node.style.visibility = status
+                ft.handles.y.disc.node.style.visibility = status
+                ft.handles.y.line.node.style.visibility = status
+                ft.bbox.node.style.visibility = status
+                ft.handles.bbox.forEach((item: any) => Object.assign(item?.element?.node?.style, { visibility: status, opacity: "0.5" }));
                 console.log('newft', ft);                          
             }    
 }

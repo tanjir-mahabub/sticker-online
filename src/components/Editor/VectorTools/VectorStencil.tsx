@@ -25,7 +25,6 @@ const VectorStencil = () => {
     const isLayoutEffectExecuted = useRef(false);
 
     const dispatch = useDispatch();
-    const { deselect } = useTransformUtils(dispatch, currentFtRef, setSelectedItem);
 
     useEffect(() => {
         if (!isLayoutEffectExecuted.current && typeof window !== "undefined" && raphaelRef.current && !paper) {
