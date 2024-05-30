@@ -4,7 +4,7 @@ import '@/lib/raphael.free_transform';
 import '@/lib/raphael.group';
 import { usePaper } from "@/context/PaperContext";
 import { useEffect, useRef, useState } from "react";
-import VectorFrame from './CanvasFrame';
+import VectorFrame from './VectorFrame';
 import Spinner from '@/components/Utils/Spinner';
 import FrameBackground from './Elements/FrameBackground';
 import ImageElement from './Elements/ImageElement';
@@ -15,6 +15,8 @@ import { useTransformUtils } from '@/hooks/useTransformUtils';
 import { useDispatch } from 'react-redux';
 import { useAppSelector } from '@/redux/store';
 import FreeTransform from './Elements/FreeTransform';
+import { setCanvasProperties } from '@/redux/features/canvasSlice';
+import HistoryControl from './Elements/HistoryControl';
 
 const VectorStencil = () => {
     const objectHistories = useAppSelector((state) => state.history.objectHistories);
@@ -23,18 +25,31 @@ const VectorStencil = () => {
     const raphaelRef = useRef<HTMLDivElement | null>(null);
     const [StickerWrapper, setStickerWrapper] = useState<HTMLDivElement | null>(null);
     const isLayoutEffectExecuted = useRef(false);
+    
+    const CanvasProperties = useAppSelector(state => state.canvas);
+
+    const { canvasWidth, canvasHeight } = CanvasProperties;
 
     const dispatch = useDispatch();
 
+    // useEffect(() => {
+    //     if (!isLayoutEffectExecuted.current && typeof window !== "undefined" && raphaelRef.current) {           
+            
+    //         dispatch(setCanvasProperties({
+    //             canvasWidth: canvasWidth,
+    //             canvasHeight: canvasHeight
+    //         }))
+    //     }
+    // })
+
     useEffect(() => {
-        if (!isLayoutEffectExecuted.current && typeof window !== "undefined" && raphaelRef.current && !paper) {
-            const width = raphaelRef.current.clientWidth;
-            const height = raphaelRef.current.clientHeight;
-            const paperInstance = new Raphael(raphaelRef.current, width, height);
+        if (!isLayoutEffectExecuted.current && typeof window !== "undefined" && raphaelRef.current && !paper && canvasWidth && canvasHeight) {
+            
+            const paperInstance = new Raphael(raphaelRef.current, canvasWidth, canvasHeight);
             const svgElement = paperInstance.canvas;
             svgElement.id = "VECTORSVGId";
 
-            const StickerMainWrapper = paperInstance.rect(0, 0, width, height).attr({
+            const StickerMainWrapper = paperInstance.rect(0, 0, canvasWidth, canvasHeight).attr({
                 fill: "transparent",
                 stroke: "none"
             });
@@ -50,18 +65,26 @@ const VectorStencil = () => {
             });
             isLayoutEffectExecuted.current = true;
         }
-    }, [paper, setPaper]);
-
+    }, [paper, setPaper, canvasWidth, canvasHeight]);
 
     useEffect(() => {
-        if (objectHistories[0]?.objectId && paper) {
-            paper.forEach((el: any) => {
-                if (objectHistories[0].objectId === el.id) {
-                    console.log(objectHistories[0].history[objectHistories[0].historyStep]);
-                }
-            })
+        if(paper && (canvasWidth || canvasHeight)) {
+            paper.setViewBox(0,0,canvasWidth, canvasHeight, false)
+            // paper.setSize("100%", "100%")
+            console.log('stencil', canvasWidth, canvasHeight)
         }
-    }, [objectHistories, paper])
+    }, [paper, canvasWidth, canvasHeight])
+
+
+    // useEffect(() => {
+    //     if (objectHistories[0]?.objectId && paper) {
+    //         paper.forEach((el: any) => {
+    //             if (objectHistories[0].objectId === el.id) {
+    //                 console.log(objectHistories[0].history[objectHistories[0].historyStep]);
+    //             }
+    //         })
+    //     }
+    // }, [objectHistories, paper])   
 
 
     return (
@@ -74,6 +97,7 @@ const VectorStencil = () => {
             <TextElement />
             <ControlElement />
             <CleanUpElement />
+            <HistoryControl />
             <FreeTransform />
         </div>
     );

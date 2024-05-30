@@ -1,4 +1,8 @@
+import { pixelToCm } from "@/components/Utils/vectorFunction";
+import { setCanvasProperties } from "@/redux/features/canvasSlice";
 import { useAppSelector } from "@/redux/store";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
 
 interface FrameProps {
 
@@ -8,6 +12,21 @@ const VectorFrame: React.FC<FrameProps> = ({ }) => {
 
     const CanvasProperties = useAppSelector(state => state.canvas);
     const { centerX, centerY, frameWidth, frameHeight, bredd, hojd } = CanvasProperties;
+
+    const dispatch = useDispatch()
+
+    // useEffect(() => {        
+    //     if(frameWidth && frameHeight) {
+    //         dispatch(setCanvasProperties({
+    //             bredd: pixelToCm(frameWidth), 
+    //             hojd: pixelToCm(frameHeight)
+    //         }))
+    //     }
+    // }, [dispatch, frameWidth, frameHeight])
+
+    useEffect(() => {
+        console.log(bredd, hojd);
+    })
 
     return (
         <div className="relative flex justify-center h-full transition">

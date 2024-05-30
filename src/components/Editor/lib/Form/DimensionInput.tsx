@@ -1,62 +1,55 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import BreddInput from './BreddInput';
 import HojdInput from './HojdInput';
 import { useDispatch } from 'react-redux';
 import { setCanvasProperties } from '@/redux/features/canvasSlice';
 import { setCalculation } from '@/redux/features/calculationSlice';
-import { setBreddDefaultValue, setHojdDefaultValue } from '@/redux/features/formSlice';
 import { useAppSelector } from '@/redux/store';
 import { cmToPixel } from '@/components/Utils/vectorFunction';
+import { debounce } from "lodash";
 
 const DimensionInput = () => {
     const dispatch = useDispatch();
-
     const dimensionDefault = useAppSelector(state => state.formValues);
+    const CanvasProperties = useAppSelector(state => state.canvas);
 
-    const [bredd, setBredd] = useState(dimensionDefault.breddDefaultValue);
-    const [hojd, setHojd] = useState(dimensionDefault.hojdDefaultValue);
+    const [bredd, setBredd] = useState(CanvasProperties.bredd);
+    const [hojd, setHojd] = useState(CanvasProperties.hojd);
 
-    const handleBreddStepUp = () => {
-        setBredd((prevValue) => prevValue + 0.1);
-    };
+    const handleBreddStep = useCallback((step: number) => {
+        setBredd(prevValue => prevValue + step);
+    }, []);
 
-    const handleBreddStepDown = () => {
-        setBredd((prevValue) => prevValue - 0.1);
-    };
+    const handleHojdStep = useCallback((step: number) => {
+        setHojd(prevValue => prevValue + step);
+    }, []);
 
-    const handleHojdStepUp = () => {
-        setHojd((prevValue) => prevValue + 0.1);
-    };
-
-    const handleHojdStepDown = () => {
-        setHojd((prevValue) => prevValue - 0.1);
-    };
-
-
-
-    useEffect(() => {
-
-        dispatch(setBreddDefaultValue(bredd)); // Set default value for bredd input
-        dispatch(setHojdDefaultValue(hojd)); // Set default value for hojd input
-    }, [dispatch, bredd, hojd]);
-
-
-    useEffect(() => {
-        const newBreddCost = bredd * 10;
+    const debouncedUpdateBredd = useCallback(debounce((newBredd) => {
+        const newBreddCost = newBredd * 10;
+        dispatch(setCanvasProperties({ frameWidth: cmToPixel(newBredd), bredd: newBredd }));
         dispatch(setCalculation({ breddCost: newBreddCost }));
-    }, [bredd, dispatch]);
+    }, 300), [dispatch]);
 
-    useEffect(() => {
-        const newHojdCost = hojd * 10;
+    const debouncedUpdateHojd = useCallback(debounce((newHojd) => {
+        const newHojdCost = newHojd * 10;
+        dispatch(setCanvasProperties({ frameHeight: cmToPixel(newHojd), hojd: newHojd }));
         dispatch(setCalculation({ HojdCost: newHojdCost }));
-    }, [hojd, dispatch]);
-
+    }, 300), [dispatch]);
 
     useEffect(() => {
-        dispatch(setCanvasProperties({ frameWidth: cmToPixel(bredd), frameHeight: cmToPixel(hojd), bredd: bredd, hojd: hojd }));
-        // console.log(bredd, hojd, cmToPixel(bredd), 'aspect ratio', cmToPixel(bredd) / cmToPixel(hojd));
-        // console.log('frameHeight', cmToPixel(hojd));
-    }, [bredd, hojd, dispatch]);
+        debouncedUpdateBredd(bredd);
+    }, [bredd, debouncedUpdateBredd]);
+
+    useEffect(() => {
+        debouncedUpdateHojd(hojd);
+    }, [hojd, debouncedUpdateHojd]);
+
+    useEffect(() => {
+        if(CanvasProperties.bredd || CanvasProperties.hojd) {
+            setBredd(CanvasProperties.bredd)
+            setHojd(CanvasProperties.hojd)            
+        }
+    }, [CanvasProperties])
 
     return (
         <>
@@ -64,17 +57,17 @@ const DimensionInput = () => {
                 <label htmlFor="bredd" className="block text-sm 3xl:text-sm font-bold text-gray-700">
                     Bredd
                 </label>
-                <BreddInput value={bredd} onChange={setBredd} onStepUp={handleBreddStepUp} onStepDown={handleBreddStepDown} />
+                <BreddInput value={bredd} onChange={setBredd} onStepUp={() => handleBreddStep(0.1)} onStepDown={() => handleBreddStep(-0.1)} />
             </div>
 
             <div>
                 <label htmlFor="hojd" className="block text-sm 3xl:text-sm font-bold text-gray-700">
                     Höjd
                 </label>
-                <HojdInput value={hojd} onChange={setHojd} onStepUp={handleHojdStepUp} onStepDown={handleHojdStepDown} />
+                <HojdInput value={hojd} onChange={setHojd} onStepUp={() => handleHojdStep(0.1)} onStepDown={() => handleHojdStep(-0.1)} />
             </div>
         </>
-    )
+    );
 }
 
-export default DimensionInput
+export default DimensionInput;

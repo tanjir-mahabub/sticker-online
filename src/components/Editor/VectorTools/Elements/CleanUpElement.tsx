@@ -8,7 +8,7 @@ import { useTransformUtils } from "@/hooks/useTransformUtils";
 interface CleanUpElementProps { }
 
 const CleanUpElement: React.FC<CleanUpElementProps> = () => {
-    const { paper, selectedItem, setSelectedItem, currentFtRef, isLoading } = usePaper();
+    const { paper, selectedItem, setSelectedItem, currentFtRef, isLoading, setIsLoading } = usePaper();
     const imagePreviews = useAppSelector((state) => state.imagePreview.images);
     const textPreviews = useAppSelector((state) => state.text.texts);
     const { centerX, centerY, frameWidth, frameHeight } = useAppSelector((state) => state.canvas); 
@@ -35,9 +35,14 @@ const CleanUpElement: React.FC<CleanUpElementProps> = () => {
             }
         });
 
-        elementsToRemove.forEach((el) => el.remove());       
+        elementsToRemove.forEach((el) => {
+            el.remove()
+        });       
+        
+        setSelectedItem(null)
+        
         console.log('deleted', elementsToRemove); 
-    }, [paper, centerX, centerY, frameWidth, frameHeight, imagePreviews, textPreviews, isLoading]);
+    }, [paper, centerX, centerY, frameWidth, frameHeight, imagePreviews, textPreviews, isLoading, setSelectedItem]);
 
 
     return null;

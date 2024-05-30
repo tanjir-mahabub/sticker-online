@@ -11,8 +11,7 @@ import { setCategoryToRemove } from "@/redux/features/categoryToRemove";
 const BilderCustomize = () => {
     const dispatch = useDispatch();
 
-    const CanvasProperties = useAppSelector(state => state.canvas);
-    const { centerX, centerY, frameWidth, frameHeight } = CanvasProperties;
+    const CanvasProperties = useAppSelector(state => state.canvas);    
 
     const imagePreviews = useAppSelector((state: RootState) => state.imagePreview.images);
 
@@ -24,15 +23,25 @@ const BilderCustomize = () => {
                 if (typeof imageDataUrl === "string") {
                     const image = new window.Image();
                     image.onload = () => {
-                        const aspectRatio = image.naturalWidth / image.naturalHeight;
-                        const width = 280;
-                        const height = width / aspectRatio;
+                        const width = image.naturalWidth;
+                        const height = image.naturalHeight;                        
+                        
+                        let status = "";
+                        if (width >= 1920 && height >= 1080) {
+                            status = "HD";
+                        } else if (width >= 1280 && height >= 720) {
+                            status = "SD";
+                        } else {
+                            status = "Low";
+                        }
+
                         dispatch(addImage({
                             id: generateUniqueId(),
                             src: imageDataUrl,
                             width: width,
-                            height: height,
+                            height: height,                            
                             category: 'image',
+                            status: status
                         }));
                     };
                     image.src = imageDataUrl;

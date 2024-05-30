@@ -1,7 +1,12 @@
+import { CanvasState } from "@/types/types";
 import geom from "../../lib/geom";
 import * as d3 from "d3";
 import { Selection } from 'd3-selection';
 import { line } from 'd3-shape';
+
+export const createDieCut = (paper: any, pathValue: string, canvasProps: CanvasState) => {
+    console.log(paper, pathValue, canvasProps);
+}
 
 // Function to generate SVG image data URL
 export const generateSVGImageData = async (svgData: string, width: number, height: number, grow: number, backgroundColor: string): Promise<string> => {
@@ -30,6 +35,7 @@ const svgModification = async (svg: string, newWidth: number, newHeight: number,
 
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = 'high';
+            console.log('diecut test', newWidth, newHeight);
             ctx.drawImage(img, 0, 0, newWidth, newHeight);
             const imageData = ctx.getImageData(0, 0, newWidth, newHeight);
             const pixels = imageData.data;
@@ -220,3 +226,24 @@ const drawSVGLine = (points: any[], width: number, height: number, grow: number,
 
     return null;  // Return null if points array is empty
 }
+
+
+export const extractDAttributeValue = async (svgUrl: string): Promise<string | null> => {
+    try {
+        // Fetch SVG content from the Blob URL
+        const response = await fetch(svgUrl);
+        const svgString = await response.text();
+
+        // Ensure the SVG string starts with "<svg>" tag
+        const formattedSvgString = svgString.startsWith("<svg>") ? svgString : `<svg xmlns="http://www.w3.org/2000/svg"> ${svgString}</>`;
+
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(formattedSvgString, "image/svg+xml");
+
+        const pathElement = doc.querySelector('path');
+        return pathElement ? pathElement.getAttribute('d') : null;
+    } catch (error) {
+        console.error('Error parsing SVG:', error);
+        return null;
+    }
+};

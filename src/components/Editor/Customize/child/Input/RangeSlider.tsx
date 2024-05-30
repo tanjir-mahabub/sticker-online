@@ -26,13 +26,9 @@ const RangeSlider: React.FC<RangeSliderProps> = ({ minValue, maxValue, step, lab
             setIsSliding(false);
             // Dispatch the action when the user has finished sliding
             dispatch(setCanvasProperties({ grow: value }));
+            console.log(value);
         }
     };
-
-    // useEffect(() => {
-    //     // This will log the value whenever it changes, including during sliding
-    //     console.log(value);
-    // }, [value])
 
     return (
         <div className="flex flex-col gap-3 w-full">

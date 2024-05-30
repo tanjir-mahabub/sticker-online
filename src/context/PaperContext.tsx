@@ -1,4 +1,6 @@
-import React, { createContext, useContext, useState, ReactNode, useRef } from 'react';
+import { historyReducer, initialHistoryState } from '@/reducer/historyReducer';
+import { HistoryAction, HistoryState } from '@/reducer/historyTypes';
+import React, { createContext, useContext, useState, ReactNode, useRef, Dispatch, useReducer } from 'react';
 
 interface PaperContextType {
     paper: any;
@@ -12,6 +14,12 @@ interface PaperContextType {
     setLastAddedElement: React.Dispatch<React.SetStateAction<any>>;
     elementActive: any,
     setElementActive: React.Dispatch<React.SetStateAction<any>>;
+    isShowError: boolean;
+    setIsShowError: React.Dispatch<React.SetStateAction<boolean>>;
+    ftEndData: any;
+    setFTEndData: React.Dispatch<React.SetStateAction<any>>;
+    historyState: HistoryState;
+    historyDispatch: Dispatch<HistoryAction>;
 }
 
 // Create a context
@@ -25,9 +33,13 @@ export const PaperProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     const [elementActive, setElementActive] = useState<any[]>([]);
     const currentFtRef = useRef<any>(null);
     const [lastAddedElement, setLastAddedElement] = useState<any>(null);
+    const [isShowError, setIsShowError] = useState<boolean>(false);
+    const [ftEndData, setFTEndData]  = useState<any>(null);
+
+    const [historyState, historyDispatch] = useReducer(historyReducer, initialHistoryState);
 
     return (
-        <PaperContext.Provider value={{ paper, setPaper, selectedItem, setSelectedItem, isLoading, setIsLoading, currentFtRef, lastAddedElement, setLastAddedElement, elementActive, setElementActive }}>
+        <PaperContext.Provider value={{ paper, setPaper, selectedItem, setSelectedItem, isLoading, setIsLoading, currentFtRef, lastAddedElement, setLastAddedElement, elementActive, setElementActive, isShowError, setIsShowError, ftEndData, setFTEndData, historyState, historyDispatch }}>
             {children}
         </PaperContext.Provider>
     );

@@ -25,6 +25,7 @@ export interface ImageInfo {
   id: string;
   src: string;
   category?: string;
+  status?: string;
   x?: number;
   y?: number;
   width?: number;
@@ -46,8 +47,10 @@ export interface ExtendedRaphaelPaper {
 
 
 export interface CanvasState {
-  width: number;
-  height: number;
+  canvasX: number,
+  canvasY: number,
+  canvasWidth: number,
+  canvasHeight: number,
   centerX: number;
   centerY: number;
   frameWidth: number;
@@ -56,7 +59,6 @@ export interface CanvasState {
   hojd: number;
   scale: number;
   grow: number;
-  selectionCancel?: boolean;
   backgroundColor: string;
   textColor: string;
 }

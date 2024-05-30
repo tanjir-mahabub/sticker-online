@@ -84,8 +84,8 @@ export const cmToPixel = (cm: number, dpi = 96) => {
 
 export const pixelToCm = (pixels: number, dpi = 96) => {
     const inches = pixels / dpi;
-    const cm = inches * 2.54;
-    return cm.toFixed(1).replace('.', ',');
+    const cm = inches * 2.54;    
+    return Math.round(cm);
 }
 
 export const calculateFrameEdges = (frame: Frame) => {
@@ -148,6 +148,58 @@ export const convertJpgToBase64 = (imageURL: string) => {
     });
 }
 
+export const svgStringToNode = (svgString: string) => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(svgString, 'image/svg+xml');
+    return doc.documentElement;
+}
+
+export const handleFrameAdjustment = (elements: any) => {
+    if(elements) {
+        const checkValues:any = [];
+        elements?.forEach((el: any) => {
+            el?.freeTransform?.hideHandles({ undrag: false })
+            const bbox = el?.getBBox();
+            checkValues.push({id: el.id, bbox: bbox})
+            
+        })
+        console.log(checkValues.filter((item:any) => Math.min(item.bbox.x)));
+    }
+}
+
+// TypeScript function to determine image quality for printing
+export const getImageQualityForPrinting = (
+    actualWidthPixels: number,
+    actualHeightPixels: number,
+    printWidthCm: number,
+    printHeightCm: number
+  ): string => {
+    const cmToInch = 2.54; // Conversion factor from centimeters to inches
+    const requiredDPI = 300; // Standard print DPI
+  
+    // Convert print size from centimeters to inches
+    const printWidthInches = printWidthCm / cmToInch;
+    const printHeightInches = printHeightCm / cmToInch;
+  
+    // Calculate required dimensions in pixels for 300 DPI
+    const requiredWidthPixels = printWidthInches * requiredDPI;
+    const requiredHeightPixels = printHeightInches * requiredDPI;
+  
+    let quality: string = "Unknown";
+  
+    if (actualWidthPixels >= requiredWidthPixels && actualHeightPixels >= requiredHeightPixels) {
+      quality = "Best";
+    } else if (actualWidthPixels >= requiredWidthPixels * 0.75 && actualHeightPixels >= requiredHeightPixels * 0.75) {
+      quality = "Average";
+    } else {
+      quality = "Low";
+    }
+  
+    return quality;
+  }
+  
+  
+  
 
 export const defaultOptions = {
     keepRatio: true,

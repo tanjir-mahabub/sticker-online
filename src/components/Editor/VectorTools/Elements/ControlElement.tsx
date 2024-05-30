@@ -6,25 +6,28 @@ import { useDispatch } from "react-redux";
 import { useTransformUtils } from "@/hooks/useTransformUtils";
 import { deleteImage, updateElementAttributes } from "@/redux/features/imagePreviewSlice";
 import { removeText } from "@/redux/features/textSlice";
-import { addedToHistory, deleteHistoryById } from "@/redux/features/historySlice";
+import { addedToHistory, clearAllHistories, deleteHistoryById } from "@/redux/features/historySlice";
 import { useCallback, useEffect, useState } from "react";
 import { isElementInsideFrame } from "../elementUtils";
 import { useAppSelector } from "@/redux/store";
-import { generateSVGImageData } from "@/components/Utils/DieCutFunction";
-import { convertJpgToBase64, defaultOptions, FTitemVisibility, handleFreeTransform, hideFreeTransform, showFreeTransform } from "@/components/Utils/vectorFunction";
+import { createDieCut, extractDAttributeValue, generateSVGImageData } from "@/components/Utils/DieCutFunction";
+import { convertJpgToBase64, defaultOptions, FTitemVisibility, handleFrameAdjustment, handleFreeTransform, hideFreeTransform, pixelToCm, showFreeTransform, svgStringToNode } from "@/components/Utils/vectorFunction";
 import materialStore from '@/store/materialStore';
 import { addStackElement, clearStackOrder, removeStackElement, sendBack, sendBackward, sendForward, sendFront } from "@/redux/features/stackOrderSlice";
 import { setCategoryToRemove } from "@/redux/features/categoryToRemove";
+import { setCanvasProperties } from "@/redux/features/canvasSlice";
+import { FrameAdjustment } from "@/components/Utils/FrameAdjustment";
+import { debounce } from "lodash";
 
 
 const ControlElement = () => {
     const [dieCutResult, setDieCutResult] = useState<string | null>(null);
-    const { paper, selectedItem, setSelectedItem, currentFtRef, setIsLoading, lastAddedElement, setLastAddedElement, elementActive, setElementActive } = usePaper();
+    const { paper, selectedItem, setSelectedItem, currentFtRef, isLoading, setIsLoading, lastAddedElement, setLastAddedElement, elementActive, setElementActive, setIsShowError } = usePaper();
 
     const materialDefault = useAppSelector(state => state.formValues.materialLastSelected);
     const stackOrder = useAppSelector(state => state.stackOrder);
     const StickerSelected = useAppSelector(state => state.sticker);
-    const ImagePreview = useAppSelector(state => state.imagePreview);
+    const History = useAppSelector((state) => state.history.objectHistories);  
     const CanvasProperties = useAppSelector(state => state.canvas);
     const CategoryToRemove = useAppSelector(state => state.categoryToRemove);
 
@@ -34,7 +37,7 @@ const ControlElement = () => {
     const [sendBackwardBTN, setSendBackwardBTN] = useState(true)
     const [isFirstLoad, setIsFirstLoad] = useState(true);
 
-    const { centerX, centerY, frameWidth, frameHeight, grow, backgroundColor } = CanvasProperties;
+    const { canvasX, canvasY, canvasWidth, canvasHeight, centerX, centerY, frameWidth, frameHeight, grow, backgroundColor } = CanvasProperties;
 
     const dispatch = useDispatch();
 
@@ -204,6 +207,7 @@ const ControlElement = () => {
                 oldFt?.unplug()
             })
             
+            setIsShowError(false)
         }
     };
 
@@ -271,53 +275,37 @@ const ControlElement = () => {
         }
     };
 
-    const extractDAttributeValue = async (svgUrl: string): Promise<string | null> => {
+    const debouncedHandleDieCut = debounce(async () => {
+        setIsLoading(true);
+        elementActive?.forEach((el: any) => {
+            el?.freeTransform?.hideHandles({ undrag: false })
+        });
+    
+        setSelectedItem(null);
+    
         try {
-            // Fetch SVG content from the Blob URL
-            const response = await fetch(svgUrl);
-            const svgString = await response.text();
-
-            // Ensure the SVG string starts with "<svg>" tag
-            const formattedSvgString = svgString.startsWith("<svg>") ? svgString : `<svg xmlns="http://www.w3.org/2000/svg"> ${svgString}</>`;
-
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(formattedSvgString, "image/svg+xml");
-
-            const pathElement = doc.querySelector('path');
-            return pathElement ? pathElement.getAttribute('d') : null;
-        } catch (error) {
-            console.error('Error parsing SVG:', error);
-            return null;
-        }
-    };
-
-    const handleDieCut = useCallback(() => {
-        async () => {
-            setIsLoading(true);
-            elementActive?.forEach((el: any) => el?.freeTransform?.hideHandles({ undrag: false }))
-            try {
-                const svgData = await paper.toSVG(centerX - frameWidth / 2, centerY - frameHeight / 2, frameWidth, frameHeight, "", true);
+            const svgData = await paper.toSVG(0, 0, paper.width, paper.height, "", true);
     
-                if (svgData) {
+            if (svgData) {
+                const modifiedSVG = await generateSVGImageData(svgData, paper.width, paper.height, grow, "white");
+                const dAttributeValue = await extractDAttributeValue(modifiedSVG);
     
-                    const modifiedSVG = await generateSVGImageData(svgData, frameWidth, frameHeight, grow, "white")
-    
-                    const dAttributeValue = await extractDAttributeValue(modifiedSVG);
-    
-                    if (dAttributeValue) {
-                        //console.log(dAttributeValue);
-    
-                        setDieCutResult(dAttributeValue)
-    
-                        setIsLoading(false);
-                    }
+                if (dAttributeValue) {
+                    createDieCut(paper, dAttributeValue, CanvasProperties)
+                    setDieCutResult(dAttributeValue);
+                    setIsLoading(false);
                 }
-            } catch (error: any) {
-                console.error('Error:', error);
             }
+        } catch (error: any) {
+            console.error('Error:', error);
         }
-    }, [elementActive, grow, setIsLoading, centerX, centerY, frameWidth, frameHeight, paper])
+    }, 300);
 
+    const handleDieCut = async () => {
+        debouncedHandleDieCut();        
+    }
+
+    // Die cut integration
     useEffect(() => {
 
         if (paper && dieCutResult && backgroundColor && materialDefault) {
@@ -328,6 +316,10 @@ const ControlElement = () => {
             paper?.forEach((element: any) => {
                 const { data } = element.data();
                 if (data === "dieCutImage") {
+                    element?.unplug?.();
+                    element?.clear?.();
+                    element?.freeTransform?.unplug?.();
+                    element?.attr?.({ href: null, src: null });
                     element.remove();
                 }
             });
@@ -341,9 +333,7 @@ const ControlElement = () => {
                 stroke: strokeColor
             })
 
-            dieCutImage.translate(dieCutX, dieCutY);
-
-            dieCutImage?.data('data', 'dieCutImage');
+            dieCutImage?.data('data', 'dieCutImage');                                                                       
 
             const selectedMaterial = materialStore.find(material => material.id === materialDefault);
             // console.log(selectedMaterial);
@@ -371,9 +361,57 @@ const ControlElement = () => {
                     // testImage.insertAfter(element);
 
                 }
-            })
+            })   
+            
+            
+            if(dieCutImage) {
+                const viewBoxModule = FrameAdjustment(paper, dieCutImage, 0, 0, paper.width, paper.height, 1,  0.65); 
+                console.log(viewBoxModule, 'llll', viewBoxModule.getViewBox());                
+                                
+                elementActive.forEach((el:any) => {
+                    el.freeTransform?.unplug()  
+                    
+                    const ft = paper?.freeTransform(el, `freeTransform stickerHandle-${el.id}`, defaultOptions, (ft: any, events: any) => {
+                                            
+                        if(events.includes("drag start")) {                                                    
+                            ft && hideFreeTransform(ft, paper)
+                        }
+        
+                        if(events.includes("drag end")) {                                                    
+                            ft && setSelectedItem(ft.subject)
+                            ft && showFreeTransform(ft)
+                        }
+                    })
+                    ft && hideFreeTransform(ft)                  
+                    // ft && showFreeTransform(ft)
+                })
+
+                // Adjust frame ratio by die cut image
+                const bbox = dieCutImage?.getBBox();
+                if(bbox) {
+                    const { x, y, width, height } = bbox;
+                    dispatch(setCanvasProperties({                       
+                        centerX: x,
+                        centerY: y,                 
+                        frameWidth: width,
+                        frameHeight: height,
+                        bredd: pixelToCm(width),
+                        hojd: pixelToCm(height)
+                    }))
+
+                    const paperCenter: { x: number, y: number } = { x: paper.width / 2, y: paper.height / 2 };
+                    const elCenter = { x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 };
+                    const translation = { x: paperCenter.x - elCenter.x, y: paperCenter.y - elCenter.y };
+                    dieCutImage.attr({ x: translation.x, y: translation.y });
+                // paper?.setViewBox(0, 0, width, height, true);
+                
+                console.log(bbox);
+                    console.log( centerX - width/2,  centerY - height/2, y, centerX, centerY);   
+                }      
+            
+            }
         }
-    }, [dieCutResult, backgroundColor, centerX, centerY, frameWidth, frameHeight, paper, materialDefault])
+    }, [dieCutResult, backgroundColor, centerX, centerY, frameWidth, frameHeight, paper, materialDefault, dispatch, elementActive, setSelectedItem])
 
 
     // useEffect(() => {
@@ -387,13 +425,12 @@ const ControlElement = () => {
     //         }
     //     });
     //     //console.log(elementActive, 'stackOrder', stackOrder);
-    // }, [paper, stackOrder, elementActive, setElementActive, lastAddedElement]);
-
+    // }, [paper, stackOrder, elementActive, setElementActive, lastAddedElement]);    
 
     useEffect(() => {
         const newStack: any = [];
         if (CategoryToRemove) {
-            // dispatch(clearStackOrder())
+            // dispatch(clearStackOrder())            
             console.log(CategoryToRemove, stackOrder);
             stackOrder?.forEach((id: any) => {
                 const element = paper?.getById(id);
@@ -412,12 +449,14 @@ const ControlElement = () => {
                 dispatch(removeStackElement(id));
 
             });
+            
             //console.log('newStack', newStack, stackOrder);
+            setIsShowError(false);
         }
         return () => {
             dispatch(setCategoryToRemove(""))
         };
-    }, [paper, stackOrder, CategoryToRemove, dispatch, setElementActive, setSelectedItem]);
+    }, [paper, stackOrder, CategoryToRemove, dispatch, setElementActive, setSelectedItem, setIsShowError]);
 
 
 
@@ -462,6 +501,54 @@ const ControlElement = () => {
             window.URL.revokeObjectURL(url);
         }
     };
+
+    // useEffect(() =>{
+    //     if(paper) {
+    //         const w= 1400;          
+    //         const h= 700;
+    //         const x = 0;
+    //         const y = 0;
+    //         const fit = true;
+    //         paper.setViewBox(x, y, w, h, fit)
+    //         paper.setSize("100%", "100%")
+    //     }
+    // })
+
+    // useEffect(() => {
+    //     if (paper && canvasWidth && canvasWidth && frameWidth && frameHeight) {
+    //         const svgWidth = canvasWidth;
+    //         const svgHeight = canvasWidth;
+            
+    //         // Calculate the target width and height for the dieCutImage (75% of paper dimensions)
+    //         const targetWidth = svgWidth * 0.75;
+    //         const targetHeight = svgHeight * 0.75;
+    
+    //         // Calculate the scale factor based on the aspect ratio of dieCutImage and target size
+    //         const scaleFactor = Math.min(targetWidth / frameWidth, targetHeight / frameHeight);
+    
+    //         // Calculate new dimensions of dieCutImage
+    //         const newWidth = frameWidth * scaleFactor;
+    //         const newHeight = frameHeight * scaleFactor;
+    
+    //         // Calculate new x and y to center dieCutImage within the paper
+    //         const newX = (svgWidth - newWidth) / 2;
+    //         const newY = (svgHeight - newHeight) / 2;
+    
+    //         // Set the viewBox to fit the resized dieCutImage in the center of the paper
+    //         paper?.setViewBox(newX, newY, newWidth, newHeight, true);
+    //        console.log('paper adjustment', newX, newY, newWidth, newHeight, true);
+    //         // paper?.setSize(newWidth, newHeight);
+    //     }
+    // }, [paper,frameWidth, frameHeight, canvasWidth, canvasHeight ]);
+
+    // useEffect(() => {
+    //     if(paper && elementActive) {
+    //         elementActive.forEach((el: any) => {
+    //             const bbox = el?.getBBox();
+    //             console.log(bbox);
+    //         })
+    //     }
+    // }, [paper, elementActive])
 
     // useEffect(() => {
     //     if (stackOrder && elementActive) {
@@ -583,7 +670,7 @@ const ControlElement = () => {
     }, [stackOrder, paper, setElementActive]);
 
     
-    useEffect(() => {
+    useEffect(() => {        
         if (elementActive.length > 0) {
             elementActive.forEach((el: any, index: number) => {
                 if (index === 0) {
@@ -593,8 +680,9 @@ const ControlElement = () => {
                     el.insertAfter(prevElement); 
                 }
                 el.show(); 
-            });
-        }
+            });                       
+        } 
+                
     }, [elementActive]);
 
     // useEffect(() => {
@@ -602,6 +690,12 @@ const ControlElement = () => {
     //         handleDieCut()
     //     }
     // }, [elementActive, stackOrder, handleDieCut]);
+
+    useEffect(() => {
+        if(selectedItem) {
+            showFreeTransform(selectedItem.freeTransform)
+        }        
+    })
 
     useEffect(() => {
         if (isFirstLoad && stackOrder.length > 0 && paper) {

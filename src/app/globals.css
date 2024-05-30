@@ -53,6 +53,11 @@ div.w-color-interactive:nth-child(1) {
     cursor: se-resize;
   } */
 
+svg {
+  width: 100%;
+  height: 100%;
+  /* border: 1px solid black; */
+}
   svg text {
     -webkit-user-select: none;
        -moz-user-select: none;

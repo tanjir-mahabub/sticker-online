@@ -2,13 +2,14 @@ import { defaultOptions, hideFreeTransform, showFreeTransform } from "@/componen
 import { usePaper } from "@/context/PaperContext";
 import { useRaphaelElements } from "@/hooks/useRaphaelElements";
 import { useTransformUtils } from "@/hooks/useTransformUtils";
+import { addedToHistory } from "@/redux/features/historySlice";
 import { addStackElement } from "@/redux/features/stackOrderSlice";
 import { useAppSelector } from "@/redux/store";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 
 const ImageElements = () => {
-    const { paper, lastAddedElement, selectedItem, setSelectedItem, setLastAddedElement, currentFtRef, isLoading } = usePaper();
+    const { paper, lastAddedElement, selectedItem, setSelectedItem, setLastAddedElement, setFTEndData, historyState } = usePaper();
     const { addImageElement } = useRaphaelElements(paper);
 
     const dispatch = useDispatch();
@@ -23,13 +24,18 @@ const ImageElements = () => {
             const paperCenter: { x: number, y: number } = { x: paper.width / 2, y: paper.height / 2 };
 
             imagePreviews.forEach((image, index) => {
+                console.log('images', image);
                 const element = addImageElement({
                     id: image.id,
                     src: image.src,
                     x: image.x || 0,
                     y: image.y || 0,
-                    width: image.width || 220,
-                    height: image.height || 180,
+                    scaleX: image.scaleX || 0,
+                    scaleY: image.scaleY || 0,
+                    rotate: image.rotate || 0,
+                    width: image.width,
+                    height: image.height,
+                    status: image.status,
                     attrs: { opacity: 1, cursor: 'move' },
                     type: (image.category === "image") ? "image" : "motiv",
                     stackNum: image.stackNum || index                   
@@ -41,8 +47,20 @@ const ImageElements = () => {
                     const translation = { x: paperCenter.x - elCenter.x, y: paperCenter.y - elCenter.y };
 
                     if(!element.x && !element.y) {
-                        element.attr({ x: translation.x, y: translation.y });
-                    }    
+                        element.attr({ x: translation.x, y: translation.y });                                               
+                    }                 
+
+                    if(!element.scaleX || !element.scaleY) {
+                        const scaleFactor = Math.min(paper.width / bbox.width, paper.height / bbox.height) * 0.70;
+                        console.log(scaleFactor);
+                        element.scale(scaleFactor, scaleFactor) 
+                    } 
+
+                    // if(!element)
+                    
+                    // console.log(element.data()); 
+                  
+                    console.log(element);                                                
 
                     element.hide()
                     
@@ -64,20 +82,82 @@ const ImageElements = () => {
                         if(events.includes("drag end")) {                            
                             // setLastAddedElement(ft.subject);
                             ft && setSelectedItem(ft.subject)
-                            ft && showFreeTransform(ft)
+                            ft && showFreeTransform(ft) 
+                            
+                            const bbox = element.getBBox();
+                            console.log(bbox, '<pre></pre>', ft);
+
+                            ft && setFTEndData({
+                                id: ft.subject.id,
+                                category: ft.subject.data().data,
+                                position: {
+                                    x: bbox.x,
+                                    y: bbox.y,
+                                    width: bbox.width,
+                                    height: bbox.height,                                      
+                                    center: ft.attrs.center,
+                                    translate: ft.attrs.translate,
+                                    scaleX: ft.attrs.scale.x,
+                                    scaleY: ft.attrs.scale.y,
+                                    rotate: ft.attrs.rotate,
+                                }
+                            })
                         }
-                    })
+
+                        if(events.includes("scale end") || events.includes("rotate end")) {
+                            const bbox = element.getBBox();
+
+                            ft && setFTEndData({
+                                id: ft.subject.id,
+                                category: ft.subject.data().data,
+                                position: {
+                                    x: bbox.x,
+                                    y: bbox.y,
+                                    width: bbox.width,
+                                    height: bbox.height,                                        
+                                    center: ft.attrs.center,                   
+                                    translate: ft.attrs.translate,     
+                                    scaleX: ft.attrs.scale.x,
+                                    scaleY: ft.attrs.scale.y,
+                                    rotate: ft.attrs.rotate,
+                                }
+                            })
+                        }
+                    })   
+                    
+                    // if(ft) {
+                    //     const bbox = element.getBBox();
+                        
+                    //     setFTEndData({
+                    //         id: ft.subject.id,
+                    //         category: ft.subject.data().data,
+                    //         position: {
+                    //             x: bbox.x,
+                    //             y: bbox.y,
+                    //             width: bbox.width,
+                    //             height: bbox.height,                                        
+                    //             center: {
+                    //                 x: bbox.cx,
+                    //                 y: bbox.cy
+                    //             },                   
+                    //             translate: ft.attrs.translate,     
+                    //             scaleX: ft.attrs.scale.x,
+                    //             scaleY: ft.attrs.scale.y,
+                    //             rotate: ft.attrs.rotate,
+                    //         }
+                    //     })
+                    // }
                                      
                     ft && hideFreeTransform(ft)      
                          
                     // setLastAddedElement(element);
                     
-                    dispatch(addStackElement(element.id))
+                    element && dispatch(addStackElement(element.id))
                     
                 }
             });
         }
-    }, [paper, setLastAddedElement, setSelectedItem, imagePreviews, addImageElement, dispatch, histories]);
+    }, [paper, setLastAddedElement, setSelectedItem, imagePreviews, addImageElement, dispatch, histories, setFTEndData]);   
 
 
     return null
