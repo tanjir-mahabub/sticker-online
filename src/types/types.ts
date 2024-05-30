@@ -47,6 +47,8 @@ export interface ExtendedRaphaelPaper {
 
 
 export interface CanvasState {
+  clientWidth: number,
+  clientHeight: number,
   canvasX: number,
   canvasY: number,
   canvasWidth: number,

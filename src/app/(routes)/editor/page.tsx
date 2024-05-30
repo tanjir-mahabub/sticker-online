@@ -10,8 +10,35 @@ import Header from "@/components/Editor/Header"
 import Footer from "@/components/Editor/Footer"
 import Sidebar from "@/components/Editor/Sidebar"
 import OverlayPopUp from "@/components/Utils/OverlayPopUp"
+import { useDispatch } from "react-redux"
+import { useEffect } from "react"
+import { setCanvasProperties } from "@/redux/features/canvasSlice"
 
 const Editor = () => {
+
+    const dispatch = useDispatch();
+    
+    useEffect(() => {
+      const setInitialCanvasDimensions = () => {
+        const clientWidth = window.innerWidth;
+        const clientHeight = window.innerHeight;
+  
+        dispatch(setCanvasProperties({ clientWidth: clientWidth, clientHeight: clientHeight }));
+        console.log("window size", clientWidth, clientHeight);
+      };
+      
+      const handleDOMContentLoaded = () => {
+        setInitialCanvasDimensions();
+      };
+  
+      document.addEventListener('DOMContentLoaded', handleDOMContentLoaded);
+      window.addEventListener('load resize', setInitialCanvasDimensions);
+  
+      return () => {
+        document.removeEventListener('DOMContentLoaded', handleDOMContentLoaded);
+        window.removeEventListener('resize', setInitialCanvasDimensions);
+      };
+    }, [dispatch]);
 
     return (
         <section>

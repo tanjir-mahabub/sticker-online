@@ -23,7 +23,7 @@ const SidebarNav = () => {
 
 
     return (
-        <div className="flex flex-col w-full justify-center divide-y divide-white/30 pb-5">
+        <div className="flex lg:flex-col bg-black w-full justify-start divide-y divide-white/30 pb-5">
             {sideNavs && sideNavs.map(nav => (
                 <div key={nav.id} className={`flex flex-col items-center 2xl:gap-1.5 pt-2.5 pb-3 px-3 cursor-pointer group ${(nav.id === selected.id) ? "bg-white" : "hover:bg-so-deep-gray/80"}`} onClick={() => sideNavDispatch(selectedSideNav({ id: nav.id }))}>
                     <div className="w-[22px]">

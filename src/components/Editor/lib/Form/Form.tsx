@@ -11,7 +11,7 @@ const Form = () => {
         <form className="">
 
             {/* Desktop Design */}
-            <div className='hidden lg:flex justify-start items-center gap-5'>
+            <div className='hidden lg:flex justify-start items-center gap-2 lg:gap-5'>
                 <DimensionInput />
 
                 <div className=''>
@@ -39,29 +39,37 @@ const Form = () => {
 
 
             {/* Mobile Design */}
-            <div className='flex lg:hidden'>
-                <DimensionInput />
+            <div className='flex lg:hidden w-full flex-col gap-3'>                            
 
-                <div>
-                    <label htmlFor="laminat" className="block text-sm 3xl:text-sm font-bold text-gray-700">
-                        Laminat
-                    </label>
-                    <LaminatingDropdown />
+                <div className='flex w-full gap-2'>
+                    <div className='w-1/2'>
+                        <label htmlFor="laminat" className="block text-xs lg:text-sm font-bold text-gray-700">
+                            Laminat
+                        </label>
+                        <LaminatingDropdown />
+                    </div>
+
+                    <div className='w-1/2'>
+                        <label htmlFor="material" className="block text-xs lg:text-sm font-bold text-gray-700">
+                            Material
+                        </label>
+                        <MaterialDropdown />
+                    </div>
+                </div>
+
+                <div className='flex gap-2'>
+                    <div className='flex gap-2 w-1/2'>
+                        <DimensionInput />
+                    </div>                    
                 </div>
 
                 <div>
-                    <label htmlFor="material" className="block text-sm 3xl:text-sm font-bold text-gray-700">
-                        Material
-                    </label>
-                    <MaterialDropdown />
-                </div>
-
-                <div>
-                    <label htmlFor="antal" className="block text-sm 3xl:text-sm font-bold text-gray-700">
-                        Antal
-                    </label>
-                    <AntalDropdown />
-
+                <div className='w-full'>
+                        <label htmlFor="antal" className="block text-xs lg:text-sm font-bold text-gray-700">
+                            Antal
+                        </label>
+                        <AntalDropdown />
+                    </div>
                 </div>
             </div>
 

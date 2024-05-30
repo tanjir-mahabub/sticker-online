@@ -1,15 +1,13 @@
 import { defaultOptions, hideFreeTransform, showFreeTransform } from "@/components/Utils/vectorFunction";
 import { usePaper } from "@/context/PaperContext";
 import { useRaphaelElements } from "@/hooks/useRaphaelElements";
-import { useTransformUtils } from "@/hooks/useTransformUtils";
-import { addedToHistory } from "@/redux/features/historySlice";
 import { addStackElement } from "@/redux/features/stackOrderSlice";
 import { useAppSelector } from "@/redux/store";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 
 const ImageElements = () => {
-    const { paper, lastAddedElement, selectedItem, setSelectedItem, setLastAddedElement, setFTEndData, historyState } = usePaper();
+    const { paper, setSelectedItem, setLastAddedElement, setFTEndData } = usePaper();
     const { addImageElement } = useRaphaelElements(paper);
 
     const dispatch = useDispatch();
@@ -123,30 +121,7 @@ const ImageElements = () => {
                                 }
                             })
                         }
-                    })   
-                    
-                    // if(ft) {
-                    //     const bbox = element.getBBox();
-                        
-                    //     setFTEndData({
-                    //         id: ft.subject.id,
-                    //         category: ft.subject.data().data,
-                    //         position: {
-                    //             x: bbox.x,
-                    //             y: bbox.y,
-                    //             width: bbox.width,
-                    //             height: bbox.height,                                        
-                    //             center: {
-                    //                 x: bbox.cx,
-                    //                 y: bbox.cy
-                    //             },                   
-                    //             translate: ft.attrs.translate,     
-                    //             scaleX: ft.attrs.scale.x,
-                    //             scaleY: ft.attrs.scale.y,
-                    //             rotate: ft.attrs.rotate,
-                    //         }
-                    //     })
-                    // }
+                    })                        
                                      
                     ft && hideFreeTransform(ft)      
                          

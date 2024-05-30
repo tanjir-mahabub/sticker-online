@@ -1,26 +1,31 @@
-import { useAppSelector } from "@/redux/store"
-import Form from "./lib/Form/Form"
-import { formattedTotalCost } from "../Utils/vectorFunction";
+import Form from "./lib/Form/Form";
+import PriceCartBtn from "./Child/PriceCartBtn";
+import SidebarNav from "./Nav/SidebarNav";
 
 const Footer = () => {
-    const calculation = useAppSelector(state => state.calculation)
-
-    const { totalCost } = calculation;
-
-
+   
     return (
-        <footer className="flex h-full items-center border-t px-7">
-            <div className="flex-auto xl:py-7 border-r border-so-black/20">
+        <>
+        {/* Desktop version */}
+        <footer className="hidden lg:flex h-fit items-center border-t px-3 xl:px-7">
+            <div className="flex-auto pr-3 py-2.5 lg:py-7 border-r border-so-black/20 text-sm">
                 <Form />
             </div>
-            <div className="w-fit 4xl:w-[20%] flex h-full xl:gap-6 justify-end items-center xl:py-7">
-                <div className="w-fit px-3">
-                    <h6 className="text-xs font-bold">Totalt</h6>
-                    <p className="text-so-orange text-lg font-bold">{formattedTotalCost(totalCost)}</p>
-                </div>
-                <button className="bg-so-orange hover:bg-so-orange/90 text-sm xl:text-base font-bold text-white px-7 py-3 rounded shadow-md shadow-so-orange/50 hover:shadow-so-orange/70 transition-all duration-300">Lägg i kundvagnen</button>
+            <div className="w-fit 4xl:w-[20%] flex h-full gap-1.5 xl:gap-6 justify-end items-center lg:py-7">
+               <PriceCartBtn />
             </div>
         </footer>
+
+        {/* Mobile version */}
+        <footer className="flex lg:hidden flex-col lg:flex-auto w-full h-fit justify-center items-center border-t px-0 xl:px-7">
+            <div className="flex flex-auto w-full py-2.5 lg:py-7 border-r border-so-black/20 text-xs">
+                <Form />
+            </div>
+            <div className="w-full 4xl:w-[20%] flex h-fit gap-1.5 xl:gap-6 justify-end items-center py-5 text-xs">
+                <SidebarNav />
+            </div>
+        </footer>
+        </>
     )
 }
 

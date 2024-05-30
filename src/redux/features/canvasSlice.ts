@@ -2,6 +2,8 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { CanvasState } from '@/types/types'; // Assuming you have a separate file for defining types
 
 const initialState: CanvasState = {
+  clientWidth: 0,
+  clientHeight: 0,
   canvasX: 0,
   canvasY: 0,
   canvasWidth: 0,

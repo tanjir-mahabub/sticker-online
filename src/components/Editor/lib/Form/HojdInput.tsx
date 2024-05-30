@@ -39,14 +39,14 @@ const HojdInput: React.FC<HojdInputProps> = ({ value, onChange, onStepUp, onStep
             <div className="absolute top-1 right-3 inset-y-0 flex flex-col justify-center items-center pl-2">
                 <button
                     type="button"
-                    className="text-so-black text-[10px] bg-gray-200 px-1.5 py-0.5"
+                    className="text-so-black text-[10px] bg-gray-200 px-[5px] py-0 leading-0"
                     onClick={onStepUp}
                 >
                     ▲
                 </button>
                 <button
                     type="button"
-                    className="text-so-black text-[10px] bg-gray-200 px-1.5 py-0.5"
+                    className="text-so-black text-[10px] bg-gray-200 px-[5px] py-0 leading-0"
                     onClick={onStepDown}
                 >
                     ▼

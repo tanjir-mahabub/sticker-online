@@ -54,14 +54,14 @@ const DimensionInput = () => {
     return (
         <>
             <div>
-                <label htmlFor="bredd" className="block text-sm 3xl:text-sm font-bold text-gray-700">
+                <label htmlFor="bredd" className="block text-xs lg:text-sm font-bold text-gray-700">
                     Bredd
                 </label>
                 <BreddInput value={bredd} onChange={setBredd} onStepUp={() => handleBreddStep(0.1)} onStepDown={() => handleBreddStep(-0.1)} />
             </div>
 
             <div>
-                <label htmlFor="hojd" className="block text-sm 3xl:text-sm font-bold text-gray-700">
+                <label htmlFor="hojd" className="block text-xs lg:text-sm font-bold text-gray-700">
                     Höjd
                 </label>
                 <HojdInput value={hojd} onChange={setHojd} onStepUp={() => handleHojdStep(0.1)} onStepDown={() => handleHojdStep(-0.1)} />
