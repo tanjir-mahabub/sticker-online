@@ -12,13 +12,13 @@ const OverlayPopUp = () => {
     if (!isVisible || !content) return null;
 
     return (
-        <div className='fixed left-0 right-0 w-full h-full flex justify-center items-center bg-black/70 z-[200] overflow-hidden'>
+        <div className='fixed left-0 right-0 w-full h-full flex justify-center items-center bg-black/70 z-[200] overflow-hidden px-3'>
             <AnimateIn
                 from="opacity-0 translate-y-4"
                 to="opacity-100 translate-y-0 translate-x-0"
                 duration={1000}
             >
-                <div className='flex flex-col gap-5 lg:gap-7 w-[500px] h-auto bg-white p-5 lg:p-7 rounded-lg'>
+                <div className='flex flex-col gap-5 lg:gap-7 lg:w-[500px] h-auto bg-white p-5 lg:p-7 rounded-lg'>
                     <div className="flex justify-between items-center">
                         <h2 className="text-sm lg:text-lg font-bold">{content.title}</h2>
                         <div onClick={() => dispatch(hidePopup())} className="cursor-pointer">

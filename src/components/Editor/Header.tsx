@@ -2,8 +2,19 @@ import Image from "next/image";
 import Link from "next/link";
 import UndoRedo from "./Child/UndoRedo";
 import PriceCartBtn from "./Child/PriceCartBtn";
+import { Tooltip } from "../Utils/ToolTips";
+import { useRouter } from "next/navigation";
 
-const Header = () => {    
+const Header = () => {
+    const router = useRouter();
+
+    const handleExitClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        e.preventDefault();
+        if (window.confirm("Are you sure you want to exit?")) {
+            router.push("/");
+        }
+    };
+
 
     return (
         <>
@@ -23,17 +34,24 @@ const Header = () => {
             </header>
 
             {/* Mobile version */}
-            <header className="flex lg:hidden items-center bg-black border-b border-black/10 shadow-sm px-1.5 sm:px-3 py-1 lg:py-3">               
+            <header className="flex lg:hidden items-center bg-black border-b border-black/10 shadow-sm px-1.5 sm:px-3 py-1 lg:py-3">
 
                 <div className="flex-auto flex justify-between items-center gap-2">
-                    <div className="flex justify-center items-center">
-                    <UndoRedo />
+
+                    <div className="flex justify-center items-center gap-2">
+                        <div className="w-full h-auto" onClick={handleExitClick}>
+                            <Tooltip message={"Exit"}>
+                                <Image className="w-full h-auto" src="/editor/icon/return.svg" alt="logo" width={100} height={100} />
+                            </Tooltip>
+                        </div>
+
+                        <UndoRedo />
                     </div>
 
                     <div className="flex justify-center items-center gap-2">
-                    <PriceCartBtn />
+                        <PriceCartBtn />
                     </div>
-                    
+
                 </div>
             </header>
 

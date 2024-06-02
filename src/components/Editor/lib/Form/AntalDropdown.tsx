@@ -48,13 +48,13 @@ const AntalDropdown: React.FC = () => {
     }, []);
 
     return (
-        <div className="relative w-full" ref={dropdownRef}>
+        <div className="lg:relative w-full" ref={dropdownRef}>
             <button
                 onClick={(e) => {
                     e.preventDefault();
                     setIsOpen(!isOpen);
                 }}
-                className="mt-1 px-3 py-3 bg-so-gray border border-gray-300 rounded-md w-full focus:outline-none focus:ring focus:border-blue-300 relative flex justify-between items-center"
+                className="mt-1 px-3 py-2 lg:py-3 bg-so-gray border border-gray-300 rounded-md w-full focus:outline-none focus:ring focus:border-blue-300 relative flex justify-between items-center"
             >
                 <div className="font-semibold w-fit min-w-[160px] cursor-pointer flex gap-1 justify-start items-center pr-5">
                     <div className='w-fit flex justify-start px-1'>
@@ -67,7 +67,7 @@ const AntalDropdown: React.FC = () => {
                 <span className={`transition transform ${isOpen ? 'rotate-180' : ''}`}><Image src={'/downArrow.svg'} alt='down-arrow' width={11} height={11} /></span>
             </button>
             {isOpen && (
-                <div className={`absolute left-0 bottom-[92px] mb-2 grid gap-4 w-[280px] bg-white border border-gray-300 divide-x rounded-md z-50 overflow-hidden`}>
+                <div className="antal-option">
                     <ul className="w-full">
                         <AntalOptions antal={antalOptions} onSelectOption={handleOptionChange} />
                     </ul>

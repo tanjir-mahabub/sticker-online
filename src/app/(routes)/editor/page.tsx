@@ -50,9 +50,11 @@ const Editor = () => {
                     <div className="h-fit">
                         <Header />
                     </div>
-                    <div className="flex overflow-hidden divide-x h-full">
+                    <div className="flex overflow-hidden lg:divide-x h-full">
                         <Sidebar />
+                        <div className="hidden lg:flex">
                         <Customize />
+                        </div>
                         <Dashboard />
                     </div>
                     <div className="h-auto">

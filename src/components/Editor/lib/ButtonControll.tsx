@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { Tooltip } from '@/components/Utils/ToolTips';
 import Image from 'next/image';
+import { useAppSelector } from '@/redux/store';
 
 interface ButtonControlProps {
     onClick: () => void;
@@ -20,23 +21,30 @@ const ButtonControl: FC<ButtonControlProps> = ({
     borderRadiusClasses = '',
     disabled,
     disabledIconFilter = 'brightness(0) invert(0.75)',
-}) => (
-    <Tooltip message={tooltip}>
-        <button
-            type='button'
-            onClick={onClick}
-            disabled={disabled}
-            className={`border ${borderClasses} ${borderRadiusClasses} flex justify-center items-center h-full px-1.5 py-2 hover:bg-so-deep-gray cursor-pointer`}
-        >
-            <Image
-                src={iconSrc}
-                width="20"
-                height="20"
-                alt="icon"
-                style={{ filter: disabled ? disabledIconFilter : 'none' }}
-            />
-        </button>
-    </Tooltip>
-);
+}) => {
+
+    const canvasProperties = useAppSelector(state => state.canvas)
+
+    const { clientWidth } = canvasProperties;
+
+    return (
+        <Tooltip message={tooltip} direction='up'>
+            <button
+                type='button'
+                onClick={onClick}
+                disabled={disabled}
+                className={`border ${borderClasses} ${borderRadiusClasses} flex justify-center items-center h-full px-1.5 py-2 hover:bg-so-deep-gray cursor-pointer`}
+            >
+                <Image
+                    src={iconSrc}
+                    width={clientWidth >= 1024 ? 20 : 14}
+                    height={clientWidth >= 1024 ? 20 : 14}
+                    alt="icon"
+                    style={{ filter: disabled ? disabledIconFilter : 'none' }}
+                />
+            </button>
+        </Tooltip>
+    )
+};
 
 export default ButtonControl;

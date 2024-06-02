@@ -70,9 +70,9 @@ const TextCustomize: React.FC = () => {
     };
 
     return (
-        <div className="w-full h-full">
-            <div className='w-full h-[92%] overflow-auto pb-10'>
-                <div className="p-4 space-y-5 overflow-y-auto">
+        <div className="w-full h-[90%] lg:h-full">
+            <div className='w-full h-[92%] pb-5 lg:pb-7 overflow-y-auto'>
+                <div className="p-4 space-y-5">
                     <h2 className="text-sm sm:text-base lg:text-lg font-bold">Lägg till text</h2>
                 </div>
 
@@ -124,19 +124,19 @@ const TextCustomize: React.FC = () => {
             </div>
 
 
-            <div className="flex justify-start items-center gap-1 border-t-2 h-[8%] px-3">
-                <div className="hover:bg-so-deep-gray h-fit cursor-pointer p-2 rounded hover:shadow-lg border" onClick={handleClearTexts}>
+
+            <div className="flex justify-start items-center gap-1 border-t-2 h-auto lg:h-[8%] p-3">
+                <div className="hover:bg-so-deep-gray cursor-pointer hover:shadow-lg" onClick={handleClearTexts}>
                     <Image
                         src="/editor/sidebar/trash.svg"
                         alt="trash-icon"
                         width={18}
                         height={18}
-                        className="max-h-24 max-w-full w-full h-auto"
+                        className="w-full h-full border rounded-sm p-2"
                     />
                 </div>
                 <p className="text-xs md:text-sm font-semibold">Ta bort alla bilder</p>
             </div>
-
         </div>
     );
 };

@@ -9,25 +9,33 @@ const SliderSection = () => {
         loop: true,
         mode: "free",
         slides: { origin: "center", perView: 4.5, spacing: 25 },
+        breakpoints: {
+            '(max-width: 500px)': {
+                slides: {
+                    perView: 2.5, 
+                    spacing: 10,
+                }
+            }
+        }
     })
 
     return (
         <>
-            <section className="my-5 w-full">
+            <section className="lg:my-5 w-full">
                 <div ref={ref} className="keen-slider">
-                    <div className="keen-slider__slide py-10">
+                    <div className="keen-slider__slide py-5 lg:py-10">
                         <Image src="/homepage/slider/1.png" alt="1" width={380} height={380} priority className="object-cover rounded-lg drop-shadow-lg w-full h-full" />
                     </div>
-                    <div className="keen-slider__slide py-10">
+                    <div className="keen-slider__slide py-5 lg:py-10">
                         <Image src="/homepage/slider/2.png" alt="2" width={380} height={380} priority className="object-cover rounded-lg drop-shadow-lg w-full h-full" />
                     </div>
-                    <div className="keen-slider__slide py-10">
+                    <div className="keen-slider__slide py-5 lg:py-10">
                         <Image src="/homepage/slider/3.png" alt="3" width={380} height={380} priority className="object-cover rounded-lg drop-shadow-lg w-full h-full" />
                     </div>
-                    <div className="keen-slider__slide py-10">
+                    <div className="keen-slider__slide py-5 lg:py-10">
                         <Image src="/homepage/slider/4.png" alt="4" width={380} height={380} priority className="object-cover rounded-lg drop-shadow-lg w-full h-full" />
                     </div>
-                    <div className="keen-slider__slide py-10">
+                    <div className="keen-slider__slide py-5 lg:py-10">
                         <Image src="/homepage/slider/5.png" alt="5" width={380} height={380} priority className="object-cover rounded-lg drop-shadow-lg w-full h-full" />
                     </div>
                 </div>

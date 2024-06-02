@@ -25,18 +25,18 @@ const HojdInput: React.FC<HojdInputProps> = ({ value, onChange, onStepUp, onStep
     };
 
     return (
-        <div className="relative w-full">
+        <div className="relative w-full lg:w-fit">
             <input
                 type="text"
                 id="hojd"
                 name="hojd"
                 placeholder="5 cm"
-                className="mt-1 px-3.5 py-3 bg-so-gray border border-gray-300 rounded-md w-28 3xl:w-36 focus:outline-none focus:ring focus:border-blue-300"
+                className="mt-1 pl-3.5 lg:px-3.5 py-3 bg-so-gray border border-gray-300 rounded-md w-full lg:w-28 3xl:w-36 focus:outline-none focus:ring focus:border-blue-300"
                 value={`${value.toFixed(1).replace('.', ',')} cm`}
                 onChange={handleChange}
                 onKeyDown={handleKeyDown}
             />
-            <div className="absolute top-1 right-3 inset-y-0 flex flex-col justify-center items-center pl-2">
+            <div className="absolute top-1 right-2 lg:right-3 inset-y-0 flex flex-col justify-center items-center pl-2">
                 <button
                     type="button"
                     className="text-so-black text-[10px] bg-gray-200 px-[5px] py-0 leading-0"

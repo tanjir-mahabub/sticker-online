@@ -22,7 +22,7 @@ import { debounce } from "lodash";
 
 const ControlElement = () => {
     const [dieCutResult, setDieCutResult] = useState<string | null>(null);
-    const { paper, selectedItem, setSelectedItem, currentFtRef, isLoading, setIsLoading, lastAddedElement, setLastAddedElement, elementActive, setElementActive, setIsShowError } = usePaper();
+    const { paper, selectedItem, setSelectedItem, currentFtRef, setIsLoading, elementActive, setElementActive, setIsShowError } = usePaper();
 
     const materialDefault = useAppSelector(state => state.formValues.materialLastSelected);
     const stackOrder = useAppSelector(state => state.stackOrder);
@@ -37,7 +37,7 @@ const ControlElement = () => {
     const [sendBackwardBTN, setSendBackwardBTN] = useState(true)
     const [isFirstLoad, setIsFirstLoad] = useState(true);
 
-    const { canvasX, canvasY, canvasWidth, canvasHeight, centerX, centerY, frameWidth, frameHeight, grow, backgroundColor } = CanvasProperties;
+    const { clientWidth, canvasX, canvasY, canvasWidth, canvasHeight, centerX, centerY, frameWidth, frameHeight, grow, backgroundColor } = CanvasProperties;
 
     const dispatch = useDispatch();
 
@@ -590,11 +590,11 @@ const ControlElement = () => {
     return (
         <>
             <div className='absolute z-50 left-0 bottom-0 w-full h-fit transition duration-500 delay-300 ease-in-out'>
-                {(StickerSelected.id) && (
-                    <div className="absolute bottom-0 left-0 w-fit mx-auto h-3 flex justify-start items-end gap-5 z-50">
+                {(StickerSelected.id ) && (
+                    <div className="absolute bottom-0 left-0 w-fit mx-auto h-3 hidden lg:flex justify-start items-end gap-5 z-50">
                         <div className="flex gap-3 p-4 space-y-3 w-60">
                             <RangeSlider minValue={20} maxValue={120} step={1} defaultValue={grow} label="Kantlinje" />
-                            <Tooltip message='Die Cut Effect'>
+                            <Tooltip message='Die Cut Effect' direction="up">
                                 <button onClick={handleDieCut} className='text-sm font-semibold bg-white hover:bg-so-deep-gray cursor-pointer border border-black/20 hover:border-black/50 shadow-sm hover:shadow-lg rounded-full px-2 pt-1 pb-1.5'>Apply</button>
                             </Tooltip>
 
@@ -605,7 +605,7 @@ const ControlElement = () => {
                 )}
 
                 {selectedItem ? (
-                    <div className="absolute bottom-2 left-0 w-full mx-auto h-3 flex justify-start items-end gap-5 z-40">
+                    <div className="absolute bottom-20 lg:bottom-2 left-0 w-full mx-auto h-3 flex justify-start items-end gap-5 z-40">
                         <div className="flex justify-center items-center w-full">
                             <div className='flex justify-center items-center bg-white shadow-sm border rounded-full'>
                                 {buttons.map((button, index) => (

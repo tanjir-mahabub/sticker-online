@@ -80,7 +80,7 @@ const Dashboard = () => {
 
 
     return (
-        <div ref={divRef} className="relative top-0 left-0 w-full overflow-hidden border-l bg-so-deep-gray">
+        <div ref={divRef} className="relative top-0 left-0 w-full h-full overflow-hidden lg:border-l bg-so-deep-gray">
             <RaphaelComponentNoSSR />
         </div>
     );
