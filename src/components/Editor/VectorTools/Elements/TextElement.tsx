@@ -1,4 +1,3 @@
-import { convertTextToPath, defaultOptions, hideFreeTransform, showFreeTransform } from "@/components/Utils/vectorFunction";
 import { usePaper } from "@/context/PaperContext";
 import { useRaphaelElements } from "@/hooks/useRaphaelElements";
 import { addStackElement } from "@/redux/features/stackOrderSlice";
@@ -132,35 +131,35 @@ const TextElement = () => {
 
                     textElement.translate(translation.x, translation.y)
                    
-                    const ft = paper?.freeTransform(textElement, `freeTransform stickerHandle-${textElement.id}`, defaultOptions, (ft: any, events: any) => {
+                    // const ft = paper?.freeTransform(textElement, `freeTransform stickerHandle-${textElement.id}`, defaultOptions, (ft: any, events: any) => {
                                         
-                        if(events.includes("drag start")) {                            
-                            // setSelectedItem(null)
-                            ft && hideFreeTransform(ft, paper)
-                        }
+                    //     if(events.includes("drag start")) {                            
+                    //         // setSelectedItem(null)
+                    //         ft && hideFreeTransform(ft, paper)
+                    //     }
 
-                        if(events.includes("drag end")) {                            
-                            // setLastAddedElement(ft.subject);
-                            ft && setSelectedItem(ft.subject)
-                            ft && showFreeTransform(ft) 
+                    //     if(events.includes("drag end")) {                            
+                    //         // setLastAddedElement(ft.subject);
+                    //         ft && setSelectedItem(ft.subject)
+                    //         ft && showFreeTransform(ft) 
                             
-                            ft && setFTEndData({
-                                id: ft.subject.id,
-                                category: ft.subject.data().data,
-                                position: {...ft.subject.freeTransform.attrs}
-                            })
-                        }
+                    //         ft && setFTEndData({
+                    //             id: ft.subject.id,
+                    //             category: ft.subject.data().data,
+                    //             position: {...ft.subject.freeTransform.attrs}
+                    //         })
+                    //     }
 
-                        if(events.includes("scale end") || events.includes("rotate end")) {
-                            ft && setFTEndData({
-                                id: ft.subject.id,
-                                category: ft.subject.data().data,
-                                position: {...ft.subject.freeTransform.attrs}
-                            })
-                        }
-                    })                    
+                    //     if(events.includes("scale end") || events.includes("rotate end")) {
+                    //         ft && setFTEndData({
+                    //             id: ft.subject.id,
+                    //             category: ft.subject.data().data,
+                    //             position: {...ft.subject.freeTransform.attrs}
+                    //         })
+                    //     }
+                    // })                    
                                      
-                    ft && hideFreeTransform(ft)      
+                    // ft && hideFreeTransform(ft)      
                          
                     // setLastAddedElement(element);
                     

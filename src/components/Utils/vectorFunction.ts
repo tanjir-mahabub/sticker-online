@@ -245,81 +245,81 @@ export const createRotatePattern = (svgElement: SVGElement) => {
     }
 }
 
-export const showFreeTransform = (ft: any) => {
-    if (ft) {
-        ft.showHandles()
-        if (ft.handles) {
-            if (ft.handles.x.line) ft.handles.x.line.hide();
+// export const showFreeTransform = (ft: any) => {
+//     if (ft) {
+//         ft.showHandles()
+//         if (ft.handles) {
+//             if (ft.handles.x.line) ft.handles.x.line.hide();
 
-            if (ft.handles.x.disc) ft.handles.x.disc.hide();
+//             if (ft.handles.x.disc) ft.handles.x.disc.hide();
 
-            if (ft.handles.center.disc) ft.handles.center.disc.node.setAttribute("pointer-events", "none")
+//             if (ft.handles.center.disc) ft.handles.center.disc.node.setAttribute("pointer-events", "none")
 
-        }
-    }
+//         }
+//     }
 
-    ft?.updateHandles();
+//     ft?.updateHandles();
 
-    ft?.apply();
-}
+//     ft?.apply();
+// }
 
-export const hideFreeTransform = (ft: any, paper?: any) => {
-    ft && ft?.hideHandles({ undrag: false })
-    if (paper) {
-        paper?.forEach((el: any) => {
-            if (el.type === "image" && el.id !== ft.subject.id) {
-                el.freeTransform && el.freeTransform.hideHandles({ undrag: false })
-            }
-        })
-    }
-}
+// export const hideFreeTransform = (ft: any, paper?: any) => {
+//     ft && ft?.hideHandles({ undrag: false })
+//     if (paper) {
+//         paper?.forEach((el: any) => {
+//             if (el.type === "image" && el.id !== ft.subject.id) {
+//                 el.freeTransform && el.freeTransform.hideHandles({ undrag: false })
+//             }
+//         })
+//     }
+// }
 
 
-export const handleFreeTransform = (ft: any, events: any) => {
-    // console.log(ft, events);          
-    if (events.includes('drag start')) {
-        ft.subject.paper.forEach((el: any) => {
-            if (el.node.classList.contains('freeTransform')) {
-                el.node.style.visibility = "hidden"
-            }
-        })
-    }
-    if (events.includes('drag end')) {
-        ft.handles.center.disc.node.style.visibility = "visible"
-        ft.handles.x.disc.node.style.visibility = "visible"
-        ft.handles.x.line.node.style.visibility = "visible"
-        ft.handles.y.disc.node.style.visibility = "visible"
-        ft.handles.y.line.node.style.visibility = "visible"
-        ft.bbox.node.style.visibility = "visible"
-        ft.handles.bbox.forEach((item: any) => {
-            item.element.node.style.visibility = "visible";
-            item.element.node.style.opacity = "0.5"
-        })
+// export const handleFreeTransform = (ft: any, events: any) => {
+//     // console.log(ft, events);          
+//     if (events.includes('drag start')) {
+//         ft.subject.paper.forEach((el: any) => {
+//             if (el.node.classList.contains('freeTransform')) {
+//                 el.node.style.visibility = "hidden"
+//             }
+//         })
+//     }
+//     if (events.includes('drag end')) {
+//         ft.handles.center.disc.node.style.visibility = "visible"
+//         ft.handles.x.disc.node.style.visibility = "visible"
+//         ft.handles.x.line.node.style.visibility = "visible"
+//         ft.handles.y.disc.node.style.visibility = "visible"
+//         ft.handles.y.line.node.style.visibility = "visible"
+//         ft.bbox.node.style.visibility = "visible"
+//         ft.handles.bbox.forEach((item: any) => {
+//             item.element.node.style.visibility = "visible";
+//             item.element.node.style.opacity = "0.5"
+//         })
 
-        // console.log('drag end from vector', ft);
-        const paper: any = ft.subject?.paper;
-        const paperCenter: { x: number, y: number } = { x: paper.width / 2, y: paper.height / 2 };
-        const bbox: any = ft.subject?.getBBox();
-        const elCenter = { x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 };
-        const translation = { x: paperCenter.x - elCenter.x, y: paperCenter.y - elCenter.y };
+//         // console.log('drag end from vector', ft);
+//         const paper: any = ft.subject?.paper;
+//         const paperCenter: { x: number, y: number } = { x: paper.width / 2, y: paper.height / 2 };
+//         const bbox: any = ft.subject?.getBBox();
+//         const elCenter = { x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 };
+//         const translation = { x: paperCenter.x - elCenter.x, y: paperCenter.y - elCenter.y };
 
-        const matrix = ft.subject?.transform();
-        console.log('ft.attrs', translation.x, translation.y);
-        let x = translation.x;
-        let y = translation.y;
+//         const matrix = ft.subject?.transform();
+//         console.log('ft.attrs', translation.x, translation.y);
+//         let x = translation.x;
+//         let y = translation.y;
 
-        return {
-            subject: ft.subject,
-            attrs: {
-                x: x,
-                y: y,
-            }
-        };
-    }
+//         return {
+//             subject: ft.subject,
+//             attrs: {
+//                 x: x,
+//                 y: y,
+//             }
+//         };
+//     }
 
-    if (events.includes('scale end') || events.includes('rotate end')) {
+//     if (events.includes('scale end') || events.includes('rotate end')) {
 
-    }
+//     }
 
     // if (events.includes('scale end') || events.includes('rotate end')) {
 
@@ -371,7 +371,7 @@ export const handleFreeTransform = (ft: any, events: any) => {
     //         }
     //     };
     // }
-}
+// }
 
 
 export const FTitemVisibility = (selectedItem: any, status: string) => {
@@ -387,3 +387,37 @@ export const FTitemVisibility = (selectedItem: any, status: string) => {
         console.log('newft', ft);
     }
 }
+
+export const calculateBoundingBox = (paper: any, set: any) => {
+    let minX = paper.width;
+    let minY = paper.height;
+    let maxX = 0;
+    let maxY = 0;
+
+    set.forEach((el: any) => {
+        const bbox = el.getBBox();
+        
+        if (bbox.x < minX) {
+            minX = bbox.x;
+        }
+        if (bbox.y < minY) {
+            minY = bbox.y;
+        }
+        if (bbox.x + bbox.width > maxX) {
+            maxX = bbox.x + bbox.width;
+        }
+        if (bbox.y + bbox.height > maxY) {
+            maxY = bbox.y + bbox.height;
+        }
+    });
+
+    const totalWidth = maxX - minX;
+    const totalHeight = maxY - minY;
+
+    return {
+        x: minX,
+        y: minY,
+        width: totalWidth,
+        height: totalHeight
+    };
+};

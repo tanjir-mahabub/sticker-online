@@ -27,7 +27,7 @@ const VectorStencil = () => {
     
     const CanvasProperties = useAppSelector(state => state.canvas);
 
-    const { canvasWidth, canvasHeight } = CanvasProperties;
+    const { clientWidth, canvasWidth, canvasHeight } = CanvasProperties;
 
     const dispatch = useDispatch();
 
@@ -42,7 +42,7 @@ const VectorStencil = () => {
     // })
 
     useEffect(() => {
-        if (!isLayoutEffectExecuted.current && typeof window !== "undefined" && raphaelRef.current && !paper && canvasWidth && canvasHeight) {
+        if (!isLayoutEffectExecuted.current && typeof window !== "undefined" && raphaelRef.current && !paper && clientWidth && canvasWidth && canvasHeight) {
             
             const paperInstance = new Raphael(raphaelRef.current, canvasWidth, canvasHeight);
             const svgElement = paperInstance.canvas;
@@ -66,7 +66,7 @@ const VectorStencil = () => {
 
             createRotatePattern(svgElement)
         }
-    }, [paper, setPaper, canvasWidth, canvasHeight]);
+    }, [paper, setPaper, clientWidth, canvasWidth, canvasHeight]);
 
     useEffect(() => {
         if(paper && (canvasWidth || canvasHeight)) {

@@ -8,9 +8,10 @@ interface RangeSliderProps {
     step: number;
     label?: string;
     defaultValue?: number;
+    handleDieCut?: () => void;
 }
 
-const RangeSlider: React.FC<RangeSliderProps> = ({ minValue, maxValue, step, label, defaultValue }) => {
+const RangeSlider: React.FC<RangeSliderProps> = ({ minValue, maxValue, step, label, defaultValue, handleDieCut }) => {
     const [value, setValue] = useState<number>(defaultValue || minValue);
     const [isSliding, setIsSliding] = useState<boolean>(false);
 
@@ -29,6 +30,12 @@ const RangeSlider: React.FC<RangeSliderProps> = ({ minValue, maxValue, step, lab
             console.log(value);
         }
     };
+
+    useEffect(() => {
+        if (defaultValue !== undefined && handleDieCut) {
+            handleDieCut();
+        }
+    }, []);
 
     return (
         <div className="flex flex-col gap-2 lg:gap-3 w-full">

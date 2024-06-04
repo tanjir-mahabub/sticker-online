@@ -1,6 +1,6 @@
-import { defaultOptions, hideFreeTransform, showFreeTransform } from "@/components/Utils/vectorFunction";
 import { usePaper } from "@/context/PaperContext";
 import { useRaphaelElements } from "@/hooks/useRaphaelElements";
+import { useTransformUtils } from "@/hooks/useTransformUtils";
 import { addStackElement } from "@/redux/features/stackOrderSlice";
 import { useAppSelector } from "@/redux/store";
 import { useEffect } from "react";
@@ -9,12 +9,12 @@ import { useDispatch } from "react-redux";
 const ImageElements = () => {
     const { paper, setSelectedItem, setLastAddedElement, setFTEndData } = usePaper();
     const { addImageElement } = useRaphaelElements(paper);
+    const { addOrRemoveTransform } = useTransformUtils();
 
     const dispatch = useDispatch();
 
     const imagePreviews = useAppSelector((state) => state.imagePreview.images);   
-    const histories = useAppSelector((state) => state.history.objectHistories);   
-    const stackOrder = useAppSelector(state => state.stackOrder);
+    const histories = useAppSelector((state) => state.history.objectHistories);           
 
 
     useEffect(() => {
@@ -54,73 +54,10 @@ const ImageElements = () => {
 
                     // if(!element)
                     
-                    // console.log(element.data());                                                               
+                        
+                    element.hide()                                                                                                                                             
 
-                    element.hide()
-                    
-                  //  console.log(element);
-                    // if(histories && element.x) {
-                    //     histories.forEach((history: any) => {
-                    //         if(history.objectId === element.id) {
-                    //             element.attr(history.history[history.historyStep])
-                    //         }
-                    //     })
-                    // }
-                    const ft = paper?.freeTransform(element, `freeTransform stickerHandle-${element.id}`, defaultOptions, (ft: any, events: any) => {
-                                                
-                        if(events.includes("drag start")) {                            
-                            // setSelectedItem(null)
-                            ft && hideFreeTransform(ft, paper)
-                        }
-
-                        if(events.includes("drag end")) {                            
-                            // setLastAddedElement(ft.subject);
-                            ft && setSelectedItem(ft.subject)
-                            ft && showFreeTransform(ft) 
-                            
-                            const bbox = element.getBBox();
-                            console.log(bbox, '<pre></pre>', ft);
-
-                            ft && setFTEndData({
-                                id: ft.subject.id,
-                                category: ft.subject.data().data,
-                                position: {
-                                    x: bbox.x,
-                                    y: bbox.y,
-                                    width: bbox.width,
-                                    height: bbox.height,                                      
-                                    center: ft.attrs.center,
-                                    translate: ft.attrs.translate,
-                                    scaleX: ft.attrs.scale.x,
-                                    scaleY: ft.attrs.scale.y,
-                                    rotate: ft.attrs.rotate,
-                                }
-                            })
-                        }
-
-                        if(events.includes("scale end") || events.includes("rotate end")) {
-                            const bbox = element.getBBox();
-                            ft && showFreeTransform(ft) 
-                            
-                            ft && setFTEndData({
-                                id: ft.subject.id,
-                                category: ft.subject.data().data,
-                                position: {
-                                    x: bbox.x,
-                                    y: bbox.y,
-                                    width: bbox.width,
-                                    height: bbox.height,                                        
-                                    center: ft.attrs.center,                   
-                                    translate: ft.attrs.translate,     
-                                    scaleX: ft.attrs.scale.x,
-                                    scaleY: ft.attrs.scale.y,
-                                    rotate: ft.attrs.rotate,
-                                }
-                            })
-                        }
-                    })                        
-                                     
-                    ft && hideFreeTransform(ft)      
+                    addOrRemoveTransform(element)
                          
                     // setLastAddedElement(element);
                     
@@ -129,7 +66,7 @@ const ImageElements = () => {
                 }
             });
         }
-    }, [paper, setLastAddedElement, setSelectedItem, imagePreviews, addImageElement, dispatch, histories, setFTEndData]);   
+    }, [paper, setLastAddedElement, setSelectedItem, imagePreviews, addImageElement, dispatch, histories, setFTEndData, addOrRemoveTransform]);   
 
 
     return null

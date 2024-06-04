@@ -3,26 +3,20 @@ import RangeSlider from "../../Customize/child/Input/RangeSlider"
 import ButtonControl from "../../lib/ButtonControl"
 import { usePaper } from "@/context/PaperContext";
 import { useDispatch } from "react-redux";
-import { deleteImage } from "@/redux/features/imagePreviewSlice";
-import { removeText } from "@/redux/features/textSlice";
 import { useEffect, useState } from "react";
-import { isElementInsideFrame } from "../elementUtils";
 import { useAppSelector } from "@/redux/store";
-import { createDieCut, extractDAttributeValue, generateSVGImageData } from "@/components/Utils/DieCutFunction";
-import { convertJpgToBase64, defaultOptions, hideFreeTransform, pixelToCm, showFreeTransform } from "@/components/Utils/vectorFunction";
-import materialStore from '@/store/materialStore';
-import { removeStackElement, sendBack, sendBackward, sendForward, sendFront } from "@/redux/features/stackOrderSlice";
+import { removeStackElement } from "@/redux/features/stackOrderSlice";
 import { setCategoryToRemove } from "@/redux/features/categoryToRemove";
-import { setCanvasProperties } from "@/redux/features/canvasSlice";
-import { FrameAdjustment } from "@/components/Utils/FrameAdjustment";
-import { debounce } from "lodash";
+import { useDieCut } from "@/hooks/useDieCut";
+import { useControlButton } from "@/hooks/useControlButton";
 
 
-const ControlElement = () => {
-    const [dieCutResult, setDieCutResult] = useState<string | null>(null);
-    const { paper, selectedItem, setSelectedItem, currentFtRef, setIsLoading, elementActive, setElementActive, setIsShowError } = usePaper();
 
-    const materialDefault = useAppSelector(state => state.formValues.materialLastSelected);
+const ControlElement = () => {    
+    const { paper, selectedItem, setSelectedItem, elementActive, setElementActive, setIsShowError } = usePaper();
+    const { handleDownloadSVG, handleDieCut } = useDieCut();
+    const { handleFlipX, handleFlipY, handleSendFront, handleSendBack, handleSendForward, handleSendBackward, handleDelete, handleCenterEL } = useControlButton();
+    
     const stackOrder = useAppSelector(state => state.stackOrder);
     const StickerSelected = useAppSelector(state => state.sticker);
     const History = useAppSelector((state) => state.history.objectHistories);  
@@ -35,34 +29,11 @@ const ControlElement = () => {
     const [sendBackwardBTN, setSendBackwardBTN] = useState(true)
     const [isFirstLoad, setIsFirstLoad] = useState(true);
 
-    const { centerX, centerY, frameWidth, frameHeight, grow, backgroundColor } = CanvasProperties;
+    const { grow } = CanvasProperties;
 
     const dispatch = useDispatch();
 
-    const handleFlipX = () => {
-        if (selectedItem && paper) {
-            const bbox = selectedItem.getBBox(true);
-            // Apply flipping by scaling
-            selectedItem.transform(`...s-1,1,${bbox.x + bbox.width / 2},${bbox.y + bbox.height / 2}`);
-            
-            const oldFt = selectedItem.freeTransform
-            oldFt.unplug()
-           
-            const ft = paper?.freeTransform(selectedItem, `freeTransform stickerHandle-${selectedItem.id}`, defaultOptions, (ft: any, events: any) => {
-                                            
-                if(events.includes("drag start")) {                                                    
-                    ft && hideFreeTransform(ft, paper)
-                }
-
-                if(events.includes("drag end")) {                                                    
-                    ft && setSelectedItem(ft.subject)
-                    ft && showFreeTransform(ft)
-                }
-            })
-            ft && hideFreeTransform(ft)                  
-            ft && showFreeTransform(ft)
-        }
-    };
+    
 /// working tomorrow
     // useEffect(() => {
     //     if(selectedItem?.freeTransform) {
@@ -75,342 +46,7 @@ const ControlElement = () => {
     //                     position: {...selectedItem.freeTransform.attrs}
     //                 }));
     //     }
-    // }, [selectedItem, dispatch])
-
-    const handleFlipY = () => {
-        if (selectedItem && paper) {
-            const bbox = selectedItem.getBBox(true);
-            selectedItem.transform(`...s1,-1,${bbox.x + bbox.width / 2},${bbox.y + bbox.height / 2}`);
-            
-            const oldFt = selectedItem.freeTransform
-            oldFt.unplug()
-           
-            const ft = paper?.freeTransform(selectedItem, `freeTransform stickerHandle-${selectedItem.id}`, defaultOptions, (ft: any, events: any) => {
-                                            
-                if(events.includes("drag start")) {                                                    
-                    ft && hideFreeTransform(ft, paper)
-                }
-
-                if(events.includes("drag end")) {                                                    
-                    ft && setSelectedItem(ft.subject)
-                    ft && showFreeTransform(ft)
-                }
-            })
-            ft && hideFreeTransform(ft)                  
-            ft && showFreeTransform(ft)
-
-        }
-    };
-
-    const handleSendFront = () => {
-        if (selectedItem && paper && stackOrder.length > 0) {
-            if (selectedItem.type !== "rect" && selectedItem.type !== "circle") {                
-                const presentItem = elementActive?.find((item: any) => item.id === selectedItem.id)
-                const currentIndex = stackOrder.indexOf(selectedItem.id);
-                console.log(currentIndex);
-                if (currentIndex < stackOrder.length - 1) {
-                    const lastElement = stackOrder[stackOrder.length - 1];
-                    const element = elementActive?.find((el: any) => el.id === lastElement)
-                    selectedItem?.insertAfter(element);                    
-                    dispatch(sendFront(selectedItem.id));
-                    // setSelectedItem(presentItem)
-                }
-            }
-        }
-    };
-
-    const handleSendBack = () => {
-        if (selectedItem && paper && stackOrder.length > 0) {
-            console.log("from send back", selectedItem, stackOrder);
-            if (selectedItem.type !== "rect" && selectedItem.type !== "circle") {                
-                const presentItem = elementActive?.find((item: any) => item.id === selectedItem.id)
-                const currentIndex = stackOrder.indexOf(selectedItem.id);                
-                console.log(currentIndex, presentItem);
-                if (currentIndex > 0) {
-                    const firstElement = stackOrder[0];
-                    const element = elementActive?.find((el: any) => el.id === firstElement);
-                    console.log('present element', presentItem);
-                    selectedItem?.insertBefore(element);
-                    dispatch(sendBack(selectedItem.id));                    
-                    // setSelectedItem(presentItem)
-                    // elementActive?.forEach((el: any) => {
-                    //     hideFreeTransform(el.freeTransform)
-                    // })
-                }
-            }
-        }
-    };
-
-    const handleSendForward = () => {
-        if (selectedItem && paper && stackOrder.length > 0) {
-            if (selectedItem.type !== "rect" && selectedItem.type !== "circle") {
-                const currentIndex = stackOrder.indexOf(selectedItem.id);
-                console.log(stackOrder[currentIndex]);
-                if (currentIndex < stackOrder.length - 1) {
-                    const nextElementId = stackOrder[currentIndex + 1];
-                    console.log(nextElementId);
-                    const nextElement = elementActive.find((el: any) => el.id === nextElementId);
-                    console.log(nextElement);
-                    if (nextElement) {
-                        selectedItem.insertAfter(nextElement);
-                        dispatch(sendForward(selectedItem.id));
-                    }
-                }
-            }
-        }
-    };
-    
-    const handleSendBackward = () => {
-        if (selectedItem && paper && stackOrder.length > 0) {
-            if (selectedItem.type !== "rect" && selectedItem.type !== "circle") {
-                const currentIndex = stackOrder.indexOf(selectedItem.id);
-                if (currentIndex > 0) {
-                    const prevElementId = stackOrder[currentIndex - 1];
-                    console.log(prevElementId);
-                    const prevElement = elementActive.find((el: any) => el.id === prevElementId);
-                    console.log(prevElement);
-                    if (prevElement) {
-                        selectedItem.insertBefore(prevElement);
-                        dispatch(sendBackward(selectedItem.id));
-                    }
-                }
-            }
-        }
-    };
-    
-
-
-    const handleDelete = () => {
-        if (selectedItem && paper) {
-            if (currentFtRef.current) {
-                currentFtRef.current.unplug(); // Proper cleanup
-            }
-
-            const { category } = selectedItem.data()
-            selectedItem.type === "image" && dispatch(deleteImage(selectedItem.id)) && dispatch(deleteHistoryById(selectedItem.id))
-            category === "text" && dispatch(removeText(selectedItem.id)) && dispatch(deleteHistoryById(selectedItem.id))
-
-            const oldFt = selectedItem.freeTransform
-            oldFt.unplug()
-
-            dispatch(removeStackElement(selectedItem.id));
-            setElementActive((prev: any) => prev.filter((item: any) => item.id !== selectedItem.id));
-
-            selectedItem.remove(); // Remove the element            
-            dispatch(deleteImage(selectedItem.id)) // delete history   
-            dispatch(deleteHistoryById(selectedItem.id)) // delete history   
-            
-            elementActive?.forEach((el: any) => {
-                const oldFt = el?.freeTransform
-                oldFt?.unplug()
-            })
-            
-            setIsShowError(false)
-        }
-    };
-
-    const centerElements = () => {
-        if (paper) {
-            const paperCenter = { x: paper.width / 2, y: paper.height / 2 };
-
-            paper.forEach((el: any) => {
-                // Check if the element has been marked as centerable
-                if (el.data('isCenterable')) {
-                    const bbox = el.getBBox();
-                    const elCenter = { x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 };
-                    const translation = { x: paperCenter.x - elCenter.x, y: paperCenter.y - elCenter.y };
-
-                    el.transform(`...T${translation.x}, ${translation.y}`);
-
-                    if (isElementInsideFrame(el, centerX, centerY, frameWidth, frameHeight)) {
-                        el.attr({ opacity: 1 })
-                        // console.log("The element is inside the frame.");
-                    } else {
-                        el.attr({ opacity: 1 }) // 0.3
-                        // console.log("The element is outside the frame.");
-                    }                    
-                }
-            });
-        }
-    };
-
-    const handleCenterEL = () => {
-        if (paper && selectedItem) {
-            const paperCenter = { x: paper.width / 2, y: paper.height / 2 };
-            const el = selectedItem;
-
-            if (el.data('isCenterable')) {
-                const bbox = el.getBBox();
-                const elCenter = { x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 };
-                const translation = { x: paperCenter.x - elCenter.x, y: paperCenter.y - elCenter.y };            
-                
-                el.transform(`...T${translation.x}, ${translation.y}`);
-
-                const oldFt = el.freeTransform
-                oldFt.unplug()
-               
-                const ft = paper?.freeTransform(el, `freeTransform stickerHandle-${el.id}`, defaultOptions, (ft: any, events: any) => {
-                                                
-                    if(events.includes("drag start")) {                                                    
-                        ft && hideFreeTransform(ft, paper)
-                    }
-
-                    if(events.includes("drag end")) {                                                    
-                        ft && setSelectedItem(ft.subject)
-                        ft && showFreeTransform(ft)
-                    }
-                })
-                ft && hideFreeTransform(ft)                  
-                ft && showFreeTransform(ft)
-                
-                // Check if the element is inside the frame and adjust opacity accordingly
-                if (isElementInsideFrame(el, centerX, centerY, frameWidth, frameHeight)) {
-                    el.attr({ opacity: 1 });
-                } else {
-                    el.attr({ opacity: 1 }); //0.3
-                }                
-            }
-        }
-    };
-
-    const debouncedHandleDieCut = debounce(async () => {
-        setIsLoading(true);
-        elementActive?.forEach((el: any) => {
-            el?.freeTransform?.hideHandles({ undrag: false })
-        });
-    
-        setSelectedItem(null);
-    
-        try {
-            const svgData = await paper.toSVG(0, 0, paper.width, paper.height, "", true);
-    
-            if (svgData) {
-                const modifiedSVG = await generateSVGImageData(svgData, paper.width, paper.height, grow, "white");
-                const dAttributeValue = await extractDAttributeValue(modifiedSVG);
-    
-                if (dAttributeValue) {
-                    createDieCut(paper, dAttributeValue, CanvasProperties)
-                    setDieCutResult(dAttributeValue);
-                    setIsLoading(false);
-                }
-            }
-        } catch (error: any) {
-            console.error('Error:', error);
-        }
-    }, 300);
-
-    const handleDieCut = async () => {
-        debouncedHandleDieCut();        
-    }
-
-    // Die cut integration
-    useEffect(() => {
-
-        if (paper && dieCutResult && backgroundColor && materialDefault) {
-            const dieCutX: number = centerX - frameWidth / 2;
-            const dieCutY: number = centerY - frameHeight / 2;
-
-            // Remove existing dieCutImage if it exists
-            paper?.forEach((element: any) => {
-                const { data } = element.data();
-                if (data === "dieCutImage") {
-                    element?.unplug?.();
-                    element?.clear?.();
-                    element?.freeTransform?.unplug?.();
-                    element?.attr?.({ href: null, src: null });
-                    element.remove();
-                }
-            });
-
-            // Create the dieCutImage using the generated SVG image data                    
-            const dieCutImage = paper.path(dieCutResult)
-
-            const strokeColor = "rgba(0,0,0,0.3)";
-
-            dieCutImage?.attr({
-                stroke: strokeColor
-            })
-
-            dieCutImage?.data('data', 'dieCutImage');                                                                       
-
-            const selectedMaterial = materialStore.find(material => material.id === materialDefault);
-            // console.log(selectedMaterial);
-
-            //pattern add
-            selectedMaterial && selectedMaterial.src ? convertJpgToBase64(selectedMaterial.src)
-                .then((base64Data) => {
-                    // console.log('Base64-encoded data:', base64Data);
-                    // Handle the base64-encoded data as needed
-                    dieCutImage.attr({ fill: `url(${base64Data})` });
-                })
-                .catch((error) => {
-                    console.error('Error converting JPG to base64:', error);
-                }) : (
-                (selectedMaterial?.value === "clear") ? dieCutImage.attr({ fill: "transparent" }) : dieCutImage.attr({ fill: backgroundColor })
-            )
-
-            paper.forEach((element: any) => {
-                const { data } = element.data();
-                const isRectOrCircle = data === "frame-rect" || data === "frame-circle";
-                const isCircle = data === "frame-circle";
-
-                if (isRectOrCircle) {
-                    dieCutImage.insertAfter(element);
-                    // testImage.insertAfter(element);
-
-                }
-            })   
-            
-            
-            if(dieCutImage) {
-                const viewBoxModule = FrameAdjustment(paper, dieCutImage, 0, 0, paper.width, paper.height, 1,  0.65); 
-                console.log(viewBoxModule, 'llll', viewBoxModule.getViewBox());                
-                                
-                elementActive.forEach((el:any) => {
-                    el.freeTransform?.unplug()  
-                    
-                    const ft = paper?.freeTransform(el, `freeTransform stickerHandle-${el.id}`, defaultOptions, (ft: any, events: any) => {
-                                            
-                        if(events.includes("drag start")) {                                                    
-                            ft && hideFreeTransform(ft, paper)
-                        }
-        
-                        if(events.includes("drag end")) {                                                    
-                            ft && setSelectedItem(ft.subject)
-                            ft && showFreeTransform(ft)
-                        }
-                    })
-                    ft && hideFreeTransform(ft)                  
-                    // ft && showFreeTransform(ft)
-                })
-
-                // Adjust frame ratio by die cut image
-                const bbox = dieCutImage?.getBBox();
-                if(bbox) {
-                    const { x, y, width, height } = bbox;
-                    dispatch(setCanvasProperties({                       
-                        centerX: x,
-                        centerY: y,                 
-                        frameWidth: width,
-                        frameHeight: height,
-                        bredd: pixelToCm(width),
-                        hojd: pixelToCm(height)
-                    }))
-
-                    const paperCenter: { x: number, y: number } = { x: paper.width / 2, y: paper.height / 2 };
-                    const elCenter = { x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 };
-                    const translation = { x: paperCenter.x - elCenter.x, y: paperCenter.y - elCenter.y };
-                    dieCutImage.attr({ x: translation.x, y: translation.y });
-                // paper?.setViewBox(0, 0, width, height, true);
-                
-                console.log(bbox);
-                    console.log( centerX - width/2,  centerY - height/2, y, centerX, centerY);   
-                }      
-            
-            }
-        }
-    }, [dieCutResult, backgroundColor, centerX, centerY, frameWidth, frameHeight, paper, materialDefault, dispatch, elementActive, setSelectedItem])
- 
+    // }, [selectedItem, dispatch])    
 
     useEffect(() => {
         const newStack: any = [];
@@ -455,39 +91,7 @@ const ControlElement = () => {
     //             dispatch(setHojdDefaultValue(dimension.height));
     //         }
 
-    /**
-     * Svg export function
-     */
-    const handleDownloadSVG = async (): Promise<void> => {        
-
-        if (paper) {
-
-            elementActive?.forEach((el: any) => el?.freeTransform?.hideHandles({ undrag: false }))
-
-            const strokeColor = "rgba(255,0,255, 1)";
-            // Proceed with SVG export and download
-            const svgData = paper.toSVG(centerX - frameWidth / 2, centerY - frameHeight / 2, frameWidth, frameHeight, strokeColor, false);
-
-            // Create a Blob from the SVG data
-            const blob = new Blob([svgData], { type: 'image/svg+xml' });
-
-            // Create a URL for the Blob
-            const url = window.URL.createObjectURL(blob);
-
-            // Create a temporary anchor element
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'image.svg'; // Set the download filename
-            document.body.appendChild(a);
-
-            // Trigger a click event on the anchor to start the download
-            a.click();
-
-            // Cleanup
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
-        }
-    };
+   
 
     
     useEffect(() =>{
@@ -556,11 +160,11 @@ const ControlElement = () => {
     //     }
     // }, [elementActive, stackOrder, handleDieCut]);
 
-    useEffect(() => {
-        if(selectedItem) {
-            showFreeTransform(selectedItem.freeTransform)
-        }        
-    })
+    // useEffect(() => {
+    //     if(selectedItem) {
+    //         showFreeTransform(selectedItem.freeTransform)
+    //     }        
+    // })
 
     useEffect(() => {
         if (isFirstLoad && stackOrder.length > 0 && paper) {
