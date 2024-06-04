@@ -7,7 +7,7 @@ const FormCustomize = () => {
                 <h2 className="text-sm md:text-base xl:text-lg font-bold">Välj bakgrundsfärg</h2>
             </div>
 
-            <div className="flex flex-wrap flex-grow justify-around items-center gap-3 px-4 pb-5 lg:pb-3">
+            <div className="flex flex-wrap flex-grow justify-around items-center gap-3 pb-5">
                 <StickerSelector />
             </div>
         </div>

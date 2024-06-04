@@ -45,7 +45,7 @@ const Form = () => {
 
 
             {/* Mobile Design */}
-            <div className='flex lg:hidden w-full flex-col gap-3'>
+            <div className='flex lg:hidden w-full flex-col gap-5 py-3'>
 
                 <div className='flex w-full gap-2 px-3'>
                     <div className='w-1/2'>

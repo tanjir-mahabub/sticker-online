@@ -11,12 +11,11 @@ import ImageElement from './Elements/ImageElement';
 import TextElement from './Elements/TextElement';
 import ControlElement from './Elements/ControlElement';
 import CleanUpElement from './Elements/CleanUpElement';
-import { useTransformUtils } from '@/hooks/useTransformUtils';
 import { useDispatch } from 'react-redux';
 import { useAppSelector } from '@/redux/store';
-import FreeTransform from './Elements/FreeTransform';
 import { setCanvasProperties } from '@/redux/features/canvasSlice';
 import HistoryControl from './Elements/HistoryControl';
+import { createRotatePattern } from '@/components/Utils/vectorFunction';
 
 const VectorStencil = () => {
     const objectHistories = useAppSelector((state) => state.history.objectHistories);
@@ -64,6 +63,8 @@ const VectorStencil = () => {
                 })
             });
             isLayoutEffectExecuted.current = true;
+
+            createRotatePattern(svgElement)
         }
     }, [paper, setPaper, canvasWidth, canvasHeight]);
 
@@ -97,8 +98,7 @@ const VectorStencil = () => {
             <TextElement />
             <ControlElement />
             <CleanUpElement />
-            <HistoryControl />
-            <FreeTransform />
+            <HistoryControl />            
         </div>
     );
 };

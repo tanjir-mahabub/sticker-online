@@ -2,8 +2,6 @@ import { useEffect } from "react";
 import { usePaper } from "@/context/PaperContext";
 import { useAppSelector } from "@/redux/store";
 import { isElementInsideFrame } from "../elementUtils";
-import { useDispatch } from "react-redux";
-import { useTransformUtils } from "@/hooks/useTransformUtils";
 
 interface CleanUpElementProps { }
 

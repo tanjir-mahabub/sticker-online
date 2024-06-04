@@ -1,7 +1,6 @@
 import { convertTextToPath, defaultOptions, hideFreeTransform, showFreeTransform } from "@/components/Utils/vectorFunction";
 import { usePaper } from "@/context/PaperContext";
 import { useRaphaelElements } from "@/hooks/useRaphaelElements";
-import { useTransformUtils } from "@/hooks/useTransformUtils";
 import { addStackElement } from "@/redux/features/stackOrderSlice";
 import { useAppSelector } from "@/redux/store";
 import { useEffect } from "react";

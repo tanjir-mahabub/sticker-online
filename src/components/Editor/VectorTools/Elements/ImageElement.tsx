@@ -21,8 +21,7 @@ const ImageElements = () => {
         if (paper) {
             const paperCenter: { x: number, y: number } = { x: paper.width / 2, y: paper.height / 2 };
 
-            imagePreviews.forEach((image, index) => {
-                console.log('images', image);
+            imagePreviews?.forEach((image, index) => {                
                 const element = addImageElement({
                     id: image.id,
                     src: image.src,
@@ -47,18 +46,15 @@ const ImageElements = () => {
                     if(!element.x && !element.y) {
                         element.attr({ x: translation.x, y: translation.y });                                               
                     }                 
-
-                    if(!element.scaleX || !element.scaleY) {
-                        const scaleFactor = Math.min(paper.width / bbox.width, paper.height / bbox.height) * 0.70;
-                        console.log(scaleFactor);
-                        element.scale(scaleFactor, scaleFactor) 
+                    if(!element.scaleX && !element.scaleY) {
+                        const scaleFactor = Math.min(paper.width / bbox.width, paper.height / bbox.height) * 0.60;                        
+                        !isNaN(scaleFactor) && scaleFactor !== Infinity && element.scale(scaleFactor, scaleFactor) 
                     } 
+
 
                     // if(!element)
                     
-                    // console.log(element.data()); 
-                  
-                    console.log(element);                                                
+                    // console.log(element.data());                                                               
 
                     element.hide()
                     
@@ -104,7 +100,8 @@ const ImageElements = () => {
 
                         if(events.includes("scale end") || events.includes("rotate end")) {
                             const bbox = element.getBBox();
-
+                            ft && showFreeTransform(ft) 
+                            
                             ft && setFTEndData({
                                 id: ft.subject.id,
                                 category: ft.subject.data().data,

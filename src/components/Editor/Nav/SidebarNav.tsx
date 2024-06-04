@@ -11,12 +11,22 @@ const SidebarNav = () => {
     const SideNavSelected = useAppSelector(state => state.sideNav);
     const [selected, setSelected] = useState<SideNavState>(SideNavSelected);
 
+    const CanvasProperties = useAppSelector(state => state.canvas);
+
+    const { clientWidth } = CanvasProperties;
+
     useEffect(() => {
         setSelected(SideNavSelected);
     }, [SideNavSelected]);
 
+    useEffect(() => {
+        if(clientWidth > 1023) {
+            sideNavDispatch(selectedSideNav({ id: 1 }));
+        }
+    }, [clientWidth, sideNavDispatch])
+
     const handleNavClick = (navId: number) => {
-        if (selected.id === navId) {
+        if (selected.id === navId && clientWidth <= 1023) {
             sideNavDispatch(selectedSideNav({ id: 0 }));
         } else {
             sideNavDispatch(selectedSideNav({ id: navId }));

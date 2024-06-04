@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import { Tooltip } from '@/components/Utils/ToolTips';
 import Image from 'next/image';
 import { useAppSelector } from '@/redux/store';
@@ -25,7 +25,7 @@ const ButtonControl: FC<ButtonControlProps> = ({
 
     const canvasProperties = useAppSelector(state => state.canvas)
 
-    const { clientWidth } = canvasProperties;
+    const { clientWidth } = canvasProperties;  
 
     return (
         <Tooltip message={tooltip} direction='up'>

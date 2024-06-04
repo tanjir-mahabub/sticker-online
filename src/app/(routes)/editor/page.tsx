@@ -20,25 +20,25 @@ const Editor = () => {
     
     useEffect(() => {
       const setInitialCanvasDimensions = () => {
-        const clientWidth = window.innerWidth;
-        const clientHeight = window.innerHeight;
-  
-        dispatch(setCanvasProperties({ clientWidth: clientWidth, clientHeight: clientHeight }));
-        console.log("window size", clientWidth, clientHeight);
+          const clientWidth = window.innerWidth;
+          const clientHeight = window.innerHeight;
+
+          dispatch(setCanvasProperties({ clientWidth, clientHeight }));
+          console.log("window size", clientWidth, clientHeight);
       };
-      
+
       const handleDOMContentLoaded = () => {
-        setInitialCanvasDimensions();
+          setInitialCanvasDimensions();
       };
-  
-      document.addEventListener('DOMContentLoaded', handleDOMContentLoaded);
-      window.addEventListener('load resize', setInitialCanvasDimensions);
-  
+
+      setInitialCanvasDimensions(); // Ensure dimensions are set on first render
+
+      window.addEventListener("resize", setInitialCanvasDimensions);
+
       return () => {
-        document.removeEventListener('DOMContentLoaded', handleDOMContentLoaded);
-        window.removeEventListener('resize', setInitialCanvasDimensions);
+          window.removeEventListener("resize", setInitialCanvasDimensions);
       };
-    }, [dispatch]);
+  }, [dispatch]);
 
     return (
         <section>

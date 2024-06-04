@@ -84,7 +84,7 @@ export const cmToPixel = (cm: number, dpi = 96) => {
 
 export const pixelToCm = (pixels: number, dpi = 96) => {
     const inches = pixels / dpi;
-    const cm = inches * 2.54;    
+    const cm = inches * 2.54;
     return Math.round(cm);
 }
 
@@ -155,15 +155,15 @@ export const svgStringToNode = (svgString: string) => {
 }
 
 export const handleFrameAdjustment = (elements: any) => {
-    if(elements) {
-        const checkValues:any = [];
+    if (elements) {
+        const checkValues: any = [];
         elements?.forEach((el: any) => {
             el?.freeTransform?.hideHandles({ undrag: false })
             const bbox = el?.getBBox();
-            checkValues.push({id: el.id, bbox: bbox})
-            
+            checkValues.push({ id: el.id, bbox: bbox })
+
         })
-        console.log(checkValues.filter((item:any) => Math.min(item.bbox.x)));
+        console.log(checkValues.filter((item: any) => Math.min(item.bbox.x)));
     }
 }
 
@@ -173,33 +173,33 @@ export const getImageQualityForPrinting = (
     actualHeightPixels: number,
     printWidthCm: number,
     printHeightCm: number
-  ): string => {
+): string => {
     const cmToInch = 2.54; // Conversion factor from centimeters to inches
     const requiredDPI = 300; // Standard print DPI
-  
+
     // Convert print size from centimeters to inches
     const printWidthInches = printWidthCm / cmToInch;
     const printHeightInches = printHeightCm / cmToInch;
-  
+
     // Calculate required dimensions in pixels for 300 DPI
     const requiredWidthPixels = printWidthInches * requiredDPI;
     const requiredHeightPixels = printHeightInches * requiredDPI;
-  
+
     let quality: string = "Unknown";
-  
+
     if (actualWidthPixels >= requiredWidthPixels && actualHeightPixels >= requiredHeightPixels) {
-      quality = "Best";
+        quality = "Best";
     } else if (actualWidthPixels >= requiredWidthPixels * 0.75 && actualHeightPixels >= requiredHeightPixels * 0.75) {
-      quality = "Average";
+        quality = "Average";
     } else {
-      quality = "Low";
+        quality = "Low";
     }
-  
+
     return quality;
-  }
-  
-  
-  
+}
+
+
+
 
 export const defaultOptions = {
     keepRatio: true,
@@ -216,58 +216,59 @@ export const defaultOptions = {
     },
 };
 
-export const showFreeTransform = (ft: any) => {
-    if(ft) {
-        ft.showHandles()
-        if(ft.handles) {
-            if (ft.handles.x.line) ft.handles.x.line.hide();
-    
-            if (ft.handles.x.disc) ft.handles.x.disc.hide();
-            
-            if (ft.handles.center.disc) ft.handles.center.disc.node.setAttribute("pointer-events", "none")
-            
+export const createRotatePattern = (svgElement: SVGElement) => {
+    const svgNS = "http://www.w3.org/2000/svg";
+
+    if (svgElement) {
+        const pattern = document.createElementNS(svgNS, "pattern");
+        // Pattern attributes
+        pattern.setAttribute("id", "rotateImageFill");
+        pattern.setAttribute("patternUnits", "objectBoundingBox");
+        pattern.setAttribute("width", "100%");
+        pattern.setAttribute("height", "100%");
+
+        const image = document.createElementNS(svgNS, "image");
+        // Image attributes
+        image.setAttributeNS("http://www.w3.org/1999/xlink", "href", "/rotateIcon.svg");
+        image.setAttribute("width", "22");
+        image.setAttribute("height", "22");
+
+        pattern.appendChild(image);
+
+        // Append pattern to defs
+        let defs = svgElement.querySelector("defs");
+        if (!defs) {
+            defs = document.createElementNS(svgNS, "defs");
+            svgElement.appendChild(defs);
         }
+        defs.appendChild(pattern);
+    }
+}
 
-        const svgNS = "http://www.w3.org/2000/svg";
-        const svgElement = document.querySelector("svg");
+export const showFreeTransform = (ft: any) => {
+    if (ft) {
+        ft.showHandles()
+        if (ft.handles) {
+            if (ft.handles.x.line) ft.handles.x.line.hide();
 
-        if (svgElement) {
-            const pattern = document.createElementNS(svgNS, "pattern");
-            // Pattern attributes
-            pattern.setAttribute("id", "rotateImageFill");
-            pattern.setAttribute("patternUnits", "objectBoundingBox");
-            pattern.setAttribute("width", "100%");
-            pattern.setAttribute("height", "100%");
+            if (ft.handles.x.disc) ft.handles.x.disc.hide();
 
-            const image = document.createElementNS(svgNS, "image");
-            // Image attributes
-            image.setAttributeNS("http://www.w3.org/1999/xlink", "href", "/rotateIcon.svg");
-            image.setAttribute("width", "22");
-            image.setAttribute("height", "22");
+            if (ft.handles.center.disc) ft.handles.center.disc.node.setAttribute("pointer-events", "none")
 
-            pattern.appendChild(image);
-
-            // Append pattern to defs
-            let defs = svgElement.querySelector("defs");
-            if (!defs) {
-                defs = document.createElementNS(svgNS, "defs");
-                svgElement.appendChild(defs);
-            }
-            defs.appendChild(pattern);
         }
     }
 
     ft?.updateHandles();
 
-    ft?.apply();    
+    ft?.apply();
 }
 
 export const hideFreeTransform = (ft: any, paper?: any) => {
-    ft && ft?.hideHandles({ undrag: false})
-    if(paper) {
+    ft && ft?.hideHandles({ undrag: false })
+    if (paper) {
         paper?.forEach((el: any) => {
-            if(el.type === "image" && el.id !== ft.subject.id) {                                    
-                el.freeTransform && el.freeTransform.hideHandles({ undrag: false})
+            if (el.type === "image" && el.id !== ft.subject.id) {
+                el.freeTransform && el.freeTransform.hideHandles({ undrag: false })
             }
         })
     }
@@ -302,26 +303,26 @@ export const handleFreeTransform = (ft: any, events: any) => {
         const elCenter = { x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 };
         const translation = { x: paperCenter.x - elCenter.x, y: paperCenter.y - elCenter.y };
 
-            const matrix = ft.subject?.transform();
-console.log('ft.attrs',translation.x, translation.y);
-             let x = translation.x;
-            let y = translation.y;
-           
-            return {
-                subject: ft.subject,
-                attrs: {
-                    x: x,
-                    y: y,                   
-                }
-            };
+        const matrix = ft.subject?.transform();
+        console.log('ft.attrs', translation.x, translation.y);
+        let x = translation.x;
+        let y = translation.y;
+
+        return {
+            subject: ft.subject,
+            attrs: {
+                x: x,
+                y: y,
+            }
+        };
     }
 
     if (events.includes('scale end') || events.includes('rotate end')) {
-        
-    }  
+
+    }
 
     // if (events.includes('scale end') || events.includes('rotate end')) {
-        
+
     //     // const paper: any = ft.subject?.paper;
     //     // const paperCenter: { x: number, y: number } = { x: paper.width / 2, y: paper.height / 2 };
     //     // const bbox: any = ft.subject?.getBBox();
@@ -331,14 +332,14 @@ console.log('ft.attrs',translation.x, translation.y);
     //     //     const matrix = ft.subject?.matrix;
 
     //     //     console.log(matrix);
-          
+
     //     //     let x = translation.x;
     //     //     let y = translation.y;
     //     //     console.log('scale---', ft);
     //     //     let scaleX = ft.attrs.scale.x;
     //     //     let scaleY = ft.attrs.scale.y;          
     //     //     let rotate = ft.attrs.scale.rotate;
-          
+
     //     //     // matrix.forEach(([operation, ...params]: any) => {
     //     //     //     switch (operation) {
     //     //     //         case "T":
@@ -358,7 +359,7 @@ console.log('ft.attrs',translation.x, translation.y);
     //     //     // Log transformation values
     //     //     // console.log(ft.subject?.id);
 
-          
+
     //         // console.log("Drag end ScaleX:", scaleX);
     //         // console.log("Drag end ScaleY:", scaleY);            
     //         // console.log("Drag end Rotate:", rotate);
@@ -375,14 +376,14 @@ console.log('ft.attrs',translation.x, translation.y);
 
 export const FTitemVisibility = (selectedItem: any, status: string) => {
     const ft = selectedItem?.freeTransform
-            if (ft && status) {
-                ft.handles.center.disc.node.style.visibility = status
-                ft.handles.x.disc.node.style.visibility = status
-                ft.handles.x.line.node.style.visibility = status
-                ft.handles.y.disc.node.style.visibility = status
-                ft.handles.y.line.node.style.visibility = status
-                ft.bbox.node.style.visibility = status
-                ft.handles.bbox.forEach((item: any) => Object.assign(item?.element?.node?.style, { visibility: status, opacity: "0.5" }));
-                console.log('newft', ft);                          
-            }    
+    if (ft && status) {
+        ft.handles.center.disc.node.style.visibility = status
+        ft.handles.x.disc.node.style.visibility = status
+        ft.handles.x.line.node.style.visibility = status
+        ft.handles.y.disc.node.style.visibility = status
+        ft.handles.y.line.node.style.visibility = status
+        ft.bbox.node.style.visibility = status
+        ft.handles.bbox.forEach((item: any) => Object.assign(item?.element?.node?.style, { visibility: status, opacity: "0.5" }));
+        console.log('newft', ft);
+    }
 }

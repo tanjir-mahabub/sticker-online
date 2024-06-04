@@ -32,7 +32,7 @@ const Customize = () => {
     const SideNavSelected = useAppSelector(state => state.sideNav);
 
     return (
-        <div className="flex w-full lg:w-[290px] 2xl:w-[370px] h-[40vh] lg:h-full overflow-auto">
+        <div className="flex w-full lg:w-[290px] 2xl:w-[400px] h-[40vh] lg:h-full overflow-auto">
             {SelectCustomizeSettings.map(settings => {
                 if (settings.id === SideNavSelected.id) {
                     return <settings.component key={settings.id} />;

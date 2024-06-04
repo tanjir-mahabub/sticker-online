@@ -1,19 +1,17 @@
 import { Tooltip } from "@/components/Utils/ToolTips"
 import RangeSlider from "../../Customize/child/Input/RangeSlider"
-import ButtonControl from "../../lib/ButtonControll"
+import ButtonControl from "../../lib/ButtonControl"
 import { usePaper } from "@/context/PaperContext";
 import { useDispatch } from "react-redux";
-import { useTransformUtils } from "@/hooks/useTransformUtils";
-import { deleteImage, updateElementAttributes } from "@/redux/features/imagePreviewSlice";
+import { deleteImage } from "@/redux/features/imagePreviewSlice";
 import { removeText } from "@/redux/features/textSlice";
-import { addedToHistory, clearAllHistories, deleteHistoryById } from "@/redux/features/historySlice";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { isElementInsideFrame } from "../elementUtils";
 import { useAppSelector } from "@/redux/store";
 import { createDieCut, extractDAttributeValue, generateSVGImageData } from "@/components/Utils/DieCutFunction";
-import { convertJpgToBase64, defaultOptions, FTitemVisibility, handleFrameAdjustment, handleFreeTransform, hideFreeTransform, pixelToCm, showFreeTransform, svgStringToNode } from "@/components/Utils/vectorFunction";
+import { convertJpgToBase64, defaultOptions, hideFreeTransform, pixelToCm, showFreeTransform } from "@/components/Utils/vectorFunction";
 import materialStore from '@/store/materialStore';
-import { addStackElement, clearStackOrder, removeStackElement, sendBack, sendBackward, sendForward, sendFront } from "@/redux/features/stackOrderSlice";
+import { removeStackElement, sendBack, sendBackward, sendForward, sendFront } from "@/redux/features/stackOrderSlice";
 import { setCategoryToRemove } from "@/redux/features/categoryToRemove";
 import { setCanvasProperties } from "@/redux/features/canvasSlice";
 import { FrameAdjustment } from "@/components/Utils/FrameAdjustment";
@@ -37,7 +35,7 @@ const ControlElement = () => {
     const [sendBackwardBTN, setSendBackwardBTN] = useState(true)
     const [isFirstLoad, setIsFirstLoad] = useState(true);
 
-    const { clientWidth, canvasX, canvasY, canvasWidth, canvasHeight, centerX, centerY, frameWidth, frameHeight, grow, backgroundColor } = CanvasProperties;
+    const { centerX, centerY, frameWidth, frameHeight, grow, backgroundColor } = CanvasProperties;
 
     const dispatch = useDispatch();
 

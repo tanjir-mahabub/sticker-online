@@ -58,23 +58,24 @@ const BilderCustomize = () => {
     };
 
     return (
-        <div className="w-full h-[85%] lg:h-full">
-            <div className="px-3 py-3 lg:pb-5 lg:p-4 space-y-5 h-full overflow-y-auto">
+        <div className="flex flex-col w-full h-full">
+            <div className="flex-auto space-y-3 h-full overflow-y-auto bg-white p-4">
                 <h2 className="text-sm md:text-base xl:text-lg font-bold">Ladda upp bild</h2>
-                <ImageUpload onImageUpload={handleImageUpload} />
-                {imagePreviews && <ImagePreview images={imagePreviews} />}
+                    <ImageUpload onImageUpload={handleImageUpload} />
+                <div className="py-3">
+                    {imagePreviews && <ImagePreview images={imagePreviews} />}
+                </div>           
             </div>
-
-            <div className="flex justify-start items-center gap-1 border-t-2 h-auto lg:h-[8%] p-3">
+            <div className="flex-auto flex justify-start items-center gap-1 h-[60px] bg-white border-t px-3">
                 <div className="hover:bg-so-deep-gray cursor-pointer hover:shadow-lg" onClick={handleDeleteBTN}>
-                    <Image
-                        src="/editor/sidebar/trash.svg"
-                        alt="trash-icon"
-                        width={18}
-                        height={100}
-                        className="w-full h-full border rounded-sm p-2"
-                        priority
-                    />
+                            <Image
+                                src="/editor/sidebar/trash.svg"
+                                alt="trash-icon"
+                                width={18}
+                                height={18}
+                                className="w-fit h-fit border rounded-sm p-1"
+                                priority
+                            />
                 </div>
                 <p className="text-xs md:text-sm font-semibold">Ta bort alla bilder</p>
             </div>

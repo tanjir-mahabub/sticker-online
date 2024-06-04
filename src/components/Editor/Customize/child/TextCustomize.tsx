@@ -70,13 +70,13 @@ const TextCustomize: React.FC = () => {
     };
 
     return (
-        <div className="w-full h-[90%] lg:h-full">
-            <div className='w-full h-[92%] pb-5 lg:pb-7 overflow-y-auto'>
-                <div className="p-4 space-y-5">
+        <div className="flex flex-col w-full h-full">
+            <div className='flex-auto space-y-3 h-full overflow-y-auto bg-white p-4'>
+                <div className="space-y-3 lg:space-y-5">
                     <h2 className="text-sm sm:text-base lg:text-lg font-bold">Lägg till text</h2>
                 </div>
 
-                <div className="grid grid-cols-2 xl:grid-cols-3 justify-start items-center gap-3 px-3">
+                <div className="grid grid-cols-2 xl:grid-cols-3 justify-start items-center gap-3">
                     {customizeFonts.map(customFonts => (
                         <div key={customFonts.id} className={`${selectedFont === customFonts.id ? 'border-2 border-orange-300' : 'border-gray-300/70'} bg-so-deep-gray flex justify-center items-center w-full h-20 rounded cursor-pointer hover:shadow-md border`}
                             onClick={() => setSelectedFont(customFonts.id)}
@@ -88,7 +88,7 @@ const TextCustomize: React.FC = () => {
                     ))}
                 </div>
 
-                <div className='px-3 pt-3'>
+                <div className=''>
                     <div>
                         <TextInput
                             value={text}
@@ -125,14 +125,14 @@ const TextCustomize: React.FC = () => {
 
 
 
-            <div className="flex justify-start items-center gap-1 border-t-2 h-auto lg:h-[8%] p-3">
+            <div className="flex-auto flex justify-start items-center gap-1 h-[60px] bg-white border-t px-3">
                 <div className="hover:bg-so-deep-gray cursor-pointer hover:shadow-lg" onClick={handleClearTexts}>
                     <Image
                         src="/editor/sidebar/trash.svg"
                         alt="trash-icon"
                         width={18}
                         height={18}
-                        className="w-full h-full border rounded-sm p-2"
+                        className="w-fit h-fit border rounded-sm p-1"
                     />
                 </div>
                 <p className="text-xs md:text-sm font-semibold">Ta bort alla bilder</p>
