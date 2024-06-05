@@ -330,6 +330,15 @@ export const useControlButton = () => {
                     payload: selectedItem.id
                 });
             }
+
+            if (selectedItem.type === "motiv") {
+                dispatch(deleteImage(selectedItem.id));
+                historyDispatch({
+                    type: 'deleteHistoryById',
+                    payload: selectedItem.id
+                });
+            }
+
             if (category === "text") {
                 dispatch(removeText(selectedItem.id));
                 historyDispatch({

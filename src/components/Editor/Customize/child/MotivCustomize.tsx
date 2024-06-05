@@ -7,6 +7,7 @@ import { addImage, clearImages } from "@/redux/features/imagePreviewSlice";
 import { RootState, useAppSelector } from "@/redux/store";
 import { deleteAllHistoriesByCategory } from "@/redux/features/historySlice";
 import { generateUniqueId } from "@/components/Utils/vectorFunction";
+import { setCategoryToRemove } from "@/redux/features/categoryToRemove";
 
 const MotivCustomize = () => {
     const [selectedMotiveCategory, setSelectedMotiveCategory] = useState('Populära');
@@ -41,14 +42,25 @@ const MotivCustomize = () => {
                 const dataURL = canvas.toDataURL();
 
                 // Create a new image object with the data URL
-                const newImage = {
-                    id: generateUniqueId(),
-                    src: dataURL,
-                    category: 'motiv',
-                };
-
-                // Dispatch the new image to the store
-                dispatch(addImage(newImage));
+                if(img) {
+                    const newImage = {
+                        id: generateUniqueId(),
+                        src: dataURL,
+                        category: 'motiv',                     
+                        width: img.width * 0.7 || 200,
+                        height: img.height * 0.7 || 200,
+                        scaleX: 0,
+                        scaleY: 0,
+                        rotate: 0,                        
+                        status: "SD",
+                        attrs: { opacity: 1, cursor: 'move' },
+                        type: "motiv",
+                        stackNum: 0
+                    };
+    
+                    // Dispatch the new image to the store
+                    dispatch(addImage(newImage));
+                }
             } else {
                 console.error('Unable to get canvas context');
             }
@@ -56,8 +68,9 @@ const MotivCustomize = () => {
     };
 
 
+    
     const handleDeleteBTN = () => {
-
+        dispatch(setCategoryToRemove("motiv"))
         dispatch(clearImages("motiv"));
         dispatch(deleteAllHistoriesByCategory("motiv"))
     };
