@@ -1,4 +1,8 @@
+import { pixelToCm } from "@/components/Utils/vectorFunction";
+import { setCanvasProperties } from "@/redux/features/canvasSlice";
 import { useAppSelector } from "@/redux/store";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
 
 interface FrameProps {
 
@@ -7,15 +11,33 @@ interface FrameProps {
 const VectorFrame: React.FC<FrameProps> = ({ }) => {
 
     const CanvasProperties = useAppSelector(state => state.canvas);
-    const { centerX, centerY, frameWidth, frameHeight, bredd, hojd } = CanvasProperties;
+    const { canvasWidth, canvasHeight, centerX, centerY, frameWidth, frameHeight, bredd, hojd } = CanvasProperties;
+
+    const dispatch = useDispatch()
+
+    useEffect(() => {        
+        if(canvasWidth && canvasHeight && frameWidth && frameHeight) {
+            console.log('vector frame', frameWidth, frameHeight);
+            console.log('vector frame', bredd, hojd);
+            dispatch(setCanvasProperties({
+                bredd: pixelToCm(frameWidth), 
+                hojd: pixelToCm(frameHeight)
+            }))
+        }
+    }, [dispatch, canvasWidth, canvasHeight, frameWidth, frameHeight, bredd, hojd])
+
+    // useEffect(() => {
+    //     console.log('vector frame', frameWidth, frameHeight);
+    //     console.log('vector frame', bredd, hojd);
+    // })
 
     return (
         <div className="relative flex justify-center h-full transition">
             <div
                 className="absolute h-3 flex justify-center items-center border-x border-gray-800/20 -my-[35px] transition-all duration-300"
                 style={{
-                    top: `${centerY - frameHeight / 2}px`,
-                    left: `${centerX - frameWidth / 2}px`,
+                    top: `${canvasHeight / 2 - frameHeight / 2}px`,
+                    left: `${canvasWidth /2 - frameWidth / 2}px`,
                     width: `${frameWidth}px`,
                 }}
             >
@@ -27,8 +49,8 @@ const VectorFrame: React.FC<FrameProps> = ({ }) => {
 
             <div className="absolute flex justify-center items-center border-gray-800/20 border-r mx-[30px] transition-all duration-300"
                 style={{
-                    top: `${centerY - frameHeight / 2}px`,
-                    left: `${centerX - frameWidth / 2}px`,
+                    top: `${canvasHeight / 2 - frameHeight / 2}px`,
+                    left: `${canvasWidth /2 - frameWidth / 2}px`,
                     width: `${frameWidth}px`,
                     height: `${frameHeight}px`,
                 }}>

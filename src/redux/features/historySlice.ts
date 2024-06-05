@@ -3,15 +3,35 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 interface Position {
   x?: number;
   y?: number;
+  center?:{
+    x: number,
+    y: number
+  };
+  scale?:{
+    x: number,
+    y: number
+  };
+  translate?:{
+    x: number,
+    y: number
+  };
+  size?:{
+    x: number,
+    y: number
+  };
+  ratio: number;
+  rotate?: number;
   width?: number;
   height?: number;
   scaleX?: number;
   scaleY?: number;
-  rotation?: number;
+  matrix?: any;
+  color?: string;
+  backgoundColor?: string;
 }
 
 interface ObjectHistory {
-  objectId: string; 
+  id: string; 
   category: string; 
   history: Position[];
   historyStep: number;
@@ -29,9 +49,9 @@ const historySlice = createSlice({
   name: 'history',
   initialState,
   reducers: {
-    addedToHistory: (state, action: PayloadAction<{ objectId: string; category: string, position: Position }>) => {
-      const { objectId, category, position } = action.payload;
-      const objectHistoryIndex = state.objectHistories.findIndex((obj) => obj.objectId === objectId);
+    addedToHistory: (state, action: PayloadAction<{ id: string; category: string, position: Position }>) => {
+      const { id, category, position } = action.payload;
+      const objectHistoryIndex = state.objectHistories.findIndex((obj) => obj.id === id);
       if (objectHistoryIndex !== -1) {
         const objectHistory = state.objectHistories[objectHistoryIndex];
         state.objectHistories[objectHistoryIndex] = {
@@ -41,7 +61,7 @@ const historySlice = createSlice({
         };
       } else {
         state.objectHistories.push({
-          objectId,
+          id,
           category,
           history: [position],
           historyStep: 0,
@@ -49,23 +69,23 @@ const historySlice = createSlice({
       }
     },
     undo: (state, action: PayloadAction<string>) => {
-      const objectId = action.payload;
-      const objectHistoryIndex = state.objectHistories.findIndex((obj) => obj.objectId === objectId);
+      const id = action.payload;
+      const objectHistoryIndex = state.objectHistories.findIndex((obj) => obj.id === id);
       if (objectHistoryIndex !== -1 && state.objectHistories[objectHistoryIndex].historyStep > 0) {
         state.objectHistories[objectHistoryIndex].historyStep -= 1;
       }
     },
     redo: (state, action: PayloadAction<string>) => {
-      const objectId = action.payload;
-      const objectHistoryIndex = state.objectHistories.findIndex((obj) => obj.objectId === objectId);
+      const id = action.payload;
+      const objectHistoryIndex = state.objectHistories.findIndex((obj) => obj.id === id);
       const objectHistory = state.objectHistories[objectHistoryIndex];
       if (objectHistoryIndex !== -1 && objectHistory.historyStep < objectHistory.history.length - 1) {
         state.objectHistories[objectHistoryIndex].historyStep += 1;
       }
     },
     deleteHistoryById: (state, action: PayloadAction<string>) => {
-      const objectIdToDelete = action.payload;
-      state.objectHistories = state.objectHistories.filter(obj => obj.objectId !== objectIdToDelete);
+      const idToDelete = action.payload;
+      state.objectHistories = state.objectHistories.filter(obj => obj.id !== idToDelete);
     },
 
     deleteAllHistoriesByCategory: (state, action: PayloadAction<string>) => {

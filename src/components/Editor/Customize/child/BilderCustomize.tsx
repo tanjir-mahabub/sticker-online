@@ -6,12 +6,12 @@ import { RootState, useAppSelector } from "@/redux/store";
 import Image from "next/image";
 import { deleteAllHistoriesByCategory } from "@/redux/features/historySlice";
 import { generateUniqueId } from "@/components/Utils/vectorFunction";
+import { setCategoryToRemove } from "@/redux/features/categoryToRemove";
 
 const BilderCustomize = () => {
     const dispatch = useDispatch();
 
-    const CanvasProperties = useAppSelector(state => state.canvas);
-    const { centerX, centerY, frameWidth, frameHeight } = CanvasProperties;
+    const CanvasProperties = useAppSelector(state => state.canvas);    
 
     const imagePreviews = useAppSelector((state: RootState) => state.imagePreview.images);
 
@@ -23,15 +23,25 @@ const BilderCustomize = () => {
                 if (typeof imageDataUrl === "string") {
                     const image = new window.Image();
                     image.onload = () => {
-                        const aspectRatio = image.naturalWidth / image.naturalHeight;
-                        const width = 280;
-                        const height = width / aspectRatio;
+                        const width = image.naturalWidth;
+                        const height = image.naturalHeight;                        
+                        
+                        let status = "";
+                        if (width >= 1920 && height >= 1080) {
+                            status = "HD";
+                        } else if (width >= 1280 && height >= 720) {
+                            status = "SD";
+                        } else {
+                            status = "Low";
+                        }
+
                         dispatch(addImage({
                             id: generateUniqueId(),
                             src: imageDataUrl,
                             width: width,
-                            height: height,
+                            height: height,                            
                             category: 'image',
+                            status: status
                         }));
                     };
                     image.src = imageDataUrl;
@@ -42,28 +52,30 @@ const BilderCustomize = () => {
     };
 
     const handleDeleteBTN = () => {
+        dispatch(setCategoryToRemove("image"))
         dispatch(clearImages("image"));
         dispatch(deleteAllHistoriesByCategory("image"))
     };
 
     return (
-        <div className="w-full h-[100%]">
-            <div className="p-4 space-y-5 h-[92%] overflow-y-auto">
+        <div className="flex flex-col w-full h-full">
+            <div className="flex-auto space-y-3 h-full overflow-y-auto bg-white p-4">
                 <h2 className="text-sm md:text-base xl:text-lg font-bold">Ladda upp bild</h2>
-                <ImageUpload onImageUpload={handleImageUpload} />
-                {imagePreviews && <ImagePreview images={imagePreviews} />}
+                    <ImageUpload onImageUpload={handleImageUpload} />
+                <div className="py-3">
+                    {imagePreviews && <ImagePreview images={imagePreviews} />}
+                </div>           
             </div>
-
-            <div className="flex justify-start items-center gap-1 border-t-2 h-[8%] px-3">
-                <div className="hover:bg-so-deep-gray cursor-pointer p-2 rounded hover:shadow-lg border" onClick={handleDeleteBTN}>
-                    <Image
-                        src="/editor/sidebar/trash.svg"
-                        alt="trash-icon"
-                        width={18}
-                        height={100}
-                        className="max-h-24 max-w-full w-full h-auto"
-                        priority
-                    />
+            <div className="flex-auto flex justify-start items-center gap-1 h-[60px] bg-white border-t px-3">
+                <div className="hover:bg-so-deep-gray cursor-pointer hover:shadow-lg" onClick={handleDeleteBTN}>
+                            <Image
+                                src="/editor/sidebar/trash.svg"
+                                alt="trash-icon"
+                                width={18}
+                                height={18}
+                                className="w-fit h-fit border rounded-sm p-1"
+                                priority
+                            />
                 </div>
                 <p className="text-xs md:text-sm font-semibold">Ta bort alla bilder</p>
             </div>

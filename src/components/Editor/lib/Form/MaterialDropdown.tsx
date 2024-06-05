@@ -59,10 +59,10 @@ const MaterialDropdown: React.FC = () => {
 
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+    }, []);  
 
     return (
-        <div className="relative w-full" ref={dropdownRef}>
+        <div className="lg:relative w-full" ref={dropdownRef}>
             <button
                 onClick={(e) => {
                     e.preventDefault();
@@ -74,7 +74,7 @@ const MaterialDropdown: React.FC = () => {
                 <span className={`transition transform ${isOpen ? 'rotate-180' : ''}`}><Image src={'/downArrow.svg'} alt='down-arrow' width={11} height={11} /></span>
             </button>
             {isOpen && (
-                <div className={`absolute left-0 bottom-[92px] mb-2 w-[600px] bg-white border border-gray-300 divide-x rounded-md z-50 grid grid-cols-2 overflow-hidden`}>
+                <div className="material-option">
                     <ul className="w-full">
                         <MaterialOptions materials={firstHalfOptions} onSelectOption={handleOptionChange} />
                     </ul>

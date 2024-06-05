@@ -2,10 +2,10 @@ import Image from "next/image"
 
 const GuideSection = () => {
     return (
-        <section className="my-10">
+        <section className="my-5 lg:my-10 px-3">
             <div className="relative">
 
-                <Image src="/homepage/waterdrop.svg" alt="waterdrop" width={60} height={100} className="absolute -top-[18px] -right-[18px] z-20 w-[65px] h-auto" />
+                <Image src="/homepage/waterdrop.svg" alt="waterdrop" width={60} height={100} className="absolute -top-[18px] -right-[10px] lg:-right-[18px] z-20 w-[65px] h-auto" />
 
                 <div className="overflow-hidden rounded-lg relative">
                     <Image src="/homepage/guide.png" alt="guide" width={750} height={100} priority className="rounded-lg w-full h-auto" />

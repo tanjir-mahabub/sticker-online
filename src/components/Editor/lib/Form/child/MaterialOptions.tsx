@@ -27,9 +27,9 @@ const MaterialOptions: React.FC<MaterialOptionsProps> = ({ materials, onSelectOp
                     to="opacity-100 translate-y-0 translate-x-0"
                     delay={50 * index}
                     duration={700}>
-                    <li key={index} className="py-1 font-semibold hover:bg-gray-100 cursor-pointer flex justify-start items-center" onClick={() => handleOptionClick(option)}>
+                    <li key={index} className="lg:py-1 font-bold hover:bg-gray-100 cursor-pointer flex justify-start items-center" onClick={() => handleOptionClick(option)}>
                         <div className='w-4/12 px-1'>
-                            <Image className='w-fit object-contain' src={option.icon} width={100} height={100} alt={option.label} />
+                            <Image className='w-fit object-contain h-20 lg:h-full' src={option.icon} width={100} height={100} alt={option.label} />
                         </div>
                         <div className='w-5/12'>
                             {option.label}

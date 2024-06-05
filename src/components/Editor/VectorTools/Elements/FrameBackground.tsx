@@ -1,5 +1,4 @@
 import { usePaper } from "@/context/PaperContext";
-import { useTransformUtils } from "@/hooks/useTransformUtils";
 import { useAppSelector } from "@/redux/store";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
@@ -12,10 +11,7 @@ const FrameBackground = () => {
 
     const StickerSelected = useAppSelector(state => state.sticker);
     const CanvasProperties = useAppSelector(state => state.canvas);
-    const { centerX, centerY, frameWidth, frameHeight, backgroundColor } = CanvasProperties;
-
-    const dispatch = useDispatch();
-    const { deselect } = useTransformUtils(dispatch, currentFtRef, setSelectedItem);
+    const { centerX, centerY, frameWidth, frameHeight, backgroundColor } = CanvasProperties;        
 
     useEffect(() => {
         if (!paper || !StickerSelected) return;
@@ -43,7 +39,7 @@ const FrameBackground = () => {
         rectEl?.animate({ x: centerX - frameWidth / 2, y: centerY - frameHeight / 2, width: frameWidth, height: frameHeight }, 300, 'easeInOut');
         circleEl?.animate({ cx: centerX, cy: centerY, r: circleRadius }, 300, 'easeInOut');
 
-    }, [paper, StickerSelected, centerX, centerY, frameWidth, frameHeight, rectEl, rectElBlank, circleEl, backgroundColor, deselect]);
+    }, [paper, StickerSelected, centerX, centerY, frameWidth, frameHeight, rectEl, rectElBlank, circleEl, backgroundColor]);
 
     useEffect(() => {
         if (!paper || !StickerSelected) return;
@@ -52,7 +48,7 @@ const FrameBackground = () => {
             const rect = paper.rect(centerX - frameWidth / 2, centerY - frameHeight / 2, frameWidth, frameHeight).attr({
                 fill: "transparent",
                 stroke: "rgba(0,0,0,0)"
-            }).toBack().click(deselect).hide();
+            }).toBack().hide();
 
             rect.data({ "data": "frame-rect" })
 
@@ -64,21 +60,21 @@ const FrameBackground = () => {
             const circle = paper.circle(centerX, centerY, circleRadius).attr({
                 fill: "white",
                 stroke: "rgba(0,0,0,0.4)"
-            }).click(deselect).hide();
+            }).hide();
 
             circle.data({ "data": "frame-circle" })
 
             const rect = paper.rect(centerX - frameWidth / 2, centerY - frameHeight / 2, frameWidth, frameHeight).attr({
                 fill: "white",
                 stroke: "rgba(0,0,0,0.4)"
-            }).toBack().click(deselect).hide();
+            }).toBack().hide();
 
             rect.data("data", "frame-rect")
 
             setCircleEl(circle);
             setRectEl(rect);
         }
-    }, [paper, deselect, centerX, centerY, frameWidth, frameHeight, circleEl, rectEl, rectElBlank, StickerSelected]);
+    }, [paper, centerX, centerY, frameWidth, frameHeight, circleEl, rectEl, rectElBlank, StickerSelected]);
 
     return null;
 }

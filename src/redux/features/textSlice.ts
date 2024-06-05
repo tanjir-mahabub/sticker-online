@@ -4,8 +4,8 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 interface TextElement {
   id: string;
   text: string;
-  x: number;
-  y: number;
+  x?: number;
+  y?: number;
   type: string;
   category: string;
   fontSize: number;

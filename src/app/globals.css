@@ -1,16 +1,15 @@
-@import url('https://fonts.googleapis.com/css2?family=Red+Hat+Display&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Ravi+Prakash&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Reenie+Beanie&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Ropa+Sans&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Russo+One&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Rock+Salt&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Rouge+Script&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Saira&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Sansita&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+  overflow-x: hidden;
+  user-select: none;
+}
+
+.so-textpath {
+  pointer-events: bounding-box;
+}
 
 div.w-color-interactive:nth-child(1) {
     height: 180px !important;
@@ -59,6 +58,11 @@ div.w-color-interactive:nth-child(1) {
     cursor: se-resize;
   } */
 
+svg {
+  width: 100%;
+  height: 100%;
+  /* border: 1px solid black; */
+}
   svg text {
     -webkit-user-select: none;
        -moz-user-select: none;
@@ -95,5 +99,40 @@ svg.radial-loader[data-mode=buffer] .radial-loader__circle {
 @keyframes rotate {
   to {
       transform: rotate(1turn)
+  }
+}
+
+.slide-down {
+  transition: height 0.3s ease-in-out;
+}
+
+.slide-up {
+  transition: height 0.3s ease-in-out;
+}
+
+
+.material-option {
+  @apply absolute left-0 bottom-[92px] mb-2 w-[600px] bg-white border border-gray-300 divide-x rounded-md z-50 grid grid-cols-2 overflow-hidden;
+}
+
+.antal-option {
+  @apply absolute left-0 bottom-[92px] mb-2 grid gap-4 w-[280px] bg-white border border-gray-300 divide-x rounded-md z-50 overflow-hidden;
+}
+
+.laminate-option {
+  @apply absolute left-0 bottom-[92px] mb-2 grid gap-4 w-[130px] bg-white border border-gray-300 divide-x rounded-md z-50 overflow-hidden;
+}
+
+@media (max-width: 1023px) {
+  .material-option {
+    @apply absolute left-0 top-[10px] w-full h-full bg-white border-t border-0 rounded-none border-gray-300 divide-x grid grid-cols-1 pb-3 overflow-y-auto;
+  }
+
+  .antal-option {
+    @apply absolute left-0 top-1 w-full h-full border-t border-0 rounded-none grid gap-4 overflow-y-auto pb-3;
+  }
+
+  .laminate-option {
+    @apply absolute left-0 top-1 w-full h-full border-t border-0 rounded-none grid gap-4 overflow-y-auto pb-3;
   }
 }

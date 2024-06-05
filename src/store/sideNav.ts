@@ -1,6 +1,11 @@
 
 export const SideNavStore = [
     {
+        id: 0,
+        name: "No Selection",
+        icon: "None"
+    },
+    {
         id: 1,
         name: "Bilder",
         icon: "/editor/icon/upload-cloud.svg"

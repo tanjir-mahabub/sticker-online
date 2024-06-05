@@ -63,9 +63,9 @@ const MotivCustomize = () => {
     };
 
     return (
-        <div className="h-full">
-            <div className="w-full h-[92%]">
-                <div className="p-4 space-y-3 lg:space-y-5 overflow-y-auto">
+        <div className="flex flex-col w-full h-full">
+            <div className="flex-auto space-y-3 h-full overflow-y-auto bg-white p-4">
+                <div className="space-y-3 lg:space-y-5">
                     <h2 className="text-sm md:text-base xl:text-lg font-bold">Lägg till motiv</h2>
                     <div>
                         <label htmlFor="Kategori" className="block text-xs lg:text-sm font-bold text-gray-700">
@@ -75,20 +75,20 @@ const MotivCustomize = () => {
                     </div>
                 </div>
 
-                <div className="flex flex-wrap flex-grow justify-start items-center gap-3 px-3">
+                <div className="flex flex-wrap flex-grow justify-start items-start h-fit gap-3">
                     {motiveStore.map(motiv => (
                         motiv.category === selectedMotiveCategory && motiv.icons.map((icon, idx) => (
-                            <div key={idx} className="bg-so-deep-gray flex justify-center items-center w-20 h-20 rounded cursor-pointer hover:shadow-md border border-gray-300/70" onClick={() => handleMotivClick(icon)}>
-                                <Image src={icon} width={42} height={42} alt={`icon-${idx}`} />
+                            <div key={idx} className="bg-so-deep-gray flex justify-center items-center w-[70px] h-16 rounded cursor-pointer hover:shadow-md border border-gray-300/70" onClick={() => handleMotivClick(icon)}>
+                                <Image src={icon} width={36} height={36} alt={`icon-${idx}`} />
                             </div>
                         ))
                     ))}
                 </div>
             </div>
 
-            <div className="flex justify-start items-center gap-1 border-t-2 h-[8%] p-3">
-                <div className="hover:bg-so-deep-gray cursor-pointer p-2 rounded hover:shadow-lg border" onClick={handleDeleteBTN}>
-                    <Image src="/editor/sidebar/trash.svg" alt="trash-icon" width={18} height={100} className="max-h-24 max-w-full w-full h-auto" />
+            <div className="flex-auto flex justify-start items-center gap-1 h-[60px] bg-white border-t px-3">
+                <div className="hover:bg-so-deep-gray cursor-pointer hover:shadow-lg"  onClick={handleDeleteBTN}>
+                    <Image src="/editor/sidebar/trash.svg" alt="trash-icon" width={18} height={18} className="w-fit h-fit border rounded-sm p-1" />
                 </div>
                 <p className="text-xs lg:text-sm font-semibold">Ta bort alla motiv</p>
             </div>

@@ -67,7 +67,7 @@ const LaminatingDropdown: React.FC = () => {
     return (
 
 
-        <div className="relative w-full" ref={dropdownRef}>
+        <div className="lg:relative w-full" ref={dropdownRef}>
             <button
                 onClick={(e) => {
                     e.preventDefault();
@@ -81,7 +81,7 @@ const LaminatingDropdown: React.FC = () => {
                 <span className={`transition transform ${isOpen ? 'rotate-180' : ''}`}><Image src={'/downArrow.svg'} alt='down-arrow' width={11} height={11} /></span>
             </button>
             {isOpen && (
-                <div className={`absolute left-0 bottom-[92px] mb-2 grid gap-4 w-[130px] bg-white border border-gray-300 divide-x rounded-md z-50 overflow-hidden`}>
+                <div className="laminate-option">
                     <ul className="w-full">
                         <LaminatingOptions laminatings={laminatOptions} onSelectOption={handleOptionChange} /> {/* Pass laminatOptions */}
                     </ul>

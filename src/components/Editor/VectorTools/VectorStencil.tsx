@@ -1,36 +1,54 @@
 import Raphael from 'raphael';
 import '@/lib/raphael.export';
 import '@/lib/raphael.free_transform';
+import '@/lib/raphael.group';
 import { usePaper } from "@/context/PaperContext";
 import { useEffect, useRef, useState } from "react";
-import VectorFrame from './CanvasFrame';
+import VectorFrame from './VectorFrame';
 import Spinner from '@/components/Utils/Spinner';
 import FrameBackground from './Elements/FrameBackground';
 import ImageElement from './Elements/ImageElement';
 import TextElement from './Elements/TextElement';
 import ControlElement from './Elements/ControlElement';
 import CleanUpElement from './Elements/CleanUpElement';
-import { useTransformUtils } from '@/hooks/useTransformUtils';
 import { useDispatch } from 'react-redux';
+import { useAppSelector } from '@/redux/store';
+import { setCanvasProperties } from '@/redux/features/canvasSlice';
+import HistoryControl from './Elements/HistoryControl';
+import { createRotatePattern } from '@/components/Utils/vectorFunction';
 
 const VectorStencil = () => {
-    const { paper, currentFtRef, setSelectedItem, setPaper, isLoading } = usePaper();
+    const objectHistories = useAppSelector((state) => state.history.objectHistories);
+
+    const { paper, currentFtRef, selectedItem, setSelectedItem, setPaper, isLoading } = usePaper();
     const raphaelRef = useRef<HTMLDivElement | null>(null);
     const [StickerWrapper, setStickerWrapper] = useState<HTMLDivElement | null>(null);
     const isLayoutEffectExecuted = useRef(false);
+    
+    const CanvasProperties = useAppSelector(state => state.canvas);
+
+    const { clientWidth, canvasWidth, canvasHeight } = CanvasProperties;
 
     const dispatch = useDispatch();
-    const { deselect } = useTransformUtils(dispatch, currentFtRef, setSelectedItem);
+
+    // useEffect(() => {
+    //     if (!isLayoutEffectExecuted.current && typeof window !== "undefined" && raphaelRef.current) {           
+            
+    //         dispatch(setCanvasProperties({
+    //             canvasWidth: canvasWidth,
+    //             canvasHeight: canvasHeight
+    //         }))
+    //     }
+    // })
 
     useEffect(() => {
-        if (!isLayoutEffectExecuted.current && typeof window !== "undefined" && raphaelRef.current && !paper) {
-            const width = raphaelRef.current.clientWidth;
-            const height = raphaelRef.current.clientHeight;
-            const paperInstance = new Raphael(raphaelRef.current, width, height);
+        if (!isLayoutEffectExecuted.current && typeof window !== "undefined" && raphaelRef.current && !paper && clientWidth && canvasWidth && canvasHeight) {
+            
+            const paperInstance = new Raphael(raphaelRef.current, canvasWidth, canvasHeight);
             const svgElement = paperInstance.canvas;
             svgElement.id = "VECTORSVGId";
 
-            const StickerMainWrapper = paperInstance.rect(0, 0, width, height).attr({
+            const StickerMainWrapper = paperInstance.rect(0, 0, canvasWidth, canvasHeight).attr({
                 fill: "transparent",
                 stroke: "none"
             });
@@ -38,10 +56,37 @@ const VectorStencil = () => {
             setPaper(paperInstance);
             setStickerWrapper(StickerMainWrapper);
 
-            StickerMainWrapper.click(deselect);
+            StickerMainWrapper.click(() => {
+                paper?.forEach((el: any) => {
+                    el?.freeTransform?.unplug();
+                    console.log('clicked');
+                })
+            });
             isLayoutEffectExecuted.current = true;
+
+            createRotatePattern(svgElement)
         }
-    }, [paper, setPaper, deselect]);
+    }, [paper, setPaper, clientWidth, canvasWidth, canvasHeight]);
+
+    useEffect(() => {
+        if(paper && (canvasWidth || canvasHeight)) {
+            paper.setViewBox(0,0,canvasWidth, canvasHeight, false)
+            // paper.setSize("100%", "100%")
+            console.log('stencil', canvasWidth, canvasHeight)
+        }
+    }, [paper, canvasWidth, canvasHeight])
+
+
+    // useEffect(() => {
+    //     if (objectHistories[0]?.objectId && paper) {
+    //         paper.forEach((el: any) => {
+    //             if (objectHistories[0].objectId === el.id) {
+    //                 console.log(objectHistories[0].history[objectHistories[0].historyStep]);
+    //             }
+    //         })
+    //     }
+    // }, [objectHistories, paper])   
+
 
     return (
         <div className="relative w-full h-full">
@@ -53,6 +98,7 @@ const VectorStencil = () => {
             <TextElement />
             <ControlElement />
             <CleanUpElement />
+            <HistoryControl />            
         </div>
     );
 };

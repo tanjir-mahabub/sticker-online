@@ -1,77 +1,68 @@
-import { redo, undo } from "@/redux/features/historySlice";
-import { RootState, useAppSelector } from "@/redux/store";
-import Image from "next/image"
-import Link from "next/link"
-import { useEffect, useState } from 'react';
-import { useDispatch } from "react-redux";
+import Image from "next/image";
+import Link from "next/link";
+import UndoRedo from "./Child/UndoRedo";
+import PriceCartBtn from "./Child/PriceCartBtn";
+import { Tooltip } from "../Utils/ToolTips";
+import { useRouter } from "next/navigation";
+import { usePaper } from "@/context/PaperContext";
 
 const Header = () => {
-    const [isDisabledUndo, setDisabledUndo] = useState(false);
-    const [isDisabledRedo, setDisabledRedo] = useState(false);
+    const router = useRouter();
+    const { ftEndData, historyDispatch } = usePaper();
 
-    const dispatch = useDispatch();
-    const objectHistories = useAppSelector((state: RootState) => state.history.objectHistories);
-
-    const handleUndo = () => {
-        objectHistories?.forEach((objectHistory) => {
-            dispatch(undo(objectHistory.objectId));
-        });
-    };
-
-    const handleRedo = () => {
-        objectHistories?.forEach((objectHistory) => {
-            dispatch(redo(objectHistory.objectId));
-        });
-    };
-
-
-    useEffect(() => {
-
-        if (objectHistories) {
-
-            const canUndo = objectHistories?.some((objectHistory) => objectHistory.historyStep > 0);
-            setDisabledUndo(!canUndo);
-
-
-            const canRedo = objectHistories?.some((objectHistory) => objectHistory.historyStep < objectHistory.history.length - 1);
-            setDisabledRedo(!canRedo);
+    const handleExitClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        e.preventDefault();
+        if (window.confirm("Are you sure you want to exit?")) {
+            router.push("/");
         }
-    }, [objectHistories]);
+    };
+
 
     return (
-        <header className="flex items-center border-b border-black/10 shadow-sm px-3 py-3">
-            <div className="flex w-40">
-                <Link href={"/"}>
-                    <div className="w-full h-auto">
-                        <Image className="w-full h-auto" src="/logo.png" alt="logo" width={130} height={100} />
+        <>
+            {/* Desktop version */}
+            <header className="hidden lg:flex items-center border-b border-black/10 shadow-sm px-3 py-3">
+                <div className="flex w-40">
+                    <Link href={"/"}>
+                        <div className="w-full h-auto">
+                            <Image className="w-full h-auto" src="/logo.png" alt="logo" width={130} height={100} />
+                        </div>
+                    </Link>
+                </div>
+
+                <div className="flex-auto flex justify-center items-center gap-2">
+                    <UndoRedo />
+                </div>
+            </header>
+
+            {/* Mobile version */}
+            <header className="flex lg:hidden items-center bg-black border-b border-black/10 shadow-sm px-1.5 sm:px-3 py-1 lg:py-3">
+
+                <div className="flex-auto flex justify-between items-center gap-2">
+
+                    <div className="flex justify-center items-center gap-2">
+                        <div className="w-full h-auto" onClick={handleExitClick}>
+                            <Tooltip message={"Exit"}>
+                                <Image className="w-full h-auto" src="/editor/icon/return.svg" alt="logo" width={100} height={100} />
+                            </Tooltip>
+                        </div>
+
+                        <UndoRedo />
                     </div>
-                </Link>
-            </div>
 
-            <div className="flex-auto flex justify-center items-center gap-2">
-                <div onClick={handleUndo} className={`group flex flex-col justify-center items-center gap-2 p-2 rounded-md cursor-pointer select-none ${isDisabledUndo ? 'opacity-50 pointer-events-none' : ''}`}>
-                    <Image
-                        src="/editor/icon/undo.svg"
-                        alt="undo-icon"
-                        width={18}
-                        height={100}
-                        className={`w-auto h-auto group-hover:filter group-hover:contrast-0 ${isDisabledUndo ? 'filter-contrast-0' : ''}`}
-                    />
-                    <span className={`text-xs ${isDisabledUndo ? 'text-gray-500' : 'group-hover:text-so-black'}`}>Undo</span>
-                </div>
-                <div onClick={handleRedo} className={`group flex flex-col justify-center items-center gap-2 p-2 rounded-md cursor-pointer select-none ${isDisabledRedo ? 'opacity-50 pointer-events-none' : ''}`}>
-                    <Image
-                        src="/editor/icon/redo.svg"
-                        alt="redo-icon"
-                        width={18}
-                        height={100}
-                        className={`w-auto h-auto group-hover:filter group-hover:contrast-0 ${isDisabledRedo ? 'filter-contrast-0' : ''}`}
-                    />
-                    <span className={`text-xs ${isDisabledRedo ? 'text-gray-500' : 'group-hover:text-so-black'}`}>Redo</span>
-                </div>
-            </div>
-        </header>
-    )
-}
+                    <div className="flex justify-center items-center gap-2">
+                        <PriceCartBtn />
+                    </div>
 
-export default Header
+                </div>
+            </header>
+
+            {/* Debugging window */}
+            {/* <div className="absolute h-[700px] overflow-auto right-0 z-[150]">
+                <pre>{JSON.stringify(ftEndData, null, 2)}</pre>
+            </div> */}
+        </>
+    );
+};
+
+export default Header;

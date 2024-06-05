@@ -222,8 +222,7 @@
 
         'text': function (node) {
 
-            var textPathData = node.data('textPath'); // Get textPath data from node
-            console.log(textPathData);
+            var textPathData = node.data('textPath'); // Get textPath data from node            
 
             if (!textPathData) {
                 console.error("textPath is empty for text element:", node);
