@@ -27,7 +27,7 @@ export const useDieCut = () => {
 
         const set = paper.set()
         elementActive?.forEach((el: any) => {
-            if(el.data().data === "image" || el.data().data === "text") {
+            if(el.data().data === "image" || el.data().data === "motiv" || el.data().data === "text") {
                 set.push(el)
             }
             el?.freeTransform?.hideHandles({ undrag: false })
