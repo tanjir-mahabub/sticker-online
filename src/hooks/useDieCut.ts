@@ -20,10 +20,14 @@ export const useDieCut = () => {
     const dispatch = useDispatch();
 
     const debouncedHandleDieCut = debounce(async () => {
-        setIsLoading(true);
+        setIsLoading(true);        
+        
+        selectedItem && setSelectedItem(null);
+        paper.forEach((el: any) => el?.freeTransform?.hideHandles({ undrag: false }))
+
         const set = paper.set()
         elementActive?.forEach((el: any) => {
-            if(el.data().data === "image" ||el.data().data === "text") {
+            if(el.data().data === "image" || el.data().data === "text") {
                 set.push(el)
             }
             el?.freeTransform?.hideHandles({ undrag: false })
@@ -32,7 +36,6 @@ export const useDieCut = () => {
        const BoundingBox = calculateBoundingBox(paper, set);
         console.log('total length', BoundingBox);
     
-        selectedItem && setSelectedItem(null);
     
         try {
             const svgData = await paper.toSVG(0, 0, paper.width, paper.height, "", true);
@@ -52,7 +55,25 @@ export const useDieCut = () => {
         }
     }, 300);
 
-    const handleDieCut = async () => {
+    const handleDieCut = async () => {        
+    //     const set = paper.set()
+    //     elementActive?.forEach((el: any) => {
+    //         if(el.data().data === "image" || el.data().data === "text") {
+    //             set.push(el)
+    //         }
+    //         el?.freeTransform?.hideHandles({ undrag: false })
+    //     });
+
+    //    const BoundingBox = calculateBoundingBox(paper, set);
+    //    const paperCenter: { x: number, y: number } = { x: paper.width / 2, y: paper.height / 2 };
+    //    const elCenter = { x: BoundingBox.x + BoundingBox.width / 2, y: BoundingBox.y + BoundingBox.height / 2 };
+    //    const translation = { x: paperCenter.x - elCenter.x, y: paperCenter.y - elCenter.y };
+
+    //    set.attr({
+    //     x: translation.x,
+    //     y: translation.y
+    //    })
+    //    console.log('total length', set, BoundingBox);
         debouncedHandleDieCut();        
     }
 

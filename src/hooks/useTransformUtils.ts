@@ -9,7 +9,8 @@ export const useTransformUtils = () => {
         if (ft.handles) {
             if (ft.handles.x?.line) ft.handles.x.line.hide();
             if (ft.handles.x?.disc) ft.handles.x.disc.hide();
-            if (ft.handles.center?.disc) ft.handles.center.disc.node.setAttribute("pointer-events", "none");
+            if(ft.handles.center?.disc) ft.handles.center.disc.node.setAttribute("cursor", "move");
+            //if (ft.handles.center?.disc) ft.handles.center.disc.node.setAttribute("pointer-events", "none");
         }
 
         ft?.updateHandles();
@@ -71,9 +72,9 @@ export const useTransformUtils = () => {
 
     useEffect(() => {
         if (selectedItem) {
-            elementActive.forEach((el: any) => {
+            elementActive?.forEach((el: any) => {
                 if (el.id !== selectedItem.id) {
-                    el.freeTransform.hideHandles({ undrag: false });
+                    el?.freeTransform?.hideHandles({ undrag: false });
                 }
             });
 
@@ -82,10 +83,12 @@ export const useTransformUtils = () => {
                 ft.showHandles();
                 ft && hideExtraHandles(ft);
             }
-        } else if (elementActive.length > 0) {
-            const lastEL = elementActive[elementActive.length - 1];
-            setSelectedItem(lastEL);
-        }
+        } 
+        
+        // if (elementActive.length > 0) {
+        //     const lastEL = elementActive[elementActive.length - 1];
+        //     setSelectedItem(lastEL);
+        // }
     }, [selectedItem, elementActive, setSelectedItem, hideExtraHandles]);
 
     return useMemo(() => ({ addOrRemoveTransform }), [addOrRemoveTransform]);

@@ -7,6 +7,10 @@ body {
   user-select: none;
 }
 
+.so-textpath {
+  pointer-events: bounding-box;
+}
+
 div.w-color-interactive:nth-child(1) {
     height: 180px !important;
     margin-bottom: 10px;

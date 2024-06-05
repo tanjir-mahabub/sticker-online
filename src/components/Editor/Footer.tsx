@@ -38,7 +38,7 @@ const Footer = () => {
         <>
             {/* Desktop version */}
             <footer className="hidden lg:flex h-fit items-center border-t px-3 xl:px-7">
-                <div className="flex-auto pr-3 py-2.5 lg:py-7 border-r border-so-black/20 text-sm">
+                <div className="flex-auto pr-3 py-2.5 lg:py-2 3xl:py-6 border-r border-so-black/20 text-sm">
                     <Form />
                 </div>
                 <div className="w-fit 4xl:w-[20%] flex h-full gap-1.5 xl:gap-6 justify-end items-center lg:py-7">
