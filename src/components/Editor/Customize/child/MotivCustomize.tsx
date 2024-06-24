@@ -46,7 +46,6 @@ const MotivCustomize = () => {
                     const newImage = {
                         id: generateUniqueId(),
                         src: dataURL,
-                        category: 'motiv',                     
                         width: img.width * 0.7 || 200,
                         height: img.height * 0.7 || 200,
                         scaleX: 0,
@@ -55,6 +54,7 @@ const MotivCustomize = () => {
                         status: "SD",
                         attrs: { opacity: 1, cursor: 'move' },
                         type: "motiv",
+                        category: 'motiv',                     
                         stackNum: 0
                     };
     

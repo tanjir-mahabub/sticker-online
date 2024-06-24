@@ -4,7 +4,7 @@ import { useAppSelector } from '@/redux/store';
 import { useDispatch } from 'react-redux';
 import { setCanvasProperties } from '@/redux/features/canvasSlice';
 
-const RaphaelComponentNoSSR = dynamic(() => import('@/components/Editor/VectorTools/Vector'), {
+const RaphaelComponentNoSSR = dynamic(() => import('@/components/Editor/CanvasTools/FabricCanvas'), {
     ssr: false, // This line disables server-side rendering
 });
 

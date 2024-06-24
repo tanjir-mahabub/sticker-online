@@ -13,6 +13,7 @@ import OverlayPopUp from "@/components/Utils/OverlayPopUp"
 import { useDispatch } from "react-redux"
 import { useEffect } from "react"
 import { setCanvasProperties } from "@/redux/features/canvasSlice"
+import { CanvasProvider } from "@/context/CanvasContext"
 
 const Editor = () => {
 
@@ -45,7 +46,7 @@ const Editor = () => {
             <Script src="https://d3js.org/d3.v7.min.js" strategy="lazyOnload" />
             <Script src="https://unpkg.com/opentype.js/dist/opentype.min.js" strategy="lazyOnload" />
 
-            <PaperProvider>
+            <CanvasProvider>
                 <div className="flex flex-col overflow-hidden w-full h-screen">
                     <div className="h-fit">
                         <Header />
@@ -63,7 +64,7 @@ const Editor = () => {
 
                     <OverlayPopUp />
                 </div>
-            </PaperProvider>
+            </CanvasProvider>
         </section>
     )
 }

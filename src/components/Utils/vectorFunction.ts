@@ -4,20 +4,21 @@ import { Frame, ObjectPosition } from '@/types/types';
 
 const pathDataCache = new Map();
 
-export function convertTextToPath(element: any): Promise<void> {
+export function convertTextToPath(element: any): Promise<string> {
     // Check if path data for this text element is already cached
     if (pathDataCache.has(element.id)) {
         // Return the cached path data
         return Promise.resolve(pathDataCache.get(element.id));
     }
 
-    return new Promise<void>((resolve) => {
+    return new Promise<string>((resolve) => {
         if (element.type === "text") {
             const fontFamily = element.fontFamily;
+            console.log('checking.....');
 
             opentype?.load(fontMapping[fontFamily], (err: any, font: any) => {
                 if (err) {
-                    resolve();
+                    console.log('Something wrongs in convert text to path.', err);                    
                     return;
                 }
 
@@ -41,8 +42,6 @@ export function convertTextToPath(element: any): Promise<void> {
                 // Resolve with the path data
                 resolve(pathData);
             });
-        } else {
-            resolve();
         }
     });
 }

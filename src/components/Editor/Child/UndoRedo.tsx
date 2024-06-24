@@ -1,3 +1,4 @@
+import { useCanvas } from "@/context/CanvasContext";
 import { usePaper } from "@/context/PaperContext";
 import { useAppSelector } from "@/redux/store";
 import Image from "next/image";
@@ -7,89 +8,15 @@ import { useDispatch } from "react-redux";
 const UndoRedo = () => {
     const canvasProperties = useAppSelector(state => state.canvas);
     const { clientWidth, clientHeight } = canvasProperties;
-
-    const { paper, elementActive, selectedItem, historyState, historyDispatch } = usePaper();
+    
+    const { undo, redo } = useCanvas();
+    
     const [isDisabledUndo, setDisabledUndo] = useState(false);
     const [isDisabledRedo, setDisabledRedo] = useState(false);
 
     const [responsiveTasks, setResponsiveTasks] = useState({
         color: "#121212"
-    })
-
-    const dispatch = useDispatch();
-
-    const applyHistoryState = useCallback((itemSelected: any) => {
-        if (historyState && itemSelected) {
-            const filteredHistory = historyState.objectHistories.find(history => history.id === itemSelected.id);
-            const step = filteredHistory?.historyStep;
-            const history = filteredHistory?.history;
-
-            if (history && step !== undefined) {
-                if (itemSelected) {
-                    console.log('from header', history[step], history[step].rotate);
-                    const elem = paper.getById(itemSelected.id)
-                    if (elem) {
-
-                        // console.log(elem);
-                        const ft = elem.freeTransform;
-                        // ft.unplug()
-                        // console.log(ft);                                                                                                                                          
-
-                        ft.attrs.x = history[step]?.x
-                        ft.attrs.y = history[step]?.y
-                        ft.attrs.translate = history[step]?.translate
-                        ft.attrs.center = history[step]?.center
-
-                        ft.attrs.rotate = history[step].rotate
-                        ft.attrs.scale.x = history[step]?.scaleX
-                        ft.attrs.scale.y = history[step]?.scaleY
-                        ft.updateHandles()
-                        ft.apply()
-                        // elem.freeTransform.attrs = {...history[step]}
-                    }
-                }
-            } else {
-                console.log('empty reached');
-            }
-        }
-    }, [historyState, paper]);
-
-
-    const handleUndo = useCallback(() => {
-        if (selectedItem) {
-            historyDispatch({ type: "undo", payload: selectedItem.id });
-            // applyHistoryState(selectedItem)
-        }
-    }, [selectedItem, historyDispatch]);
-
-    const handleRedo = useCallback(() => {
-        if (selectedItem) {
-            historyDispatch({ type: "redo", payload: selectedItem.id });
-            // applyHistoryState(selectedItem)
-        }
-    }, [selectedItem, historyDispatch]);
-
-    const canUndo = useMemo(() => {
-        return historyState.objectHistories?.some((objectHistory) => objectHistory.historyStep > 0);
-    }, [historyState.objectHistories]);
-
-    const canRedo = useMemo(() => {
-        return historyState.objectHistories?.some((objectHistory) => objectHistory.historyStep < objectHistory.history.length - 1);
-    }, [historyState.objectHistories]);
-
-    useEffect(() => {
-        setDisabledUndo(!canUndo);
-    }, [canUndo]);
-
-    useEffect(() => {
-        setDisabledRedo(!canRedo);
-    }, [canRedo]);
-
-    useEffect(() => {
-        if (selectedItem) {
-            applyHistoryState(selectedItem);
-        }
-    }, [selectedItem, applyHistoryState]);
+    });  
 
     useEffect(() => {
         if (clientWidth) {
@@ -110,7 +37,7 @@ const UndoRedo = () => {
     return (
         <>
             <div
-                onClick={handleUndo}
+                onClick={undo}
                 className={`group flex flex-col justify-center items-center gap-2 p-2 rounded-md cursor-pointer select-none ${isDisabledUndo ? 'opacity-30 pointer-events-none' : ''}`}
             >
                 <svg className="hidden lg:block group-hover:opacity-30 opacity-80" width="22" height="10" viewBox="0 0 22 10" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -127,7 +54,7 @@ const UndoRedo = () => {
                 <span className={`group-hover:opacity-30 text-xxs lg:text-xs text-white lg:text-so-black ${isDisabledUndo ? 'text-white lg:text-gray-500' : 'group-hover:text-white lg:group-hover:text-so-black'}`}>Undo</span>
             </div>
             <div
-                onClick={handleRedo}
+                onClick={redo}
                 className={`group flex flex-col justify-center items-center gap-2 p-2 rounded-md cursor-pointer select-none ${isDisabledRedo ? 'opacity-30 pointer-events-none' : ''}`}
             >
                 <svg className="hidden lg:block group-hover:opacity-30 opacity-80" width="22" height="10" viewBox="0 0 22 10" fill="none" xmlns="http://www.w3.org/2000/svg">
