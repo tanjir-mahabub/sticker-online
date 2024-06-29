@@ -1,5 +1,3 @@
-// src/eventHandlers/historyController.ts
-
 import { fabric } from 'fabric';
 
 class HistoryController {
@@ -16,7 +14,7 @@ class HistoryController {
 
   saveState() {
     const state = this.canvas.toJSON(['id']);
-    console.log(this.history);
+    // console.log(this.history);
     this.history.push(state);
     this.redoStack = [];
   }
