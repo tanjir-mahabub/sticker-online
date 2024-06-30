@@ -19,7 +19,7 @@ const ImageComponent: React.FC<ImageComponentProps> = ({ fabricCanvas, images, s
 
     useEffect(() => {      
         console.log(images);
-        if (fabricCanvas.current) {    
+        if (fabricCanvas.current && images) {    
             images.forEach((image) => {        
                 fabric.Image.fromURL(image.src, (oImg) => {
                 oImg.set({

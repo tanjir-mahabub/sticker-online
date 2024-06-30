@@ -12,8 +12,9 @@ interface ControlElementsProps {
 }
 
 const ControlElements: React.FC<ControlElementsProps> = ({ canvasRef, selected }) => {
+    
   const updateButtonStates = useCallback(() => {
-    const activeObject = canvasRef.current?.getActiveObject();
+    const activeObject = canvasRef.current?.getActiveObject();   
     if (activeObject && canvasRef.current && selected) {
       const objects = canvasRef.current.getObjects();
       const objectIndex = objects.indexOf(activeObject);
@@ -44,12 +45,14 @@ const ControlElements: React.FC<ControlElementsProps> = ({ canvasRef, selected }
     const canvas = canvasRef.current;
     if (canvas) {
       canvas.on('object:selected', updateButtonStates);
+      canvas.on('selection:updated', updateButtonStates);
       canvas.on('selection:cleared', updateButtonStates);
       canvas.on('object:modified', updateButtonStates);
     }
     return () => {
       if (canvas) {
         canvas.off('object:selected', updateButtonStates);
+        canvas.off('selection:updated', updateButtonStates);
         canvas.off('selection:cleared', updateButtonStates);
         canvas.off('object:modified', updateButtonStates);
       }
@@ -76,13 +79,13 @@ const ControlElements: React.FC<ControlElementsProps> = ({ canvasRef, selected }
       <div className='absolute z-50 left-0 bottom-0 w-full h-fit transition duration-500 delay-300 ease-in-out'>
         <div className="absolute bottom-0 left-0 w-fit mx-auto h-3 hidden lg:flex justify-start items-end gap-5 z-50">
           <div className="flex gap-3 p-4 space-y-3 w-60">
-            <RangeSlider minValue={20} maxValue={120} step={1} defaultValue={grow} label="Kantlinje" />
+            {selected && <RangeSlider minValue={20} maxValue={120} step={1} defaultValue={grow} label="Kantlinje" />}
           </div>
         </div>
         <div className="absolute bottom-20 lg:bottom-2 left-0 w-full mx-auto h-3 flex justify-start items-end gap-5 z-40">
           <div className="flex justify-center items-center w-full">
             <div className='flex justify-center items-center bg-white shadow-sm border rounded-full'>
-              {buttons.map((button, index) => (
+              {selected && buttons.map((button, index) => (
                 <ButtonControl key={index} {...button} />
               ))}
             </div>
