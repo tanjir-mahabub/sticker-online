@@ -8,11 +8,34 @@ export const createDieCut = (paper: any, pathValue: string, canvasProps: CanvasS
     console.log(paper, pathValue, canvasProps);
 }
 
-// Function to generate SVG image data URL
-export const generateSVGImageData = async (svgData: string, width: number, height: number, grow: number, backgroundColor: string): Promise<string> => {
+const getSvgDimensions = (svgData: string) => {
+    const parser = new DOMParser();
+    const svgDoc = parser.parseFromString(svgData, 'image/svg+xml');
+    const svgElement = svgDoc.documentElement;
+  
+    const widthAttr = svgElement.getAttribute('width');
+    const heightAttr = svgElement.getAttribute('height');
+  
+    const width = widthAttr ? parseFloat(widthAttr) : null;
+    const height = heightAttr ? parseFloat(heightAttr) : null;
+  
+    return { width, height };
+  };
+  
+  export const generateSVGImageData = async (
+    svgData: string,
+    grow: number,
+    backgroundColor: string
+  ): Promise<string> => {
+    const { width, height } = getSvgDimensions(svgData);
+  
+    if (width === null || height === null) {
+      throw new Error('Invalid SVG dimensions');
+    }
+  
     const modifiedSVG = await svgModification(svgData, width, height, grow, backgroundColor, backgroundColor);
     return createDataURL(modifiedSVG, width, height, grow, backgroundColor);
-};
+  };
 
 // Function to modify SVG
 const svgModification = async (svg: string, newWidth: number, newHeight: number, grow: number, backgroundColor: string, strokeColor: string): Promise<SVGSVGElement> => {
@@ -35,7 +58,7 @@ const svgModification = async (svg: string, newWidth: number, newHeight: number,
 
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = 'high';
-            console.log('diecut test', newWidth, newHeight);
+            console.log('diecut test', newWidth, newHeight, 'grow', grow);
             ctx.drawImage(img, 0, 0, newWidth, newHeight);
             const imageData = ctx.getImageData(0, 0, newWidth, newHeight);
             const pixels = imageData.data;

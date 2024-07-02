@@ -1,6 +1,7 @@
 import { setCanvasProperties } from '@/redux/features/canvasSlice';
-import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useEffect, useState, useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
 
 interface RangeSliderProps {
     minValue: number;
@@ -12,10 +13,12 @@ interface RangeSliderProps {
 }
 
 const RangeSlider: React.FC<RangeSliderProps> = ({ minValue, maxValue, step, label, defaultValue, handleDieCut }) => {
+    const dispatch = useDispatch();
+    const grow = useSelector((state: RootState) => state.canvas.grow);
+
     const [value, setValue] = useState<number>(defaultValue || minValue);
     const [isSliding, setIsSliding] = useState<boolean>(false);
-
-    const dispatch = useDispatch();
+    const initialRender = useRef(true); // Ref to track the initial render
 
     const handleRangeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setValue(+e.target.value);
@@ -23,19 +26,33 @@ const RangeSlider: React.FC<RangeSliderProps> = ({ minValue, maxValue, step, lab
     };
 
     const handleRangeChangeEnd = () => {
-        if (isSliding) {
+        if (isSliding && value) {
             setIsSliding(false);
             // Dispatch the action when the user has finished sliding
             dispatch(setCanvasProperties({ grow: value }));
             console.log(value);
+            handleDieCut && handleDieCut()
         }
     };
 
-    useEffect(() => {
-        if (defaultValue !== undefined && handleDieCut) {
-            handleDieCut();
-        }
-    }, []);
+    // Run handleDieCut if defaultValue changes and is defined
+    // useEffect(() => {
+    //     if (defaultValue !== undefined && handleDieCut) {
+    //         handleDieCut();
+    //     }
+    // }, [defaultValue, handleDieCut]);
+
+    // // Run handleDieCut when grow value changes
+    // useEffect(() => {
+    //     if (initialRender.current) {
+    //         initialRender.current = false; // Skip the first render
+    //     } else {
+    //         if (handleDieCut) {
+    //             console.log('running', grow);
+    //             handleDieCut();
+    //         }
+    //     }
+    // }, [grow, handleDieCut]);
 
     return (
         <div className="flex flex-col gap-2 lg:gap-3 w-full">
@@ -64,7 +81,7 @@ const RangeSlider: React.FC<RangeSliderProps> = ({ minValue, maxValue, step, lab
                 input[type="range"]::-webkit-slider-thumb {
                     -webkit-appearance: none !important;
                     width: 24px;
-                    height:24px;
+                    height: 24px;
                     background: white;
                     border: 5px solid #F98332;
                     border-radius: 50%;

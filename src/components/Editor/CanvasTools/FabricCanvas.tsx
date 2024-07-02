@@ -41,7 +41,7 @@ const FabricCanvas: React.FC = () => {
   }, [fabricCanvasRef, handleMouseDown]);
 
   return (
-    <div>
+    <div>      
       <div className='absolute z-[100]'>
         <Controls canvasRef={fabricCanvasRef} />
       </div>
@@ -53,4 +53,4 @@ const FabricCanvas: React.FC = () => {
   );
 };
 
-export default FabricCanvas;
+export default React.memo(FabricCanvas);

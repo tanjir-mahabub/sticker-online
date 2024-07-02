@@ -71,6 +71,7 @@ export const useCanvasSetup = (
       const checkAndAdjustHandler = checkAndAdjust(fabricCanvas);
 
       const handleObjectModified = () => {
+        checkAndAdjustHandler();
         saveState();
       };
 
@@ -81,6 +82,7 @@ export const useCanvasSetup = (
 
       const handleObjectScaled = () => {
         if (scaling.current) {
+          checkAndAdjustHandler();
           saveState();
           scaling.current = false;
         }

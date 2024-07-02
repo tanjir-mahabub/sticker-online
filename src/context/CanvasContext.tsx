@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useRef, ReactNode } from 'react';
+import React, { createContext, useContext, useRef, ReactNode, useState } from 'react';
 import { fabric } from 'fabric';
 import HistoryController from '@/components/Editor/CanvasTools/eventHandlers/historyController';
 
@@ -7,6 +7,8 @@ interface CanvasContextProps {
   htmlCanvasRef: React.MutableRefObject<HTMLCanvasElement | null>;
   historyControllerRef: React.MutableRefObject<HistoryController | null>;
   iconImageRef: React.MutableRefObject<HTMLImageElement | null>;
+  isLoading: boolean;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
   saveState: () => void;
   undo: () => void;
   redo: () => void;
@@ -23,6 +25,7 @@ export const CanvasProvider: React.FC<CanvasProviderProps> = ({ children }) => {
   const htmlCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const historyControllerRef = useRef<HistoryController | null>(null);
   const iconImageRef = useRef<HTMLImageElement | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const saveState = () => {
     historyControllerRef.current?.saveState();
@@ -37,7 +40,7 @@ export const CanvasProvider: React.FC<CanvasProviderProps> = ({ children }) => {
   };
 
   return (
-    <CanvasContext.Provider value={{ fabricCanvasRef, htmlCanvasRef, historyControllerRef, iconImageRef, saveState, undo, redo }}>
+    <CanvasContext.Provider value={{ fabricCanvasRef, htmlCanvasRef, historyControllerRef, iconImageRef, isLoading, setIsLoading, saveState, undo, redo }}>
       {children}
     </CanvasContext.Provider>
   );
