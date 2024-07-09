@@ -1,33 +1,44 @@
 import React, { useEffect, useState } from 'react';
 import { fabric } from 'fabric';
-import { useDispatch } from 'react-redux';
 import { useAppSelector } from '@/redux/store';
 import { useCanvas } from '@/context/CanvasContext';
 import { debounce } from 'lodash';
 import { generateSVGImageData, extractDAttributeValue } from '@/components/Utils/DieCutFunction';
+import { centerObjectInViewport } from '@/components/Editor/CanvasTools/eventHandlers/centerObjectInViewport';
+import materialStore from '@/store/materialStore';
 import { convertJpgToBase64 } from '@/components/Utils/vectorFunction';
-import { checkSizeAndAdjustViewport } from '@/components/Editor/CanvasTools/eventHandlers/checkSizeAndAdjustViewport';
 
 type OnDieCutReady = (result: React.MutableRefObject<fabric.Canvas | null>) => void;
 
-
-export const useDieCutEffect = (onDieCutReady: OnDieCutReady) => {
+export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
   const { fabricCanvasRef, setIsLoading } = useCanvas();
   const [dieCutResult, setDieCutResult] = useState<string | null>(null);
-  const materialDefault = useAppSelector(state => state.formValues.materialLastSelected);
-  const CanvasProperties = useAppSelector(state => state.canvas);
-  const { grow } = CanvasProperties;
+  const materialDefault = useAppSelector(state => state.formValues.materialLastSelected);      
+  const canvasProperties = useAppSelector(state => state.canvas);    
+  const { grow, backgroundColor } = canvasProperties;  
 
-  const dispatch = useDispatch();
+  const deletePrevDieCut = (canvas: fabric.Canvas) => {
+    const existingObject = canvas.getObjects().find(obj => obj.get('id') === "dieCutImage");
+        if(existingObject) {
+          canvas.remove(existingObject);
+          canvas.renderAll();
+        }
+  }
 
-  const debouncedHandleDieCut = debounce(async () => {       
+  const debouncedHandleDieCut = debounce(async (grow?: number) => {
+    const canvas = fabricCanvasRef.current;
 
-    try {
-      const svgData = fabricCanvasRef?.current?.toSVG();
-    
+    if (canvas && grow) {
+
+      deletePrevDieCut(canvas);
+      
+      canvas.requestRenderAll();
+      const svgData = canvas.toSVG();
+      // console.log('handle die cut', svgData, 'zoom', canvas.getZoom());
+      // const svgData = await generateSVGWithMargin(canvas, 20);
+
       if (svgData && grow) {
         try {
-          console.log('Die Cut Produced', 'grow', grow);
           const modifiedSVG = await generateSVGImageData(svgData, grow, "white");
           const dAttributeValue = await extractDAttributeValue(modifiedSVG);
 
@@ -35,7 +46,8 @@ export const useDieCutEffect = (onDieCutReady: OnDieCutReady) => {
 
           if (dAttributeValue) {
             setDieCutResult(dAttributeValue);
-            setIsLoading(false);           
+            setIsLoading(false);
+            onDieCutReady && onDieCutReady(fabricCanvasRef);
           } else {
             console.error('Failed to extract D attribute value from the modified SVG');
           }
@@ -45,124 +57,251 @@ export const useDieCutEffect = (onDieCutReady: OnDieCutReady) => {
       } else {
         console.error('Failed to generate SVG data from the fabric canvas');
       }
-    } catch (error) {
-      console.error('Error:', error);
     }
   }, 300);
 
-  const selectAllElements = () => {
-    const canvas = fabricCanvasRef.current;
-    if (canvas) {
-      const objects = canvas.getObjects();
-      canvas.discardActiveObject();
-      const selection = new fabric.ActiveSelection(objects, {
-        canvas: canvas,
-      });
-      canvas.setActiveObject(selection);
-      checkSizeAndAdjustViewport(canvas, selection);
-      canvas.requestRenderAll();
-    }
+  const handleDieCut = async (value?: number) => {
+    value && debouncedHandleDieCut(value);       
+  };  
+  
+  const generateSVGWithMargin = (canvas: fabric.Canvas, margin = 20): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      try {
+        // Deselect all objects on the canvas
+        canvas.discardActiveObject();
+  
+        // Get all objects on the canvas
+        const objects = canvas.getObjects();
+  
+        // Process objects in chunks to avoid blocking the main thread
+        const processChunks = (startIndex: number, chunkSize: number) => {
+          return new Promise<void>((chunkResolve) => {
+            const endIndex = Math.min(startIndex + chunkSize, objects.length);
+            for (let i = startIndex; i < endIndex; i++) {
+              objects[i].set('active' as keyof fabric.Object, true as unknown as boolean);
+            }
+            canvas.discardActiveObject();
+  
+            if (endIndex < objects.length) {
+              setTimeout(() => {
+                processChunks(endIndex, chunkSize).then(chunkResolve);
+              }, 0); // Throttle by adding a delay of 0ms
+            } else {
+              chunkResolve();
+            }
+          });
+        };
+  
+        processChunks(0, 100).then(() => {
+          // Create a group from all objects
+          const group = new fabric.ActiveSelection(objects, {
+            canvas: canvas,
+          });
+  
+          // Set the group as the active object
+          canvas.setActiveObject(group);
+  
+          // Render the canvas to update the selection
+          canvas.requestRenderAll();
+  
+          // Get the bounding box of the group
+          const boundingRect = group.getBoundingRect();
+          const { left, top, width, height } = boundingRect;
+  
+          // Calculate actual position and size considering zoom and viewport transformation
+          const zoom = canvas.getZoom();
+          const viewportTransform = canvas.viewportTransform ?? [1, 0, 0, 1, 0, 0];
+          const actualLeft = (left - viewportTransform[4]) / zoom;
+          const actualTop = (top - viewportTransform[5]) / zoom;
+          const actualWidth = width / zoom;
+          const actualHeight = height / zoom;
+  
+          // Adjust the group's position for exporting
+          group.set({
+            left: actualLeft,
+            top: actualTop,
+          });
+  
+          // Update the coordinates
+          group.setCoords();
+          canvas.renderAll();
+  
+          // Get the SVG of the group
+          const groupSVG = group.toSVG();
+  
+          // Remove the temporary group from the canvas
+          canvas.remove(group);
+          canvas.renderAll();
+  
+          // Create the SVG document with proper namespaces and viewBox
+          const wrappedSVG = `
+            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="${actualLeft - margin} ${actualTop - margin} ${actualWidth + 2 * margin} ${actualHeight + 2 * margin}" width="${actualWidth + 2 * margin}" height="${actualHeight + 2 * margin}">
+              ${groupSVG}
+            </svg>
+          `;
+  
+          resolve(wrappedSVG);
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
   };
-
-  const handleDieCut = async () => {
-    // debouncedHandleDieCut();
-    // selectAllElements();
-
-    grow && debouncedHandleDieCut()
-  };
+  
 
   const handleDownloadSVG = async (): Promise<void> => {
-    if (fabricCanvasRef.current) {
-      const svgData = fabricCanvasRef.current.toSVG();
-      console.log(svgData);
-
-      const blob = new Blob([svgData], { type: 'image/svg+xml' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'canvas.svg';
-      a.click();
-      URL.revokeObjectURL(url);
+    const canvas = fabricCanvasRef.current;
+  
+    if (canvas) {
+      try {
+        const margin = 20;
+        const svgString = await generateSVGWithMargin(canvas, margin);
+  
+        // Create a Blob and download the SVG
+        const blob = new Blob([svgString], { type: 'image/svg+xml' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'canvas.svg';
+        a.click();
+        URL.revokeObjectURL(url);
+      } catch (error) {
+        console.error('Error exporting SVG:', error);
+      }
     }
   };
 
   useEffect(() => {
     const canvas = fabricCanvasRef.current;
-    if (dieCutResult && canvas) {
+  
+    if (dieCutResult && canvas && grow) {
       const strokeColor = "rgba(0,0,0,0.3)";
-      const bgColor = "white";
       const dieCutImageId = 'dieCutImage';
-
+      const selectedMaterial = materialStore.find(material => material.id === materialDefault);
+  
+      deletePrevDieCut(canvas);
+  
       const dieCutImage = new fabric.Path(dieCutResult, {
+        strokeWidth: 1,
         stroke: strokeColor,
         fill: 'transparent',
         id: dieCutImageId,
       });
+  
+      canvas.discardActiveObject();
+  
+      // Filter out the dieCutImage object
+      const objects = canvas.getObjects().filter(obj => obj.get('id') !== dieCutImageId).map(obj => obj.set('active' as keyof fabric.Object, true as unknown as boolean));
+  
+      // Deselect any active object
+      canvas.discardActiveObject();
+  
+      // Create a group from all objects except the dieCutImage
+      const group = new fabric.ActiveSelection(objects, {
+        canvas: canvas,
+      });
+  
+      // Set the group as the active object
+      canvas.setActiveObject(group);
+  
+      // Render the canvas to update the selection
+      canvas.requestRenderAll();
+  
+      // Get the bounding box of the group
+      const boundingRect = group.getBoundingRect();
+      const { left, top, width, height } = boundingRect;
+  
+      // Remove the temporary group from the canvas
+      canvas.remove(group);
+      canvas.renderAll();
+  
+      // Calculate the new position and size considering the current viewport transformation
+      const zoom = canvas.getZoom();
+      const viewportTransform = canvas.viewportTransform!;
+      const adjustedLeft = (left - viewportTransform[4]) / zoom;
+      const adjustedTop = (top - viewportTransform[5]) / zoom;
+      const adjustedWidth = width / zoom;
+      const adjustedHeight = height / zoom;
+  
+      // Set the position of the dieCutImage behind the group, accounting for the zoom level
+      dieCutImage.set({
+        left: adjustedLeft - grow,
+        top: adjustedTop - grow,
+        scaleX: (adjustedWidth + 2 * grow) / dieCutImage.width!,
+        scaleY: (adjustedHeight + 2 * grow) / dieCutImage.height!,
+      });
+  
+      // Add dieCutImage to the canvas and send it to back
+      canvas.add(dieCutImage);
+      dieCutImage.sendToBack();
 
-      // Find and remove existing dieCutImage if it exists
-      const existingObject = canvas.getObjects().find(obj => obj.get('id') === dieCutImageId);
-    //   if (existingObject) {
-    //     canvas.remove(existingObject);
-    //   }
-
-      // Check if the object already exists before adding
-      if (!existingObject) {
-        canvas.add(dieCutImage);
+      if (selectedMaterial && selectedMaterial.src) {
+        fabric.Image.fromURL(selectedMaterial.src, function(img) {
+          const element = img.getElement();
+          if (element instanceof HTMLImageElement) {
+            const pattern = new fabric.Pattern({
+              source: element,
+              repeat: 'repeat' // or 'no-repeat', 'repeat-x', 'repeat-y'
+            });
+            dieCutImage.set({ fill: pattern });
+            canvas.renderAll();
+          } else {
+            console.error("The element is not an HTMLImageElement");
+          }
+        });
+      } else {
+        if (selectedMaterial?.value === "clear") {
+          dieCutImage.set({ fill: "transparent" });
+        } else {
+          dieCutImage.set({ fill: backgroundColor });
+        }
       }
-
-      dieCutImage.set('data', 'dieCutImage');
-
-      // Set custom data attribute
-      dieCutImage.set('id', dieCutImageId);
+  
       dieCutImage.set({
         selectable: false,
-        evented: false,
+        evented: false,        
       });
-
-      dieCutImage.sendToBack();   
-      
-      fabricCanvasRef?.current && onDieCutReady(fabricCanvasRef);
-
-      // Uncomment and update the following section if you need to handle material selection and fill
-      /*
-      const selectedMaterial = materialStore.find(material => material.id === materialDefault);
-      if (selectedMaterial && selectedMaterial.src) {
-        convertJpgToBase64(selectedMaterial.src)
-          .then((base64Data: string) => {
-            const img = new Image();
-            img.src = base64Data;
-            img.onload = function () {
-              const patternSourceCanvas = document.createElement('canvas');
-              const ctx = patternSourceCanvas.getContext('2d');
-              patternSourceCanvas.width = img.width;
-              patternSourceCanvas.height = img.height;
-              ctx?.drawImage(img, 0, 0);
-
-              const patternImage = new Image();
-              patternImage.src = patternSourceCanvas.toDataURL();
-              patternImage.onload = function () {
-                const pattern = new fabric.Pattern({
-                  source: patternImage,
-                  repeat: 'repeat'
-                });
-                dieCutImage.set('fill', pattern);
-                canvas.renderAll();
-              };
-            };
-          })
-          .catch((error) => {
-            console.error('Error converting JPG to base64:', error);
-          });
-      } else if (selectedMaterial?.value === "clear") {
-        dieCutImage.set('fill', 'transparent');
-        canvas.renderAll();
-      } else {
-        dieCutImage.set('fill', bgColor);
-        canvas.renderAll();
-      }
-      */
+  
+      const afterDieObjects = canvas.getObjects().map(obj => obj.set('active' as keyof fabric.Object, true as unknown as boolean));
+  
+      // Deselect any active object
+      canvas.discardActiveObject();
+  
+      // Create a group from all objects including the dieCutImage
+      const newGroup = new fabric.ActiveSelection(afterDieObjects, {
+        canvas: canvas,
+      });
+  
+      // Set the group as the active object
+      canvas.setActiveObject(newGroup);
+      centerObjectInViewport(canvas, newGroup);
+  
+      canvas.discardActiveObject();
+      canvas.remove(newGroup);
+      canvas.renderAll();
     }
-  }, [dieCutResult, fabricCanvasRef, materialDefault, grow, onDieCutReady]);
+  
+    return () => {
+      if (canvas) {
+        deletePrevDieCut(canvas);
+      }
+    };
+  }, [dieCutResult, fabricCanvasRef, materialDefault, grow, backgroundColor]);
+
+  // useEffect(() => {
+  //   const canvas = fabricCanvasRef.current;
+  //   const existingObject = canvas?.getObjects().find(obj => obj.get('id') === "dieCutImage");
+    
+  //   if(existingObject && backgroundColor) {
+  //     existingObject.set({
+  //       fill: backgroundColor
+  //     })
+  //   }
+
+  // }, [fabricCanvasRef, backgroundColor])
+  
+  
+  
 
   return { dieCutResult, handleDownloadSVG, handleDieCut };
 };

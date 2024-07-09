@@ -112,6 +112,7 @@ export const useCanvasSetup = (
       
       checkAndAdjustHandler(); // Initial check and adjustment
       saveState(); // Save initial state
+      console.log(fabricCanvas);
     }
 
     return () => {

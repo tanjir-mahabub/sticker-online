@@ -6,7 +6,6 @@ import { useAppSelector } from "@/redux/store";
 import { useControlButtons } from "@/hooks/useControlButtons";
 import { fabric } from "fabric";
 import { useDieCutEffect } from "@/hooks/useDieCutEffect";
-import { checkAndAdjust } from "./eventHandlers/checkAndAdjust";
 import { findObjectById } from "./eventHandlers/canvasFunctions";
 import { checkSizeAndAdjustViewport } from "./eventHandlers/checkSizeAndAdjustViewport";
 
@@ -19,12 +18,12 @@ const ControlElements: React.FC<ControlElementsProps> = ({ canvasRef, selected }
 
   const { handleDownloadSVG, handleDieCut } = useDieCutEffect((fabricCanvas) => {
     console.log("Die cut image is ready:", fabricCanvas);
-    const canvas = fabricCanvas.current;
+    const canvas = fabricCanvas?.current;
     if(canvas) {
       const findObject = findObjectById(canvas, 'dieCutImage');
       console.log('findObj', canvas.getObjects());
       if(findObject) {
-        checkSizeAndAdjustViewport(canvas, findObject);
+        // checkSizeAndAdjustViewport(canvas, findObject);
         console.log('die cut checking', findObject);
       }
     }
@@ -47,6 +46,11 @@ const ControlElements: React.FC<ControlElementsProps> = ({ canvasRef, selected }
       setSendBackwardBTN(false);
     }
   }, [canvasRef, selected]);
+
+  const DieCutHandler = (value: number) => {
+    console.log('DieCutHandler', value);
+    handleDieCut(value);
+  }
 
   const { handleFlipX, handleFlipY, handleSendFront, handleSendBack, handleSendForward, handleSendBackward, handleDelete, handleCenterEL } = useControlButtons({ canvasRef, updateButtonStates });
 
@@ -96,7 +100,7 @@ const ControlElements: React.FC<ControlElementsProps> = ({ canvasRef, selected }
       <div className='absolute z-50 left-0 bottom-0 w-full h-fit transition duration-500 delay-300 ease-in-out'>
         <div className="absolute bottom-0 left-0 w-fit mx-auto h-3 hidden lg:flex justify-start items-end gap-5 z-50">
           <div className="flex gap-3 p-4 space-y-3 w-60">
-            <RangeSlider minValue={20} maxValue={120} step={1} defaultValue={grow} handleDieCut={handleDieCut} label="Kantlinje" />
+            <RangeSlider minValue={20} maxValue={120} step={1} defaultValue={grow} handleDieCut={DieCutHandler} label="Kantlinje" />
           </div>
         </div>
         <div className="absolute bottom-20 lg:bottom-2 left-0 w-full mx-auto h-3 flex justify-start items-end gap-5 z-40">

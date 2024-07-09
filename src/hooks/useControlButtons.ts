@@ -1,6 +1,8 @@
 import { useAppSelector } from "@/redux/store";
 import { useCallback, useMemo } from "react";
 import { fabric } from "fabric";
+import { useDispatch } from "react-redux";
+import { deleteImage } from "@/redux/features/imagePreviewSlice";
 
 interface ControlButtonsProps {
   canvasRef: React.MutableRefObject<fabric.Canvas | null>;
@@ -18,6 +20,9 @@ const isFirstItem = (canvas: fabric.Canvas, object: fabric.Object): boolean => {
 };
 
 export const useControlButtons = ({ canvasRef, updateButtonStates }: ControlButtonsProps) => {
+  
+  const dispatch = useDispatch();
+
   const handleFlipX = useCallback(() => {
     const activeObject = canvasRef.current?.getActiveObject();
     if (activeObject) {
@@ -75,17 +80,43 @@ export const useControlButtons = ({ canvasRef, updateButtonStates }: ControlButt
   const handleDelete = useCallback(() => {
     const activeObject = canvasRef.current?.getActiveObject();
     if (activeObject) {
+      activeObject.id && dispatch(deleteImage(activeObject.id))      
       canvasRef.current?.remove(activeObject);
       canvasRef.current?.renderAll();
       updateButtonStates();
     }
-  }, [canvasRef, updateButtonStates]);
+  }, [canvasRef, updateButtonStates, dispatch]);
+
+  // const handleCenterEL = useCallback(() => {
+  //   const activeObject = canvasRef.current?.getActiveObject();
+  //   if (activeObject) {
+  //     activeObject.center();
+  //     canvasRef.current?.renderAll();
+  //     updateButtonStates();
+  //   }
+  // }, [canvasRef, updateButtonStates]);
 
   const handleCenterEL = useCallback(() => {
-    const activeObject = canvasRef.current?.getActiveObject();
-    if (activeObject) {
-      activeObject.center();
-      canvasRef.current?.renderAll();
+    const canvas = canvasRef.current;
+    const activeObject = canvas?.getActiveObject();
+  
+    if (canvas && activeObject) {
+      const zoom = canvas.getZoom();
+      const viewportTransform = canvas.viewportTransform!;
+      const canvasWidth = canvas.getWidth();
+      const canvasHeight = canvas.getHeight();
+  
+      // Calculate the new position considering the current viewport transformation
+      const centerX = (canvasWidth / 2 - viewportTransform[4]) / zoom;
+      const centerY = (canvasHeight / 2 - viewportTransform[5]) / zoom;
+  
+      activeObject.set({
+        left: centerX - activeObject.getScaledWidth() / 2,
+        top: (centerY - activeObject.getScaledHeight() / 2) - 60,
+      });
+  
+      activeObject.setCoords();
+      canvas.renderAll();
       updateButtonStates();
     }
   }, [canvasRef, updateButtonStates]);

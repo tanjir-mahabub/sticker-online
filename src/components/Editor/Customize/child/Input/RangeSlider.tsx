@@ -9,7 +9,7 @@ interface RangeSliderProps {
     step: number;
     label?: string;
     defaultValue?: number;
-    handleDieCut?: () => void;
+    handleDieCut?: (value: number, selected: boolean) => void;
 }
 
 const RangeSlider: React.FC<RangeSliderProps> = ({ minValue, maxValue, step, label, defaultValue, handleDieCut }) => {
@@ -30,8 +30,8 @@ const RangeSlider: React.FC<RangeSliderProps> = ({ minValue, maxValue, step, lab
             setIsSliding(false);
             // Dispatch the action when the user has finished sliding
             dispatch(setCanvasProperties({ grow: value }));
-            console.log(value);
-            handleDieCut && handleDieCut()
+            // console.log(value);
+            handleDieCut && handleDieCut(value, false);
         }
     };
 
