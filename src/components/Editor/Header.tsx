@@ -4,11 +4,9 @@ import UndoRedo from "./Child/UndoRedo";
 import PriceCartBtn from "./Child/PriceCartBtn";
 import { Tooltip } from "../Utils/ToolTips";
 import { useRouter } from "next/navigation";
-import { usePaper } from "@/context/PaperContext";
 
 const Header = () => {
-    const router = useRouter();
-    const { ftEndData, historyDispatch } = usePaper();
+    const router = useRouter();    
 
     const handleExitClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         e.preventDefault();

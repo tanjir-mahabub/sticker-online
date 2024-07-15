@@ -1,6 +1,7 @@
 import { setCanvasProperties } from '@/redux/features/canvasSlice';
-import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useEffect, useState, useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
 
 interface RangeSliderProps {
     minValue: number;
@@ -8,14 +9,14 @@ interface RangeSliderProps {
     step: number;
     label?: string;
     defaultValue?: number;
-    handleDieCut?: () => void;
+    handleDieCut?: (value: number, selected: boolean) => void;
 }
 
 const RangeSlider: React.FC<RangeSliderProps> = ({ minValue, maxValue, step, label, defaultValue, handleDieCut }) => {
-    const [value, setValue] = useState<number>(defaultValue || minValue);
-    const [isSliding, setIsSliding] = useState<boolean>(false);
+    const dispatch = useDispatch();    
 
-    const dispatch = useDispatch();
+    const [value, setValue] = useState<number>(defaultValue || minValue);
+    const [isSliding, setIsSliding] = useState<boolean>(false);    
 
     const handleRangeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setValue(+e.target.value);
@@ -23,19 +24,14 @@ const RangeSlider: React.FC<RangeSliderProps> = ({ minValue, maxValue, step, lab
     };
 
     const handleRangeChangeEnd = () => {
-        if (isSliding) {
+        if (isSliding && value) {
             setIsSliding(false);
             // Dispatch the action when the user has finished sliding
             dispatch(setCanvasProperties({ grow: value }));
-            console.log(value);
+            // console.log(value);          
+            handleDieCut && handleDieCut(value, false);
         }
-    };
-
-    useEffect(() => {
-        if (defaultValue !== undefined && handleDieCut) {
-            handleDieCut();
-        }
-    }, []);
+    };    
 
     return (
         <div className="flex flex-col gap-2 lg:gap-3 w-full">
@@ -64,7 +60,7 @@ const RangeSlider: React.FC<RangeSliderProps> = ({ minValue, maxValue, step, lab
                 input[type="range"]::-webkit-slider-thumb {
                     -webkit-appearance: none !important;
                     width: 24px;
-                    height:24px;
+                    height: 24px;
                     background: white;
                     border: 5px solid #F98332;
                     border-radius: 50%;
