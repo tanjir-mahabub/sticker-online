@@ -63,6 +63,7 @@ export interface CanvasState {
   grow: number;
   backgroundColor: string;
   textColor: string;
+  isLoading: boolean;
 }
 
 

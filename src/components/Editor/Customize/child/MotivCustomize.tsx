@@ -17,55 +17,66 @@ const MotivCustomize = () => {
     const handleMotivClick = async (icon: string) => {
         // Create a new image element
         const img = new window.Image();
-
+    
         // Set the source of the image to the icon URL
         img.src = icon;
-
+    
         // Once the image has loaded, draw it onto a canvas
         img.onload = function () {
+            // Calculate maximum size constraints
+            const maxWidth = 200; // Example maximum width
+            const maxHeight = 200; // Example maximum height
+    
+            // Calculate scaling factor to fit within maxWidth and maxHeight
+            let scale = 1;
+            if (img.width > maxWidth || img.height > maxHeight) {
+                const widthRatio = maxWidth / img.width;
+                const heightRatio = maxHeight / img.height;
+                scale = Math.min(widthRatio, heightRatio);
+            }
+    
             // Create a canvas element
             const canvas = document.createElement('canvas');
-
+    
             // Set the canvas dimensions
-            canvas.width = img.width;
-            canvas.height = img.height;
-
+            canvas.width = img.width * scale;
+            canvas.height = img.height * scale;
+    
             // Get the canvas context
             const ctx = canvas.getContext('2d');
-
+    
             // Check if the canvas context is available
             if (ctx) {
                 // Draw the image onto the canvas
-                ctx.drawImage(img, 0, 0);
-
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    
                 // Convert the canvas content to a data URL
                 const dataURL = canvas.toDataURL();
-
-                // Create a new image object with the data URL
-                if(img) {
-                    const newImage = {
-                        id: generateUniqueId(),
-                        src: dataURL,
-                        width: img.width * 0.7 || 200,
-                        height: img.height * 0.7 || 200,
-                        scaleX: 0,
-                        scaleY: 0,
-                        rotate: 0,                        
-                        status: "SD",
-                        attrs: { opacity: 1, cursor: 'move' },
-                        type: "motiv",
-                        category: 'motiv',                     
-                        stackNum: 0
-                    };
     
-                    // Dispatch the new image to the store
-                    dispatch(addImage(newImage));
-                }
+                // Create a new image object with the data URL
+                const newImage = {
+                    id: generateUniqueId(),
+                    src: dataURL,
+                    width: canvas.width, // Use canvas width after scaling
+                    height: canvas.height, // Use canvas height after scaling
+                    scaleX: 0,
+                    scaleY: 0,
+                    rotate: 0,                        
+                    status: "SD",
+                    attrs: { opacity: 1, cursor: 'move' },
+                    type: "motiv",
+                    category: 'motiv',                     
+                    stackNum: 0
+                };
+    
+                // Dispatch the new image to the store
+                dispatch(addImage(newImage));
             } else {
                 console.error('Unable to get canvas context');
             }
         };
     };
+    
 
 
     

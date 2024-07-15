@@ -1,9 +1,6 @@
 "use client"
 
 import Script from "next/script"
-
-import { PaperProvider } from "@/context/PaperContext"
-
 import Customize from "@/components/Editor/Customize/Customize"
 import Dashboard from "@/components/Editor/Dashboard"
 import Header from "@/components/Editor/Header"

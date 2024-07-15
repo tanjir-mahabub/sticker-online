@@ -35,8 +35,8 @@ const svgModification = async (
     strokeColor: string
 ): Promise<SVGSVGElement> => {
     const canvas = document.createElement('canvas');
-    canvas.width = width + grow;
-    canvas.height = height + grow;
+    canvas.width = width;
+    canvas.height = height;
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
     if (!ctx) throw new Error('Canvas context is null');
 

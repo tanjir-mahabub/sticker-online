@@ -71,9 +71,9 @@ svg {
 }
 
 svg.radial-loader {
-  background: rgba(0,0,0,.8);
+  background: rgba(255,255,255,.8);
   border-radius: 10%;
-  box-shadow: 0 5px 10px 0 rgba(0,0,0,.5);
+  box-shadow: 0 5px 10px 0 rgba(255,255,255,.30);
   z-index: 10
 }
 
@@ -109,7 +109,6 @@ svg.radial-loader[data-mode=buffer] .radial-loader__circle {
 .slide-up {
   transition: height 0.3s ease-in-out;
 }
-
 
 .material-option {
   @apply absolute left-0 bottom-[92px] mb-2 w-[600px] bg-white border border-gray-300 divide-x rounded-md z-50 grid grid-cols-2 overflow-hidden;

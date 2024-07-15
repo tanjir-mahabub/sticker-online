@@ -4,18 +4,21 @@ import { useAppSelector } from '@/redux/store';
 import { useCanvas } from '@/context/CanvasContext';
 import { debounce } from 'lodash';
 import { generateSVGImageData, extractDAttributeValue } from '@/components/Utils/DieCutFunction';
-import { centerObjectInViewport } from '@/components/Editor/CanvasTools/eventHandlers/centerObjectInViewport';
 import materialStore from '@/store/materialStore';
-import { convertJpgToBase64 } from '@/components/Utils/vectorFunction';
+import { adjustViewportToElement } from '@/components/Editor/CanvasTools/eventHandlers/adjustViewportToElement';
+import { useDispatch } from 'react-redux';
+import { setCanvasProperties } from '@/redux/features/canvasSlice';
 
 type OnDieCutReady = (result: React.MutableRefObject<fabric.Canvas | null>) => void;
 
 export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
-  const { fabricCanvasRef, setIsLoading } = useCanvas();
+  const { fabricCanvasRef } = useCanvas();
   const [dieCutResult, setDieCutResult] = useState<string | null>(null);
   const materialDefault = useAppSelector(state => state.formValues.materialLastSelected);      
   const canvasProperties = useAppSelector(state => state.canvas);    
-  const { grow, backgroundColor } = canvasProperties;  
+  const { grow, backgroundColor, isLoading } = canvasProperties;  
+
+  const dispatch = useDispatch();
 
   const deletePrevDieCut = (canvas: fabric.Canvas) => {
     const existingObject = canvas.getObjects().find(obj => obj.get('id') === "dieCutImage");
@@ -45,23 +48,28 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
           console.log('running diecut');
 
           if (dAttributeValue) {
-            setDieCutResult(dAttributeValue);
-            setIsLoading(false);
+            setDieCutResult(dAttributeValue);            
             onDieCutReady && onDieCutReady(fabricCanvasRef);
           } else {
-            console.error('Failed to extract D attribute value from the modified SVG');
+            console.error('Failed to extract D attribute value from the modified SVG');            
           }
         } catch (error) {
-          console.error('Error generating SVG image data:', error);
+          console.error('Error generating SVG image data:', error);         
         }
       } else {
-        console.error('Failed to generate SVG data from the fabric canvas');
+        console.error('Failed to generate SVG data from the fabric canvas');        
       }
     }
   }, 300);
 
   const handleDieCut = async (value?: number) => {
-    value && debouncedHandleDieCut(value);       
+    if(value) {
+      // dispatch(setCanvasProperties({
+      //   isLoading: true
+      // }));
+      console.log(isLoading);
+      debouncedHandleDieCut(value);       
+    }
   };  
   
   const generateSVGWithMargin = (canvas: fabric.Canvas, margin = 20): Promise<string> => {
@@ -130,6 +138,7 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
           const groupSVG = group.toSVG();
   
           // Remove the temporary group from the canvas
+          canvas.discardActiveObject();
           canvas.remove(group);
           canvas.renderAll();
   
@@ -222,14 +231,14 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
       const adjustedTop = (top - viewportTransform[5]) / zoom;
       const adjustedWidth = width / zoom;
       const adjustedHeight = height / zoom;
-  
+  console.log(zoom);
       // Set the position of the dieCutImage behind the group, accounting for the zoom level
       dieCutImage.set({
         left: adjustedLeft - grow,
         top: adjustedTop - grow,
         scaleX: (adjustedWidth + 2 * grow) / dieCutImage.width!,
         scaleY: (adjustedHeight + 2 * grow) / dieCutImage.height!,
-      });
+      });      
   
       // Add dieCutImage to the canvas and send it to back
       canvas.add(dieCutImage);
@@ -274,11 +283,17 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
   
       // Set the group as the active object
       canvas.setActiveObject(newGroup);
-      centerObjectInViewport(canvas, newGroup);
+      // centerObjectInViewport(canvas, newGroup);
+      adjustViewportToElement({canvas, obj: newGroup});
   
       canvas.discardActiveObject();
       canvas.remove(newGroup);
-      canvas.renderAll();
+      canvas.renderAll();    
+
+      // dispatch(setCanvasProperties({
+      //   frameWidth: (adjustedWidth + 2 * grow) / dieCutImage.width!,
+      //   frameHeight: (adjustedHeight + 2 * grow) / dieCutImage.height!
+      // }))
     }
   
     return () => {
@@ -286,21 +301,7 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
         deletePrevDieCut(canvas);
       }
     };
-  }, [dieCutResult, fabricCanvasRef, materialDefault, grow, backgroundColor]);
-
-  // useEffect(() => {
-  //   const canvas = fabricCanvasRef.current;
-  //   const existingObject = canvas?.getObjects().find(obj => obj.get('id') === "dieCutImage");
-    
-  //   if(existingObject && backgroundColor) {
-  //     existingObject.set({
-  //       fill: backgroundColor
-  //     })
-  //   }
-
-  // }, [fabricCanvasRef, backgroundColor])
-  
-  
+  }, [dieCutResult, fabricCanvasRef, materialDefault, grow, backgroundColor, dispatch]);  
   
 
   return { dieCutResult, handleDownloadSVG, handleDieCut };

@@ -5,6 +5,7 @@ import { findObjectById } from './eventHandlers/canvasFunctions';
 import { useAppSelector } from '@/redux/store';
 import { useDispatch } from 'react-redux';
 import { setCategoryToRemove } from '@/redux/features/categoryToRemove';
+import { adjustViewportToElement } from './eventHandlers/adjustViewportToElement';
 
 interface ImageComponentProps {
   fabricCanvas: React.MutableRefObject<fabric.Canvas | null>;
@@ -17,7 +18,6 @@ const ImageComponent: React.FC<ImageComponentProps> = ({ fabricCanvas, images, s
   const dispatch = useDispatch();
 
   useEffect(() => {
-    console.log(images);
     if (fabricCanvas.current && images) {
       const canvas = fabricCanvas.current;
       const canvasCenter = {
@@ -52,6 +52,7 @@ const ImageComponent: React.FC<ImageComponentProps> = ({ fabricCanvas, images, s
           const objectExists = findObjectById(canvas, image.id);
           if (!objectExists) {
             canvas.add(oImg);
+            if (image.category === "image" ) adjustViewportToElement({canvas, obj: oImg});
             saveState();
           }
         });
@@ -68,7 +69,7 @@ const ImageComponent: React.FC<ImageComponentProps> = ({ fabricCanvas, images, s
     }
 
     return () => {
-      dispatch(setCategoryToRemove(""));
+      dispatch(setCategoryToRemove(''));
     };
   }, [fabricCanvas, CategoryToRemove, images, saveState, dispatch]);
 

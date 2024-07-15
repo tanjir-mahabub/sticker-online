@@ -6,9 +6,7 @@ interface CanvasContextProps {
   fabricCanvasRef: React.MutableRefObject<fabric.Canvas | null>;
   htmlCanvasRef: React.MutableRefObject<HTMLCanvasElement | null>;
   historyControllerRef: React.MutableRefObject<HistoryController | null>;
-  iconImageRef: React.MutableRefObject<HTMLImageElement | null>;
-  isLoading: boolean;
-  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  iconImageRef: React.MutableRefObject<HTMLImageElement | null>;  
   saveState: () => void;
   undo: () => void;
   redo: () => void;
@@ -24,8 +22,7 @@ export const CanvasProvider: React.FC<CanvasProviderProps> = ({ children }) => {
   const fabricCanvasRef = useRef<fabric.Canvas | null>(null);
   const htmlCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const historyControllerRef = useRef<HistoryController | null>(null);
-  const iconImageRef = useRef<HTMLImageElement | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const iconImageRef = useRef<HTMLImageElement | null>(null);  
 
   const saveState = () => {
     historyControllerRef.current?.saveState();
@@ -40,7 +37,7 @@ export const CanvasProvider: React.FC<CanvasProviderProps> = ({ children }) => {
   };
 
   return (
-    <CanvasContext.Provider value={{ fabricCanvasRef, htmlCanvasRef, historyControllerRef, iconImageRef, isLoading, setIsLoading, saveState, undo, redo }}>
+    <CanvasContext.Provider value={{ fabricCanvasRef, htmlCanvasRef, historyControllerRef, iconImageRef, saveState, undo, redo }}>
       {children}
     </CanvasContext.Provider>
   );

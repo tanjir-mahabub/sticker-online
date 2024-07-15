@@ -6,12 +6,12 @@ import { findObjectById } from './eventHandlers/canvasFunctions';
 import { useDispatch } from 'react-redux';
 import { setCategoryToRemove } from '@/redux/features/categoryToRemove';
 
-interface AddPathProps {
+interface TextPathProps {
   fabricCanvas: React.MutableRefObject<fabric.Canvas | null>;
   saveState: () => void;
 }
 
-const AddPath: React.FC<AddPathProps> = ({ fabricCanvas, saveState }) => {
+const TextPath: React.FC<TextPathProps> = ({ fabricCanvas, saveState }) => {
   const CategoryToRemove = useAppSelector(state => state.categoryToRemove);
   const textPreviews = useAppSelector((state) => state.text.texts);
 
@@ -68,4 +68,4 @@ const AddPath: React.FC<AddPathProps> = ({ fabricCanvas, saveState }) => {
   return null;
 };
 
-export default AddPath;
+export default TextPath;
