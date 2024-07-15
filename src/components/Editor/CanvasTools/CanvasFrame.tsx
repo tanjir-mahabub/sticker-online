@@ -21,6 +21,17 @@ const CanvasFrame: React.FC<FrameProps> = ({ fabricCanvas }) => {
 
     const dispatch = useDispatch();
 
+    // useEffect(() => {
+    //     if (canvasWidth && canvasHeight && frameWidth && frameHeight) {
+    //         console.log('vector frame', frameWidth, frameHeight);
+    //         console.log('vector frame', bredd, hojd);
+    //         dispatch(setCanvasProperties({
+    //             bredd: pixelToCm(frameWidth),
+    //             hojd: pixelToCm(frameHeight)
+    //         }));
+    //     }
+    // }, [dispatch, canvasWidth, canvasHeight, frameWidth, frameHeight, bredd, hojd]);
+
     useEffect(() => {
         if (!divElement.current && fabricCanvas?.wrapperEl) {
             const div = document.createElement('div');
@@ -56,21 +67,31 @@ const CanvasFrame: React.FC<FrameProps> = ({ fabricCanvas }) => {
             if (StickerNavID === 1) {
                 divElement.current.classList.add("hidden");
                 divElement.current.classList.remove("block");
-            } else if (StickerNavID === 2) {
+            } 
+            else if (StickerNavID === 2) {
                 divElement.current.style.borderRadius = "0px";
                 divElement.current.classList.add("block");
                 divElement.current.classList.remove("hidden");
-            } else if (StickerNavID === 3) {
+            }
+            else if (StickerNavID === 3) {
                 divElement.current.style.borderRadius = "50%"; // Make it a circle
                 divElement.current.classList.add("block");
                 divElement.current.classList.remove("hidden");
-            } else if (StickerNavID === 4) {
+            }
+            else if (StickerNavID === 4) {
                 divElement.current.style.borderRadius = "10px";
                 divElement.current.classList.add("block");
                 divElement.current.classList.remove("hidden");
-            }
+            }            
         }
     }, [StickerNavID]);
+
+
+    useEffect(() => {        
+        if (divElement.current) {
+            divElement.current.style.background = backgroundColor;
+        }
+    }, [backgroundColor]);
 
     useEffect(() => {
         if (frameWidth && frameHeight && divElement.current) {
@@ -79,27 +100,12 @@ const CanvasFrame: React.FC<FrameProps> = ({ fabricCanvas }) => {
             divElement.current.style.height = `${frameHeight}px`; 
             divElement.current.style.top = `${(canvasHeight / 2 - frameHeight / 2) - 50}px`;
             divElement.current.style.left = `${canvasWidth / 2 - frameWidth / 2}px`;         
+            // dispatch(setCanvasProperties({
+            //     bredd: pixelToCm(frameWidth),
+            //     hojd: pixelToCm(frameHeight)
+            // }));
         }
     }, [canvasWidth, canvasHeight, frameWidth, frameHeight]);
-
-    useEffect(() => {
-        // Calculate scale factor based on frame size relative to canvas size
-        if (frameWidth && frameHeight && canvasWidth && canvasHeight &&divElement.current) {
-            const widthRatio = frameWidth / canvasWidth;
-            const heightRatio = frameHeight / canvasHeight;
-            let scaleFactor = 1;
-
-            // Adjust scale factor based on conditions
-            if (widthRatio > 0.7 || heightRatio > 0.7) {
-                scaleFactor = 0.7;
-            } else if (widthRatio < 0.5 || heightRatio < 0.5) {
-                scaleFactor = 0.5;
-            }
-
-            // Apply scale factor to the div element
-            divElement.current!.style.transform = `scale(${scaleFactor})`;
-        }
-    }, [frameWidth, frameHeight, canvasWidth, canvasHeight]);
 
     return (
         <div className="relative flex justify-center h-full transition">
