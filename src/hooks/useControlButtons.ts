@@ -1,4 +1,3 @@
-import { useAppSelector } from "@/redux/store";
 import { useCallback, useEffect, useMemo } from "react";
 import { fabric } from "fabric";
 import { useDispatch } from "react-redux";

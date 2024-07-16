@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useRef, ReactNode, useState } from 'react';
 import { fabric } from 'fabric';
+import React, { createContext, useContext, useRef, ReactNode } from 'react';
 import HistoryController from '@/components/Editor/CanvasTools/eventHandlers/historyController';
 
 interface CanvasContextProps {
