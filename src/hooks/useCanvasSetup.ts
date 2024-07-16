@@ -109,7 +109,7 @@ export const useCanvasSetup = (
         }
       });
 
-      fabricCanvas.on('mouse:wheel', handleMouseWheel(fabricCanvas));
+      // fabricCanvas.on('mouse:wheel', handleMouseWheel(fabricCanvas));
 
       
       checkAndAdjustHandler(); // Initial check and adjustment

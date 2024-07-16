@@ -19,6 +19,7 @@ const initialState: CanvasState = {
   backgroundColor: "#ffffff",
   textColor: "#000000",
   isLoading: false,
+  hasSelected: false,
 };
 
 const canvasSlice = createSlice({

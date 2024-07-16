@@ -64,6 +64,7 @@ export interface CanvasState {
   backgroundColor: string;
   textColor: string;
   isLoading: boolean;
+  hasSelected: boolean;
 }
 
 

@@ -13,6 +13,7 @@ interface TextPathProps {
 
 const TextPath: React.FC<TextPathProps> = ({ fabricCanvas, saveState }) => {
   const CategoryToRemove = useAppSelector(state => state.categoryToRemove);
+  const CanvasProperties = useAppSelector(state => state.canvas);
   const textPreviews = useAppSelector((state) => state.text.texts);
 
   const dispatch = useDispatch();
@@ -27,8 +28,8 @@ const TextPath: React.FC<TextPathProps> = ({ fabricCanvas, saveState }) => {
               const textPath = new fabric.Path(pathData);
               textPath.set({
                 id: text.id,
-                left: 100,
-                top: 100,
+                left: CanvasProperties.canvasWidth / 2,
+                top: CanvasProperties.canvasHeight / 2,
                 fill: text.fill,
                 stroke: 'transparent',
                 strokeWidth: 1,
@@ -63,7 +64,7 @@ const TextPath: React.FC<TextPathProps> = ({ fabricCanvas, saveState }) => {
     return () => {
       dispatch(setCategoryToRemove(""))
   };
-  }, [fabricCanvas, textPreviews, CategoryToRemove, saveState, dispatch]);
+  }, [fabricCanvas, textPreviews, CategoryToRemove, CanvasProperties, saveState, dispatch]);
 
   return null;
 };

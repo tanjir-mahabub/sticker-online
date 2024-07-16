@@ -24,6 +24,37 @@ const DimensionInput = () => {
         setHojd(prevValue => prevValue + step);
     }, []);
 
+    const DimensionSettings = (frameWidth: number, frameHeight: number) => {
+        const maxWidth = CanvasProperties.canvasWidth * 0.8;
+        const minWidth = CanvasProperties.canvasWidth * 0.3;
+        const maxHeight = CanvasProperties.canvasHeight * 0.8;
+        const minHeight = CanvasProperties.canvasHeight * 0.3;
+
+        // Maintain the aspect ratio
+        let newFrameWidth = frameWidth;
+        let newFrameHeight = frameHeight;
+
+        const aspectRatio = frameWidth / frameHeight;
+
+        if (frameWidth > maxWidth) {
+            newFrameWidth = maxWidth;
+            newFrameHeight = maxWidth / aspectRatio;
+        } else if (frameWidth < minWidth) {
+            newFrameWidth = minWidth;
+            newFrameHeight = minWidth / aspectRatio;
+        }
+
+        if (newFrameHeight > maxHeight) {
+            newFrameHeight = maxHeight;
+            newFrameWidth = maxHeight * aspectRatio;
+        } else if (newFrameHeight < minHeight) {
+            newFrameHeight = minHeight;
+            newFrameWidth = minHeight * aspectRatio;
+        }
+
+        return { newFrameWidth, newFrameHeight }
+    }
+
     const debouncedUpdateBredd = useCallback(debounce((newBredd) => {
         const newBreddCost = newBredd * 10;
         dispatch(setCanvasProperties({ frameWidth: cmToPixel(newBredd), bredd: newBredd }));
