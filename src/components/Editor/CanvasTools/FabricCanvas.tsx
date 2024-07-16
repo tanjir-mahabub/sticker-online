@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Controls from './Controls';
 import TextPath from './TextPath';
 import { useAppSelector } from '@/redux/store';
@@ -11,7 +11,7 @@ import { useDispatch } from 'react-redux';
 import { setCanvasProperties } from '@/redux/features/canvasSlice';
 import CanvasFrame from './CanvasFrame';
 
-const FabricCanvas: React.FC = () => {  
+const FabricCanvas: React.FC = () => {
   const [isReady, setIsReady] = useState(false);
 
   const { fabricCanvasRef, htmlCanvasRef, historyControllerRef, iconImageRef, saveState } = useCanvas();
@@ -22,11 +22,11 @@ const FabricCanvas: React.FC = () => {
 
   useCanvasSetup(htmlCanvasRef, fabricCanvasRef, historyControllerRef, iconImageRef, saveState);
 
-  const handleMouseDown = useCallback((e: any) => { 
-    if (e.target !== null) {      
-      dispatch(setCanvasProperties({ hasSelected: true }))
+  const handleMouseDown = useCallback((e: any) => {
+    if (e.target !== null) {
+      dispatch(setCanvasProperties({ hasSelected: true }));
     } else {
-      dispatch(setCanvasProperties({ hasSelected: false }))
+      dispatch(setCanvasProperties({ hasSelected: false }));
     }
   }, [dispatch]);
 
@@ -35,13 +35,13 @@ const FabricCanvas: React.FC = () => {
     if (canvas) {
       canvas.preserveObjectStacking = true;
       canvas.renderAll();
-      setIsReady(true);      
-     
-      canvas.on('mouse:down', handleMouseDown);   
-      
+      setIsReady(true);
+
+      canvas.on('mouse:down', handleMouseDown);
+
       dispatch(setCanvasProperties({
         isLoading: false
-      }));     
+      }));
 
       return () => {
         canvas.off('mouse:down', handleMouseDown);
