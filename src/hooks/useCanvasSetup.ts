@@ -1,9 +1,8 @@
-import { useEffect, MutableRefObject, useRef } from 'react';
 import { fabric } from 'fabric';
+import { useEffect, MutableRefObject, useRef } from 'react';
 import HistoryController from '@/components/Editor/CanvasTools/eventHandlers/historyController';
 import { checkAndAdjust } from '@/components/Editor/CanvasTools/eventHandlers/checkAndAdjust';
 import { handleScaling } from '@/components/Editor/CanvasTools/eventHandlers/handleScaling';
-import { handleMouseWheel } from '@/components/Editor/CanvasTools/eventHandlers/handleMouseWheel';
 
 export const useCanvasSetup = (
   htmlCanvasRef: MutableRefObject<HTMLCanvasElement | null>,
@@ -21,10 +20,8 @@ export const useCanvasSetup = (
       iconImageRef.current = iconImage;
     };
 
-    const divElement = document.createElement('div');
-
     if (htmlCanvasRef.current) {
-        console.log('use canvas setup', htmlCanvasRef.current);
+        // console.log('use canvas setup', htmlCanvasRef.current);
       const fabricCanvas = new fabric.Canvas(htmlCanvasRef.current);
       fabricCanvasRef.current = fabricCanvas;
       historyControllerRef.current = new HistoryController(fabricCanvas);              
