@@ -11,6 +11,8 @@
   "dependencies": {
     "@reduxjs/toolkit": "^2.1.0",
     "@uiw/react-color": "^2.0.6",
+    "@vercel/node": "^3.2.4",
+    "canvas": "^2.11.2",
     "critters": "^0.0.20",
     "d3": "^7.9.0",
     "fabric": "^5.3.0",
