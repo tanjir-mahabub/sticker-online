@@ -15,32 +15,42 @@ interface ImageComponentProps {
 
 const ImageComponent: React.FC<ImageComponentProps> = ({ fabricCanvas, images, saveState }) => {
   const CategoryToRemove = useAppSelector(state => state.categoryToRemove);
+  const CanvasProperties = useAppSelector(state => state.canvas);
+  const { frameWidth, frameHeight } = CanvasProperties;
+
   const dispatch = useDispatch();
 
   useEffect(() => {
     if (fabricCanvas.current && images) {
       const canvas = fabricCanvas.current;
+      const canvasWidth = canvas.getWidth();
+      const canvasHeight = canvas.getHeight();
       const canvasCenter = {
-        left: canvas.getWidth() / 2,
-        top: canvas.getHeight() / 2,
+        left: canvasWidth / 2,
+        top: canvasHeight / 2 - 50,
       };
 
       images.forEach((image) => {
         fabric.Image.fromURL(image.src, (oImg) => {
-          const imgWidth = image.width ?? oImg.width ?? 0;
-          const imgHeight = image.height ?? oImg.height ?? 0;
+          // Calculate the aspect ratio of the image
+          const imgAspectRatio = (oImg.width || 1) / (oImg.height || 1);
+
+          // Determine the dimensions such that the image is scaled to fit within 50% of the canvas dimensions while maintaining its aspect ratio
+          let imgWidth = canvasWidth * 0.5;
+          let imgHeight = imgWidth / imgAspectRatio;
+
+          if (imgHeight > canvasHeight * 0.5) {
+            imgHeight = canvasHeight * 0.5;
+            imgWidth = imgHeight * imgAspectRatio;
+          }
 
           // Center the image on the canvas
           oImg.set({
             id: image.id,
             left: canvasCenter.left - imgWidth / 2,
             top: canvasCenter.top - imgHeight / 2,
-            width: imgWidth,
-            height: imgHeight,
-            angle: 0,
-            opacity: 1,
-            scaleX: 1,
-            scaleY: 1,
+            scaleX: imgWidth / oImg.width!,
+            scaleY: imgHeight / oImg.height!,
             crossOrigin: 'anonymous',
             data: {
               id: image.id,
@@ -52,7 +62,8 @@ const ImageComponent: React.FC<ImageComponentProps> = ({ fabricCanvas, images, s
           const objectExists = findObjectById(canvas, image.id);
           if (!objectExists) {
             canvas.add(oImg);
-            if (image.category === "image" ) adjustViewportToElement({canvas, obj: oImg});
+            console.log("Image Dimensions", oImg.width, oImg.height);
+            //if (image.category === "image") adjustViewportToElement({ canvas, obj: oImg, setOffsetY: 50 });
             saveState();
           }
         });
@@ -71,7 +82,7 @@ const ImageComponent: React.FC<ImageComponentProps> = ({ fabricCanvas, images, s
     return () => {
       dispatch(setCategoryToRemove(''));
     };
-  }, [fabricCanvas, CategoryToRemove, images, saveState, dispatch]);
+  }, [fabricCanvas, frameWidth, frameHeight, CategoryToRemove, images, saveState, dispatch]);
 
   return null;
 };

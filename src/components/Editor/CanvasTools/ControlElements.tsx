@@ -8,6 +8,8 @@ import { fabric } from "fabric";
 import { useDieCutEffect } from "@/hooks/useDieCutEffect";
 import { findObjectById } from "./eventHandlers/canvasFunctions";
 import { checkSizeAndAdjustViewport } from "./eventHandlers/checkSizeAndAdjustViewport";
+import { useDispatch } from "react-redux";
+import { setCanvasProperties } from "@/redux/features/canvasSlice";
 
 interface ControlElementsProps {
   canvasRef: React.MutableRefObject<fabric.Canvas | null>;
@@ -16,18 +18,9 @@ interface ControlElementsProps {
 
 const ControlElements: React.FC<ControlElementsProps> = ({ canvasRef, selected }) => {
 
-  const { handleDownloadSVG, handleDieCut } = useDieCutEffect((fabricCanvas) => {
-    console.log("Die cut image is ready:", fabricCanvas);
-    const canvas = fabricCanvas?.current;
-    if(canvas) {
-      const findObject = findObjectById(canvas, 'dieCutImage');
-      console.log('findObj', canvas.getObjects());
-      if(findObject) {
-        // checkSizeAndAdjustViewport(canvas, findObject);
-        console.log('die cut checking', findObject);
-      }
-    }
-  });
+  const dispatch = useDispatch();
+
+  const { handleDownloadSVG, handleDieCut } = useDieCutEffect();
 
   const updateButtonStates = useCallback(() => {
     const activeObject = canvasRef.current?.getActiveObject();   
@@ -39,13 +32,15 @@ const ControlElements: React.FC<ControlElementsProps> = ({ canvasRef, selected }
       setSendBackBTN(objectIndex > 0);
       setSendForwardBTN(objectIndex < objects.length - 1);
       setSendBackwardBTN(objectIndex > 0);
+      dispatch(setCanvasProperties({ hasSelected: true }))
     } else {
       setSendFrontBTN(false);
       setSendBackBTN(false);
       setSendForwardBTN(false);
       setSendBackwardBTN(false);
+      dispatch(setCanvasProperties({ hasSelected: false }))
     }
-  }, [canvasRef, selected]);
+  }, [canvasRef, selected, dispatch]);
 
   const DieCutHandler = (value: number) => {
     console.log('DieCutHandler', value);

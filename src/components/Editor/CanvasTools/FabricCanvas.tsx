@@ -11,8 +11,7 @@ import { useDispatch } from 'react-redux';
 import { setCanvasProperties } from '@/redux/features/canvasSlice';
 import CanvasFrame from './CanvasFrame';
 
-const FabricCanvas: React.FC = () => {
-  const [selected, setSelected] = useState(false);
+const FabricCanvas: React.FC = () => {  
   const [isReady, setIsReady] = useState(false);
 
   const { fabricCanvasRef, htmlCanvasRef, historyControllerRef, iconImageRef, saveState } = useCanvas();
@@ -25,11 +24,11 @@ const FabricCanvas: React.FC = () => {
 
   const handleMouseDown = useCallback((e: any) => { 
     if (e.target !== null) {      
-      setSelected(true);
+      dispatch(setCanvasProperties({ hasSelected: true }))
     } else {
-      setSelected(false);
+      dispatch(setCanvasProperties({ hasSelected: false }))
     }
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     const canvas = fabricCanvasRef.current;
@@ -59,8 +58,8 @@ const FabricCanvas: React.FC = () => {
       </div>
       {fabricCanvasRef.current && isReady && <TextPath fabricCanvas={fabricCanvasRef} saveState={saveState} />}
       {fabricCanvasRef.current && isReady && <ImageComponent fabricCanvas={fabricCanvasRef} images={imagePreviews} saveState={saveState} />}
-      <ControlElements canvasRef={fabricCanvasRef} selected={selected} />
-      <canvas ref={htmlCanvasRef} width={canvasProperties.canvasWidth} height={canvasProperties.canvasHeight} className="bg-transparent border border-black" />
+      <ControlElements canvasRef={fabricCanvasRef} selected={canvasProperties.hasSelected} />
+      <canvas ref={htmlCanvasRef} width={canvasProperties.canvasWidth} height={canvasProperties.canvasHeight} className="bg-transparent" />
     </div>
   );
 };

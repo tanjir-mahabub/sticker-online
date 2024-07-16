@@ -1,8 +1,10 @@
 import { useAppSelector } from "@/redux/store";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { fabric } from "fabric";
 import { useDispatch } from "react-redux";
 import { deleteImage } from "@/redux/features/imagePreviewSlice";
+import { removeText } from "@/redux/features/textSlice";
+import { setCanvasProperties } from "@/redux/features/canvasSlice";
 
 interface ControlButtonsProps {
   canvasRef: React.MutableRefObject<fabric.Canvas | null>;
@@ -80,7 +82,8 @@ export const useControlButtons = ({ canvasRef, updateButtonStates }: ControlButt
   const handleDelete = useCallback(() => {
     const activeObject = canvasRef.current?.getActiveObject();
     if (activeObject) {
-      activeObject.id && dispatch(deleteImage(activeObject.id))      
+      activeObject.id && activeObject.data.category === "image" && dispatch(deleteImage(activeObject.id))  
+      activeObject.id && activeObject.data.category === "text" && dispatch(removeText(activeObject.id))           
       canvasRef.current?.remove(activeObject);
       canvasRef.current?.renderAll();
       updateButtonStates();
@@ -112,7 +115,7 @@ export const useControlButtons = ({ canvasRef, updateButtonStates }: ControlButt
   
       activeObject.set({
         left: centerX - activeObject.getScaledWidth() / 2,
-        top: (centerY - activeObject.getScaledHeight() / 2) - 60,
+        top: (centerY - activeObject.getScaledHeight() / 2) - 50,
       });
   
       activeObject.setCoords();
@@ -120,6 +123,15 @@ export const useControlButtons = ({ canvasRef, updateButtonStates }: ControlButt
       updateButtonStates();
     }
   }, [canvasRef, updateButtonStates]);
+
+  useEffect(() => {
+    const activeObject = canvasRef.current?.getActiveObject();
+    if(activeObject) {
+      dispatch(setCanvasProperties({ hasSelected: true }))
+    } else {
+      dispatch(setCanvasProperties({ hasSelected: false }))
+    }
+  }, [canvasRef, dispatch])
 
   return useMemo(() => ({
     handleFlipX,

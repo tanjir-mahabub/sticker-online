@@ -3,6 +3,9 @@ import { fabric } from 'fabric';
 interface AdjustViewportProps {
   canvas: fabric.Canvas; 
   obj: fabric.Object;
+  frameWidth?: number;
+  frameHeight?: number;
+  frame?: boolean;
   setPercent?: number;
   setOffsetY?: number;
 }
@@ -10,15 +13,18 @@ interface AdjustViewportProps {
 export const adjustViewportToElement = ({ 
   canvas, 
   obj, 
+  frameWidth, 
+  frameHeight, 
+  frame = false, 
   setPercent = 0.5, 
   setOffsetY = 50 
 }: AdjustViewportProps): void => {
-  if(canvas && obj) {
-    const canvasWidth = canvas.getWidth();
-    const canvasHeight = canvas.getHeight();
+  if (canvas && obj) {
+    const canvasWidth = frame && frameWidth ? frameWidth : canvas.getWidth();
+    const canvasHeight = frame && frameHeight ? frameHeight : canvas.getHeight();
     const rectWidth = obj.getScaledWidth();
     const rectHeight = obj.getScaledHeight();
-
+console.log('image die---', canvasWidth, canvasHeight, rectWidth, rectHeight, '50%', canvasWidth * 0.5, canvasHeight * 0.5);
     const scaleX = (canvasWidth * setPercent) / rectWidth;
     const scaleY = (canvasHeight * setPercent) / rectHeight;
     const scale = Math.min(scaleX, scaleY);

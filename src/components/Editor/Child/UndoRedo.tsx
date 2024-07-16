@@ -6,10 +6,22 @@ const UndoRedo = () => {
     const canvasProperties = useAppSelector(state => state.canvas);
     const { clientWidth, clientHeight } = canvasProperties;
     
-    const { undo, redo } = useCanvas();
+    const {historyControllerRef, undo, redo } = useCanvas();
     
     const [isDisabledUndo, setDisabledUndo] = useState(false);
-    const [isDisabledRedo, setDisabledRedo] = useState(false);
+    const [isDisabledRedo, setDisabledRedo] = useState(true);
+
+    const handleUndo = () => {
+       historyControllerRef.current && setDisabledUndo(historyControllerRef.current?.history.length - 1 <= 1);
+       setDisabledRedo(false); // Always enable redo after an undo
+        undo();
+      };
+    
+      const handleRedo = () => {
+        setDisabledUndo(false); // Always enable undo after a redo
+       historyControllerRef.current && setDisabledRedo(historyControllerRef.current?.redoStack.length - 1 === 0);
+        redo();
+      };
 
     const [responsiveTasks, setResponsiveTasks] = useState({
         color: "#121212"
@@ -34,7 +46,7 @@ const UndoRedo = () => {
     return (
         <>
             <div
-                onClick={undo}
+                onClick={handleUndo}
                 className={`group flex flex-col justify-center items-center gap-2 p-2 rounded-md cursor-pointer select-none ${isDisabledUndo ? 'opacity-30 pointer-events-none' : ''}`}
             >
                 <svg className="hidden lg:block group-hover:opacity-30 opacity-80" width="22" height="10" viewBox="0 0 22 10" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -51,7 +63,7 @@ const UndoRedo = () => {
                 <span className={`group-hover:opacity-30 text-xxs lg:text-xs text-white lg:text-so-black ${isDisabledUndo ? 'text-white lg:text-gray-500' : 'group-hover:text-white lg:group-hover:text-so-black'}`}>Undo</span>
             </div>
             <div
-                onClick={redo}
+                onClick={handleRedo}
                 className={`group flex flex-col justify-center items-center gap-2 p-2 rounded-md cursor-pointer select-none ${isDisabledRedo ? 'opacity-30 pointer-events-none' : ''}`}
             >
                 <svg className="hidden lg:block group-hover:opacity-30 opacity-80" width="22" height="10" viewBox="0 0 22 10" fill="none" xmlns="http://www.w3.org/2000/svg">
