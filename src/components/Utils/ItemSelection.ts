@@ -100,7 +100,7 @@ export const itemSelection = (
 
     // If objects do not touch, only keep the one with the highest percentage inside
     if (!selectedObjects.some(obj => touchedObjects.some(tObj => tObj.object !== obj.object && isOverlap(calculateBoundingBox(tObj.object, grow), calculateBoundingBox(obj.object, grow))))) {
-      selectedObjects = [selectedObjects.reduce((maxObj, obj) => (obj.percentageInside > maxObj.percentageInside ? obj : maxObj))];
+      selectedObjects = [selectedObjects?.reduce((maxObj, obj) => (obj.percentageInside > maxObj.percentageInside ? obj : maxObj))];
     }
 
     return selectedObjects;

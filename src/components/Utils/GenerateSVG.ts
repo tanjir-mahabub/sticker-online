@@ -12,90 +12,76 @@ export const generateSVGWithMargin = (
 ): Promise<string> => {
   return new Promise((resolve, reject) => {
     try {
-      // Deselect all objects on the canvas
-      canvas.discardActiveObject();
+      // Store the original zoom and viewportTransform
+      const originalViewportTransform = canvas.viewportTransform?.slice() || [1, 0, 0, 1, 0, 0];
+      let zoom = originalViewportTransform[0];
 
-      // Calculate the frame's position centered on the canvas
-      const canvasWidth = canvas.getWidth();
-      const canvasHeight = canvas.getHeight();
-      const frameLeft = (canvasWidth - frameWidth) / 2;
-      const frameTop = (canvasHeight - frameHeight) / 2;
-
-      // Determine border radius based on StickerNavID
-      let cornerRadius = 0;
-      if (StickerNavID === 3) {
-        cornerRadius = Math.min(frameWidth * grow / 2, frameHeight * grow / 2) / 2; // Circle
-      } else if (StickerNavID === 4) {
-        cornerRadius = 10; // Rounded corners
+      if(zoom < 1) {
+        originalViewportTransform[0] = 1;
+        originalViewportTransform[1] = 0;
+        originalViewportTransform[2] = 0;
+        originalViewportTransform[3] = 1;
+        originalViewportTransform[4] = (originalViewportTransform[4] + margin / 2) * zoom - 30;
+        originalViewportTransform[5] = (originalViewportTransform[5] + margin / 2) * zoom - 30;
+        zoom = 1
       }
 
-      // Use itemSelection to get the selected objects
-      const selectedObjects = itemSelection(canvas, grow, frameWidth, frameHeight)?.map(item => item.object) ?? [];
+      // Export the entire canvas as SVG
+      const canvasSVG = canvas.toSVG();
 
-      // Clone the selected objects
-      Promise.all(selectedObjects.map(obj => new Promise<fabric.Object>((resolve) => {
-        obj.clone((clonedObj: fabric.Object) => resolve(clonedObj), ["left", "top", "scaleX", "scaleY", "angle", "originX", "originY"]);
-      }))).then(clonedObjects => {
-        // Set the cloned objects' positions and scales
-        clonedObjects.forEach(obj => {
-          obj.set({
-            left: obj.left!,
-            top: obj.top!,
-            scaleX: obj.scaleX ?? 1,
-            scaleY: obj.scaleY ?? 1,
-            selectable: false,
-            evented: false,
-          });
-          obj.setCoords();
-        });
+      // Create a new DOMParser instance
+      const parser = new DOMParser();
+      const svgDoc = parser.parseFromString(canvasSVG, "image/svg+xml");
 
-        // Create a temporary canvas for the SVG generation
-        const tempCanvas = new fabric.StaticCanvas(null, { width: canvasWidth, height: canvasHeight });
-        const group = new fabric.Group(clonedObjects, {
-          left: frameLeft + frameWidth / 2,
-          top: frameTop + frameHeight / 2,
-          originX: 'center',
-          originY: 'center',
-          selectable: false,
-          evented: false,
-        });
+      // Get the SVG root element
+      const svgRoot = svgDoc.documentElement;
 
-        // Add the group to the temporary canvas
-        tempCanvas.add(group);
+      // Calculate the frame's position considering the viewport transform
+      const canvasWidth = canvas.getWidth();
+      const canvasHeight = canvas.getHeight();
+      const frameLeft = (canvasWidth - frameWidth) / 2 - originalViewportTransform[4];
+      const frameTop = (canvasHeight - frameHeight) / 2 - originalViewportTransform[5] - 30;
 
-        // Create a background rectangle
-        const backgroundRect = new fabric.Rect({
-          left: frameLeft,
-          top: frameTop,
-          width: frameWidth,
-          height: frameHeight,
-          fill: backgroundColor,
-          selectable: false,
-          evented: false,
-          rx: cornerRadius,
-          ry: cornerRadius,
-        });
+      // Create a background shape element
+      let backgroundShape;
+      if (StickerNavID === 3) {
+        // Circle using rect with 50% border radius
+        backgroundShape = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        backgroundShape.setAttribute("x", frameLeft.toString());
+        backgroundShape.setAttribute("y", frameTop.toString());
+        backgroundShape.setAttribute("width", (frameWidth * zoom).toString());
+        backgroundShape.setAttribute("height", (frameHeight * zoom).toString());
+        backgroundShape.setAttribute("rx", (frameWidth * zoom / 2).toString());
+        backgroundShape.setAttribute("ry", (frameHeight * zoom / 2).toString());
+        backgroundShape.setAttribute("fill", backgroundColor);
+      } else {
+        // Rectangle or Rounded Rectangle
+        backgroundShape = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        backgroundShape.setAttribute("x", frameLeft.toString());
+        backgroundShape.setAttribute("y", frameTop.toString());
+        backgroundShape.setAttribute("width", (frameWidth * zoom).toString());
+        backgroundShape.setAttribute("height", (frameHeight * zoom).toString());
+        backgroundShape.setAttribute("fill", backgroundColor);
+        if (StickerNavID === 4) {
+          backgroundShape.setAttribute("rx", "10"); // Rounded corners
+          backgroundShape.setAttribute("ry", "10");
+        }
+      }
 
-        tempCanvas.add(backgroundRect);
-        tempCanvas.sendToBack(backgroundRect);
-        tempCanvas.renderAll();
+      // Append the background shape to the SVG
+      svgRoot.insertBefore(backgroundShape, svgRoot.firstChild);
 
-        // Get the SVG of the group with the background rectangle
-        const groupSVG = group.toSVG();
-        const backgroundRectSVG = backgroundRect.toSVG();
+      // Create a new viewBox based on the transformed frame dimensions and margin
+      const newViewBox = `${frameLeft / zoom - margin} ${frameTop / zoom - margin} ${(frameWidth + 2 * margin) * zoom} ${(frameHeight + 2 * margin) * zoom}`;
+      svgRoot.setAttribute("viewBox", newViewBox);
+      svgRoot.setAttribute("width", ((frameWidth + 2 * margin) * zoom).toString());
+      svgRoot.setAttribute("height", ((frameHeight + 2 * margin) * zoom).toString());
 
-        // Create the SVG document with the specified frame dimensions and background
-        const wrappedSVG = `
-          <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="${frameLeft - margin} ${frameTop - margin} ${frameWidth + 2 * margin} ${frameHeight + 2 * margin}" width="${frameWidth + 2 * margin}" height="${frameHeight + 2 * margin}">
-            ${backgroundRectSVG}
-            <g>
-              ${groupSVG}
-            </g>
-          </svg>
-        `;
+      // Serialize the modified SVG back to string
+      const serializer = new XMLSerializer();
+      const newSVGString = serializer.serializeToString(svgRoot);
 
-        resolve(wrappedSVG);
-      }).catch(reject);
+      resolve(newSVGString);
     } catch (error) {
       reject(error);
     }
