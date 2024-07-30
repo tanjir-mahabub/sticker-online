@@ -36,19 +36,10 @@ export interface ImageInfo {
   stackNum?: number;
 }
 
-export interface ExtendedRaphaelPaper {
-  width: number;
-  height: number;
-  forEach(callback: (el: any) => void): void;
-  rect: (x: number, y: number, width: number, height: number, round?: number) => void;
-  circle: (x: number, y: number, radius: number) => void;
-  path: (d: string) => void;
-}
-
-
 export interface CanvasState {
   clientWidth: number,
   clientHeight: number,
+  canvasInitialZoom: number,
   canvasX: number,
   canvasY: number,
   canvasWidth: number,
@@ -66,30 +57,3 @@ export interface CanvasState {
   isLoading: boolean;
   hasSelected: boolean;
 }
-
-
-// type HistoryAction = Partial<RectangleProps['shapeProps'][]> | Partial<ImageProps['imageProps'][]> | Partial<TextProps['textProps'][]>;
-
-// export type AddToHistory= (action: HistoryAction) => void;
-
-
-export interface Frame {
-  centerX: number;
-  centerY: number;
-  frameWidth: number;
-  frameHeight: number;
-}
-
-export interface ObjectPosition {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
-
-export type BoundingBox = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-};

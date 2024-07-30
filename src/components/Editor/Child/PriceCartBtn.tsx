@@ -1,4 +1,4 @@
-import { formattedTotalCost } from "@/components/Utils/vectorFunction";
+import { formattedTotalCost } from "@/components/Utils/function";
 import { useAppSelector } from "@/redux/store"
 
 const PriceCartBtn = () => {

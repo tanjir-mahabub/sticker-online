@@ -27,7 +27,7 @@ const ImageComponent: React.FC<ImageComponentProps> = ({ fabricCanvas, images, s
       const canvasHeight = canvas.getHeight();
       const canvasCenter = {
         left: canvasWidth / 2,
-        top: canvasHeight / 2 - 50,
+        top: canvasHeight / 2 - 30,
       };
 
       images.forEach((image) => {

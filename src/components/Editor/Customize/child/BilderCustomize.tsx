@@ -5,7 +5,7 @@ import { addImage, clearImages } from "@/redux/features/imagePreviewSlice";
 import { RootState, useAppSelector } from "@/redux/store";
 import Image from "next/image";
 import { deleteAllHistoriesByCategory } from "@/redux/features/historySlice";
-import { generateUniqueId } from "@/components/Utils/vectorFunction";
+import { generateUniqueId } from "@/components/Utils/function";
 import { setCategoryToRemove } from "@/redux/features/categoryToRemove";
 
 const BilderCustomize = () => {

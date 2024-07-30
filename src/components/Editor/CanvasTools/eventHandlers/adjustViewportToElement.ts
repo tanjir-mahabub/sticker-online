@@ -17,7 +17,7 @@ export const adjustViewportToElement = ({
   frameHeight, 
   frame = false, 
   setPercent = 0.5, 
-  setOffsetY = 50 
+  setOffsetY = 30 
 }: AdjustViewportProps): void => {
   if (canvas && obj) {
     const canvasWidth = frame && frameWidth ? frameWidth : canvas.getWidth();

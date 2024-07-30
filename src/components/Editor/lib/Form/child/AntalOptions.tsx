@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import AnimateIn from '@/lib/AnimateIn';
-import { formattedTotalCost } from '@/components/Utils/vectorFunction';
+import { formattedTotalCost } from '@/components/Utils/function';
 
 export interface AntalOption {
     id: number;

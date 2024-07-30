@@ -16,7 +16,7 @@ interface ControlElementsProps {
   selected: boolean;
 }
 
-const ControlElements: React.FC<ControlElementsProps> = ({ canvasRef, selected }) => {
+const ControlElements: React.FC<ControlElementsProps> = ({ canvasRef, selected }) => {  
 
   const dispatch = useDispatch();
 
