@@ -46,7 +46,7 @@ export const useCanvasSetup = (
             const img = iconImageRef.current;
             ctx.drawImage(img, -size / 2, -size / 2, size, size);
           } else {
-            ctx.fillStyle = 'yellow';
+            ctx.fillStyle = 'black';
             ctx.beginPath();
             ctx.arc(0, 0, size / 2, 0, Math.PI * 2);
             ctx.fill();
