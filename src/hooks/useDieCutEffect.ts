@@ -146,7 +146,7 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
     if (canvas) {
       try {
         const margin = 10;
-        const svgString = await generateSVGWithMargin(canvas, canvasProperties.frameWidth, canvasProperties.frameHeight, canvasProperties.backgroundColor, StickerNavID, margin, canvasProperties.grow);
+        const svgString = await generateSVGWithMargin(canvas, canvasProperties.frameWidth, canvasProperties.frameHeight, canvasProperties.backgroundColor, StickerNavID, margin, true);
 
         // Create a Blob and download the SVG
         const blob = new Blob([svgString], { type: 'image/svg+xml' });
