@@ -1,16 +1,38 @@
 import { fabric } from "fabric";
+interface GenerateSVGWithMarginOptions {
+  canvas: fabric.Canvas;
+  frameWidth: number;
+  frameHeight: number;
+  backgroundColor: string;
+  StickerNavID: number;
+  margin?: number;
+  hasBackground?: boolean;
+  printLine?: boolean;
+  printLineWidth?: number;
+  isDieCutImage?: boolean;
+}
 
-export const generateSVGWithMargin = (
-  canvas: fabric.Canvas,
-  frameWidth: number,
-  frameHeight: number,
-  backgroundColor: string,
-  StickerNavID: number,
+
+const deletePrevDieCut = (canvas: fabric.Canvas) => {
+  const existingObject = canvas.getObjects().find(obj => obj.get('id') === "dieCutImage");
+  if (existingObject) {
+    canvas.remove(existingObject);
+    canvas.renderAll();
+  }
+};
+
+export const generateSVGWithMargin = ({
+  canvas,
+  frameWidth,
+  frameHeight,
+  backgroundColor,
+  StickerNavID,
   margin = 10,
   hasBackground = true,
   printLine = true,
-  printLineWidth = 3
-): Promise<string> => {
+  printLineWidth = 3,
+  isDieCutImage = true
+}: GenerateSVGWithMarginOptions): Promise<string> => {
   return new Promise((resolve, reject) => {
     try {
       // Store the original viewportTransform
@@ -20,6 +42,8 @@ export const generateSVGWithMargin = (
       // Calculate the frame's position considering the viewport transform
       const canvasWidth = canvas.getWidth();
       const canvasHeight = canvas.getHeight();
+
+      !isDieCutImage && deletePrevDieCut(canvas);
 
       // Adjust for zoom in the original viewport transformation
       const offsetX = originalViewportTransform[4] / zoom;

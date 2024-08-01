@@ -62,7 +62,7 @@ const FabricCanvas: React.FC = () => {
         console.log("This function runs after all objects are added and rendered.");
         // Your function logic here
         if(canvasProperties.grow) {
-          handleDieCut(canvasProperties.grow);
+          // handleDieCut(canvasProperties.grow);
         }
       };
 
