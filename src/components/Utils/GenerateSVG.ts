@@ -1,17 +1,20 @@
+import { ObjectsWithPercentageArray } from "@/hooks/useDieCutEffect";
 import { fabric } from "fabric";
+
 interface GenerateSVGWithMarginOptions {
   canvas: fabric.Canvas;
+  selectedItem: ObjectsWithPercentageArray;
   frameWidth: number;
   frameHeight: number;
   backgroundColor: string;
   StickerNavID: number;
+  grow: number; // Added grow parameter
   margin?: number;
   hasBackground?: boolean;
   printLine?: boolean;
   printLineWidth?: number;
   isDieCutImage?: boolean;
 }
-
 
 const deletePrevDieCut = (canvas: fabric.Canvas) => {
   const existingObject = canvas.getObjects().find(obj => obj.get('id') === "dieCutImage");
@@ -23,10 +26,12 @@ const deletePrevDieCut = (canvas: fabric.Canvas) => {
 
 export const generateSVGWithMargin = ({
   canvas,
+  selectedItem,
   frameWidth,
   frameHeight,
   backgroundColor,
   StickerNavID,
+  grow,
   margin = 10,
   hasBackground = true,
   printLine = true,
@@ -41,19 +46,23 @@ export const generateSVGWithMargin = ({
 
       // Calculate the frame's position considering the viewport transform
       const canvasWidth = canvas.getWidth();
-      const canvasHeight = canvas.getHeight();
+      const canvasHeight = canvas.getHeight();      
 
-      !isDieCutImage && deletePrevDieCut(canvas);
+      if (!isDieCutImage) {
+        deletePrevDieCut(canvas);
+      }
 
       // Adjust for zoom in the original viewport transformation
       const offsetX = originalViewportTransform[4] / zoom;
       const offsetY = originalViewportTransform[5] / zoom;
 
-      // Calculate the frame's position centered on the canvas with an additional offsetY
+      // Calculate the frame's position centered on the canvas
       const frameLeft = (canvasWidth / zoom - frameWidth) / 2 - offsetX;
-      const frameTop = (canvasHeight / zoom - frameHeight) / 2 - offsetY - 30 / zoom;
+      const frameTop = (canvasHeight / zoom - frameHeight) / 2 - offsetY;
+      
+      console.log(`Frame: Left=${frameLeft}, Top=${frameTop}, Width=${frameWidth}, Height=${frameHeight}, Zoom=${zoom}`);
 
-      // Export the entire canvas as SVG
+      // Export canvas as SVG
       const canvasSVG = canvas.toSVG();
 
       // Create a new DOMParser instance
@@ -67,13 +76,13 @@ export const generateSVGWithMargin = ({
       let backgroundShape = null;
       if (hasBackground) {
         backgroundShape = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        backgroundShape.setAttribute("x", (frameLeft - printLineWidth / 2).toString());
-        backgroundShape.setAttribute("y", (frameTop - printLineWidth / 2).toString());
-        backgroundShape.setAttribute("width", (frameWidth + printLineWidth).toString());
-        backgroundShape.setAttribute("height", (frameHeight + printLineWidth).toString());
+        backgroundShape.setAttribute("x", (frameLeft - margin).toString());
+        backgroundShape.setAttribute("y", (frameTop - margin).toString());
+        backgroundShape.setAttribute("width", (frameWidth + 2 * margin).toString());
+        backgroundShape.setAttribute("height", (frameHeight + 2 * margin).toString());
         backgroundShape.setAttribute("fill", backgroundColor);
 
-        if(printLine) {
+        if (printLine) {
           backgroundShape.setAttribute("stroke", "magenta");
           backgroundShape.setAttribute("stroke-width", printLineWidth.toString());
           backgroundShape.setAttribute("stroke-linecap", "round");

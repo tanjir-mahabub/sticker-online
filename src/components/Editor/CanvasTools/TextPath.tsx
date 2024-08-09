@@ -39,15 +39,15 @@ const TextPath: React.FC<TextPathProps> = ({ fabricCanvas, saveState }) => {
               });
 
                // Calculate the center position
-               const canvasCenterX = CanvasProperties.canvasWidth / 2;
-               const canvasCenterY = CanvasProperties.canvasHeight / 2;
-               const textPathWidth = textPath.width ?? 0;
-               const textPathHeight = textPath.height ?? 0;
-               const textPathCenterX = textPathWidth / 2;
-               const textPathCenterY = textPathHeight / 2;
+              //  const canvasCenterX = CanvasProperties.canvasWidth / 2;
+              //  const canvasCenterY = CanvasProperties.canvasHeight / 2;
+              //  const textPathWidth = textPath.width ?? 0;
+              //  const textPathHeight = textPath.height ?? 0;
+              //  const textPathCenterX = textPathWidth / 2;
+              //  const textPathCenterY = textPathHeight / 2;
  
-               textPath.left = canvasCenterX - textPathCenterX;
-               textPath.top = canvasCenterY - textPathCenterY - 30;
+              //  textPath.left = canvasCenterX - textPathCenterX;
+              //  textPath.top = canvasCenterY - textPathCenterY - 30;
 
               const objectExists = findObjectById(fabricCanvas.current!, text.id);       
               

@@ -58,149 +58,18 @@ const parseSvgString = (svgString: string): SVGSVGElement => {
     return { width: width!, height: height!, viewBox: viewBox! };
 };
   
-//   const restoreSVG = (
-//     scaledSvgData: string,
-//     originalSvgData: string
-//   ): string => {
-//     // Parse the scaled SVG data and get the document element
-//     const parser = new DOMParser();
-//     const svgDocument = parser.parseFromString(scaledSvgData, 'image/svg+xml');
-//     const svgElement = svgDocument.documentElement;
-  
-//     // Extract original width, height, and viewBox
-//     const { width, height, viewBox } = getSvgAttributes(originalSvgData);
-  
-//     // Restore original width, height, and viewBox
-//     svgElement.setAttribute('width', width);
-//     svgElement.setAttribute('height', height);
-//     svgElement.setAttribute('viewBox', viewBox);
-  
-//     // Return the restored SVG as a string
-//     const serializer = new XMLSerializer();
-//     return serializer.serializeToString(svgElement);
-//   };
-
-  const removeExtraWhiteSpace = (svgData: string): string => {
-    const parser = new DOMParser();
-    const svgDocument = parser.parseFromString(svgData, 'image/svg+xml');
-    const svgElement = svgDocument.documentElement;
-
-    // Create an SVG element to render the SVG and calculate its bounding box
-    const tempSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    tempSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-    tempSvg.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
-    tempSvg.setAttribute('width', '0');
-    tempSvg.setAttribute('height', '0');
-    tempSvg.style.position = 'absolute';
-    tempSvg.style.opacity = '0';
-
-    // Append the SVG data to this temporary SVG
-    tempSvg.innerHTML = svgElement.innerHTML;
-
-    // Append to the document to render it and calculate bounding box
-    document.body.appendChild(tempSvg);
-
-    // Get bounding box of the content
-    const bbox = tempSvg.getBBox();
-
-    // Remove the temporary SVG
-    document.body.removeChild(tempSvg);
-
-    // Calculate the translation needed to move the content to (0, 0)
-    const translateX = -bbox.x;
-    const translateY = -bbox.y;
-
-    // Create a wrapper <g> element to contain the original content and apply translation
-    const wrapperG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-    wrapperG.setAttribute('transform', `translate(${translateX},${translateY})`);
-
-    // Move all existing child elements of the SVG into the wrapper <g>
-    while (svgElement.firstChild) {
-        wrapperG.appendChild(svgElement.firstChild);
-    }
-    svgElement.appendChild(wrapperG);
-
-    // Update the viewBox to match the bounding box of the content
-    const newViewBox = `0 0 ${bbox.width} ${bbox.height}`;
-    svgElement.setAttribute('viewBox', newViewBox);
-
-    // Return the updated SVG as a string
-    const serializer = new XMLSerializer();
-    return serializer.serializeToString(svgElement);
-};
-  
-
-const processSVG = (svgData: string, scale: number, margin: number = 0): string => {
-    const parser = new DOMParser();
-    const svgDocument = parser.parseFromString(svgData, 'image/svg+xml');
-    const svgElement = svgDocument.documentElement;
-
-    // Ensure the parsed element is an SVG element
-    if (svgElement.tagName.toLowerCase() !== 'svg') {
-        throw new Error('Parsed element is not an SVG.');
-    }
-
-    // Extract the original viewBox and scale it
-    const viewBoxAttr = svgElement.getAttribute('viewBox');
-    if (!viewBoxAttr) {
-        throw new Error("SVG must have a viewBox attribute for proper scaling.");
-    }
-    const [x, y, width, height] = viewBoxAttr.split(' ').map(parseFloat);
-    const newWidth = width * scale;
-    const newHeight = height * scale;
-    const newViewBox = `${x} ${y} ${newWidth} ${newHeight}`;
-    svgElement.setAttribute('viewBox', newViewBox);
-
-    // Create an SVG element to render the SVG and calculate its bounding box
-    const tempSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    tempSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-    tempSvg.setAttribute('width', '0');
-    tempSvg.setAttribute('height', '0');
-    tempSvg.style.position = 'absolute';
-    tempSvg.style.opacity = '0';
-
-    // Append the SVG data to this temporary SVG
-    tempSvg.innerHTML = svgElement.innerHTML;
-
-    // Append to the document to render it and calculate bounding box
-    document.body.appendChild(tempSvg);
-
-    // Get bounding box of the content
-    const bbox = tempSvg.getBBox();
-
-    // Remove the temporary SVG
-    document.body.removeChild(tempSvg);
-
-    // Update the viewBox to match the bounding box of the content with margin
-    const finalViewBox = `${bbox.x - margin} ${bbox.y - margin} ${bbox.width + 2 * margin} ${bbox.height + 2 * margin}`;
-    svgElement.setAttribute('viewBox', finalViewBox);
-
-    // Return the updated SVG as a string
-    const serializer = new XMLSerializer();
-    return serializer.serializeToString(svgElement);
-};
-
 
   export const generateSVGImageData = async (
     svgData: string,
     grow: number,
     backgroundColor: string
   ): Promise<string> => {
-    const scale = 0.10; // Example scale factor
-    console.log('Original SVG:', svgData);
-    const svgDataResized = removeExtraWhiteSpace(svgData);
-  
-    console.log('svgDataResized SVG:', svgDataResized);
-    // Scale down the SVG
-    const margin = 50; // Example margin in the desired units (e.g., px)
-const optimizedSvgData = processSVG(svgDataResized, scale, margin);
-    console.log("optimizedSvgData", optimizedSvgData);
 
-    const { width: scaledWidth, height: scaledHeight, viewBox } = await getSvgAttributes(optimizedSvgData);
+    const { width: scaledWidth, height: scaledHeight, viewBox } = await getSvgAttributes(svgData);
   
     if (scaledWidth === null || scaledHeight === null) throw new Error('Invalid SVG dimensions');
   
-    const modifiedSVG = await svgModification(optimizedSvgData, parseInt(scaledWidth), parseInt(scaledHeight), viewBox, grow, backgroundColor, backgroundColor);
+    const modifiedSVG = await svgModification(svgData, parseInt(scaledWidth), parseInt(scaledHeight), viewBox, grow, backgroundColor, backgroundColor);
   
     const serializer = new XMLSerializer();
     const modifiedSVGImg = serializer.serializeToString(modifiedSVG);
