@@ -40,8 +40,8 @@ const Editor = () => {
 
     return (
         <section>
-            <Script src="https://d3js.org/d3.v7.min.js" strategy="lazyOnload" />
-            <Script src="https://unpkg.com/opentype.js/dist/opentype.min.js" strategy="lazyOnload" />
+            {/* <Script src="https://d3js.org/d3.v7.min.js" strategy="lazyOnload" />
+            <Script src="https://unpkg.com/opentype.js/dist/opentype.min.js" strategy="lazyOnload" /> */}
 
             <CanvasProvider>
                 <div className="flex flex-col overflow-hidden w-full h-screen">

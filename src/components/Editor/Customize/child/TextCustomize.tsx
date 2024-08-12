@@ -7,7 +7,7 @@ import TextInput from './Input/TextInput';
 import { useAppSelector } from "@/redux/store"; // Adjust the import path as necessary
 import Image from 'next/image';
 import { deleteAllHistoriesByCategory } from '@/redux/features/historySlice';
-import { generateUniqueId } from '@/components/Utils/vectorFunction';
+import { generateUniqueId } from '@/components/Utils/function';
 import { setCategoryToRemove } from '@/redux/features/categoryToRemove';
 
 const TextCustomize: React.FC = () => {

@@ -27,7 +27,7 @@ const ImageComponent: React.FC<ImageComponentProps> = ({ fabricCanvas, images, s
       const canvasHeight = canvas.getHeight();
       const canvasCenter = {
         left: canvasWidth / 2,
-        top: canvasHeight / 2 - 50,
+        top: canvasHeight / 2 - 30,
       };
 
       images.forEach((image) => {
@@ -47,10 +47,10 @@ const ImageComponent: React.FC<ImageComponentProps> = ({ fabricCanvas, images, s
           // Center the image on the canvas
           oImg.set({
             id: image.id,
-            left: canvasCenter.left - imgWidth / 2,
-            top: canvasCenter.top - imgHeight / 2,
-            scaleX: imgWidth / oImg.width!,
-            scaleY: imgHeight / oImg.height!,
+            // left: canvasCenter.left - imgWidth / 2,
+            // top: canvasCenter.top - imgHeight / 2,
+            // scaleX: imgWidth / oImg.width!,
+            // scaleY: imgHeight / oImg.height!,
             crossOrigin: 'anonymous',
             data: {
               id: image.id,

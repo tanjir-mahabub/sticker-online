@@ -17,7 +17,7 @@ export const adjustViewportToElement = ({
   frameHeight, 
   frame = false, 
   setPercent = 0.5, 
-  setOffsetY = 50 
+  setOffsetY = 30 
 }: AdjustViewportProps): void => {
   if (canvas && obj) {
     const canvasWidth = frame && frameWidth ? frameWidth : canvas.getWidth();
@@ -41,7 +41,7 @@ console.log('image die---', canvasWidth, canvasHeight, rectWidth, rectHeight, '5
 
     viewportTransform[4] = centerX;
     viewportTransform[5] = centerY - setOffsetY;
-
+console.log(viewportTransform);
     canvas.setViewportTransform(viewportTransform);
     canvas.requestRenderAll();
 

@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux';
 import { setCanvasProperties } from '@/redux/features/canvasSlice';
 import { setCalculation } from '@/redux/features/calculationSlice';
 import { useAppSelector } from '@/redux/store';
-import { cmToPixel } from '@/components/Utils/vectorFunction';
+import { cmToPixel } from '@/components/Utils/function';
 import { debounce } from "lodash";
 
 const DimensionInput = () => {

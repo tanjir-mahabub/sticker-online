@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { fabric } from 'fabric';
 import { useAppSelector } from '@/redux/store';
-import { convertTextToPath } from '@/components/Utils/vectorFunction';
+import { convertTextToPath } from '@/components/Utils/function';
 import { findObjectById } from './eventHandlers/canvasFunctions';
 import { useDispatch } from 'react-redux';
 import { setCategoryToRemove } from '@/redux/features/categoryToRemove';
@@ -27,9 +27,7 @@ const TextPath: React.FC<TextPathProps> = ({ fabricCanvas, saveState }) => {
             if (pathData) {
               const textPath = new fabric.Path(pathData);
               textPath.set({
-                id: text.id,
-                left: CanvasProperties.canvasWidth / 2,
-                top: CanvasProperties.canvasHeight / 2,
+                id: text.id,               
                 fill: text.fill,
                 stroke: 'transparent',
                 strokeWidth: 1,
@@ -39,6 +37,18 @@ const TextPath: React.FC<TextPathProps> = ({ fabricCanvas, saveState }) => {
                   category: text.category,                  
                 },
               });
+
+               // Calculate the center position
+              //  const canvasCenterX = CanvasProperties.canvasWidth / 2;
+              //  const canvasCenterY = CanvasProperties.canvasHeight / 2;
+              //  const textPathWidth = textPath.width ?? 0;
+              //  const textPathHeight = textPath.height ?? 0;
+              //  const textPathCenterX = textPathWidth / 2;
+              //  const textPathCenterY = textPathHeight / 2;
+ 
+              //  textPath.left = canvasCenterX - textPathCenterX;
+              //  textPath.top = canvasCenterY - textPathCenterY - 30;
+
               const objectExists = findObjectById(fabricCanvas.current!, text.id);       
               
               !objectExists && fabricCanvas.current?.add(textPath) && saveState();
@@ -54,7 +64,7 @@ const TextPath: React.FC<TextPathProps> = ({ fabricCanvas, saveState }) => {
       if(CategoryToRemove) {                
         const texts = fabricCanvas.current.getObjects('path') as fabric.Path[];                       
         texts?.forEach(obj => {
-            if(obj.data.category === CategoryToRemove) {
+            if(obj?.data?.category === CategoryToRemove) {
                 fabricCanvas?.current?.remove(obj)
             }
         })          

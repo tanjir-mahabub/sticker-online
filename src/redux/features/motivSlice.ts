@@ -1,5 +1,5 @@
 
-import { generateUniqueId } from '@/components/Utils/vectorFunction';
+import { generateUniqueId } from '@/components/Utils/function';
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
 interface MotivState {

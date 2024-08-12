@@ -114,7 +114,7 @@ export const useControlButtons = ({ canvasRef, updateButtonStates }: ControlButt
   
       activeObject.set({
         left: centerX - activeObject.getScaledWidth() / 2,
-        top: (centerY - activeObject.getScaledHeight() / 2) - 50,
+        top: (centerY - activeObject.getScaledHeight() / 2) - 30,
       });
   
       activeObject.setCoords();

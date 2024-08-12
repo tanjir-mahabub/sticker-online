@@ -107,7 +107,7 @@ const drawSVG = async (
         fragment.appendChild(rect);
     });
 
-    console.log('svg drawing...');
+    // console.log('svg drawing...');
 
     svgRoot.appendChild(fragment);
     return svgRoot;
