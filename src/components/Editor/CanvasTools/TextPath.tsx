@@ -64,7 +64,7 @@ const TextPath: React.FC<TextPathProps> = ({ fabricCanvas, saveState }) => {
       if(CategoryToRemove) {                
         const texts = fabricCanvas.current.getObjects('path') as fabric.Path[];                       
         texts?.forEach(obj => {
-            if(obj.data.category === CategoryToRemove) {
+            if(obj?.data?.category === CategoryToRemove) {
                 fabricCanvas?.current?.remove(obj)
             }
         })          

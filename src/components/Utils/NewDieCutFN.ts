@@ -16,7 +16,7 @@ const parseSvgString = (svgString: string): SVGSVGElement => {
   };
   
   const getSvgAttributes = (svgData: string): { width: string, height: string, viewBox: string } => {
-    //console.log('Raw SVG Data:', svgData); // Log the raw SVG data
+    console.log('Raw SVG Data:', svgData); // Log the raw SVG data
 
     const parser = new DOMParser();
     const svgDocument = parser.parseFromString(svgData, 'image/svg+xml');
@@ -57,40 +57,137 @@ const parseSvgString = (svgString: string): SVGSVGElement => {
 
     return { width: width!, height: height!, viewBox: viewBox! };
 };
-  
 
-  export const generateSVGImageData = async (
+
+
+
+  
+  const scaleSVG = (svgData: string, scale: number): string => {
+    const parser = new DOMParser();
+    const svgDocument = parser.parseFromString(svgData, 'image/svg+xml');
+    const svgElement = svgDocument.documentElement;
+  
+    // Extract original viewBox
+    const { viewBox } = getSvgAttributes(svgData);
+  
+    // Set new viewBox based on scale
+    const [x, y, width, height] = viewBox.split(' ').map(parseFloat);
+    const newWidth = width / scale;
+    const newHeight = height / scale;
+    const newViewBox = `${x} ${y} ${newWidth} ${newHeight}`;
+    svgElement.setAttribute('viewBox', newViewBox);
+  
+    // Return the scaled SVG as a string
+    const serializer = new XMLSerializer();
+    return serializer.serializeToString(svgElement);
+  };
+  
+  const restoreSVG = (
+    scaledSvgData: string,
+    originalSvgData: string
+  ): string => {
+    // Parse the scaled SVG data and get the document element
+    const parser = new DOMParser();
+    const svgDocument = parser.parseFromString(scaledSvgData, 'image/svg+xml');
+    const svgElement = svgDocument.documentElement;
+  
+    // Extract original width, height, and viewBox
+    const { width, height, viewBox } = getSvgAttributes(originalSvgData);
+  
+    // Restore original width, height, and viewBox
+    svgElement.setAttribute('width', width);
+    svgElement.setAttribute('height', height);
+    svgElement.setAttribute('viewBox', viewBox);
+  
+    // Return the restored SVG as a string
+    const serializer = new XMLSerializer();
+    return serializer.serializeToString(svgElement);
+  };
+  
+  
+  const adjustViewBox = (svgElement: SVGSVGElement): void => {
+    const viewBox = svgElement.getAttribute('viewBox');
+    if (!viewBox) {
+        throw new Error('SVG must have a viewBox attribute.');
+    }
+
+    const [x, y, width, height] = viewBox.split(' ').map(Number);
+
+    // Calculate the necessary translation
+    const translateX = -x;
+    const translateY = -y;
+
+    // Set the viewBox to start at 0 0
+    svgElement.setAttribute('viewBox', `0 0 ${width} ${height}`);
+
+    // Apply the translation to all child elements
+    const children = Array.from(svgElement.children);
+    children.forEach(child => {
+        const transform = child.getAttribute('transform');
+        const translateTransform = `translate(${translateX},${translateY})`;
+        const newTransform = transform ? `${translateTransform} ${transform}` : translateTransform;
+        child.setAttribute('transform', newTransform);
+    });
+};
+
+
+// Example usage within your generateSVGImageData function or wherever you handle SVGs
+export const generateSVGImageData = async (
     svgData: string,
     grow: number,
     backgroundColor: string
-  ): Promise<string> => {
+): Promise<string> => {
+    const scale = 0.3; // Example scale factor
 
-    const { width: scaledWidth, height: scaledHeight, viewBox } = await getSvgAttributes(svgData);
-  
-    if (scaledWidth === null || scaledHeight === null) throw new Error('Invalid SVG dimensions');
-  
-    const modifiedSVG = await svgModification(svgData, parseInt(scaledWidth), parseInt(scaledHeight), viewBox, grow, backgroundColor, backgroundColor);
-  
+    console.log('Original SVG:', svgData);
+    const svgElement = parseSvgString(svgData);
+
+    // Adjust the SVG viewBox and apply necessary transformations
+    adjustViewBox(svgElement);
+
+    // Serialize the adjusted SVG back to string
     const serializer = new XMLSerializer();
+    const adjustedSvgData = serializer.serializeToString(svgElement);
+
+    console.log('Adjusted SVG:', adjustedSvgData);
+
+    // Continue with your existing scaling and modification logic...
+    const scaledSvgData = scaleSVG(adjustedSvgData, scale);
+    const { width: scaledWidth, height: scaledHeight, viewBox } = getSvgAttributes(adjustedSvgData);
+
+    if (!scaledWidth || !scaledHeight) throw new Error('Invalid SVG dimensions');
+    console.log('Scaled SVG:', scaledSvgData);
+
+    const modifiedSVG = await svgModification(
+        scaledSvgData,
+        parseInt(scaledWidth),
+        parseInt(scaledHeight),
+        viewBox,
+        grow,
+        backgroundColor,
+        backgroundColor
+    );
+
     const modifiedSVGImg = serializer.serializeToString(modifiedSVG);
-    
-    const { width: modifiedWidth, height: modifiedHeight } = getSvgAttributes(modifiedSVGImg);
-    modifiedSVG.setAttribute("viewBox", `0 0 ${modifiedWidth} ${modifiedHeight}`);
-    
-    console.log('Modified SVG:', modifiedSVG, 'scaled width', scaledWidth, scaledHeight);
-    
-    const modifiedSVGImgStirng = serializer.serializeToString(modifiedSVG);
-  
-    const svgElement = parseSvgString(modifiedSVGImgStirng);
-  
-    return createDataURL(svgElement, parseInt(modifiedWidth), parseInt(modifiedHeight), grow, backgroundColor);
-  };
+    console.log('Modified SVG:', modifiedSVG);
+
+    const restoredSvgData = restoreSVG(scaledSvgData, modifiedSVGImg);
+    console.log('Restored SVG:', restoredSvgData);
+
+    const { width: restoredWidth, height: restoredHeight } = getSvgAttributes(svgData);
+
+    if (!restoredWidth || !restoredHeight) throw new Error('Invalid SVG dimensions');
+    console.log('Restored SVG:', restoredSvgData);
+
+    return createDataURL(parseSvgString(restoredSvgData), parseInt(restoredWidth), parseInt(restoredHeight), grow, backgroundColor);
+};
+
 
 const svgModification = async (
     svg: string,
     width: number,
     height: number,
-    viewBox: string,
+    viewbox: string,
     grow: number,
     backgroundColor: string,
     strokeColor: string
@@ -116,7 +213,7 @@ const svgModification = async (
             const pixels = imageData.data;
             const nonTransparentPixels = extractNonTransparentPixels(pixels, width);
 
-            drawSVG(nonTransparentPixels, width, height, viewBox, grow, backgroundColor, strokeColor)
+            drawSVG(nonTransparentPixels, width, height, viewbox, grow, backgroundColor, strokeColor)
                 .then(resolve)
                 .catch(reject);
         };
@@ -148,57 +245,54 @@ const extractNonTransparentPixels = (
     return nonTransparentPixels;
 };
 
+
 const drawSVG = async (
-    pixels: { x: number; y: number; r: number; g: number; b: number; a: number }[],
-    width: number,
-    height: number,
-    viewBox: string,
-    grow: number,
-    backgroundColor: string,
-    strokeColor: string
+  pixels: { x: number; y: number; r: number; g: number; b: number; a: number }[],
+  width: number,
+  height: number,
+  viewbox: string,
+  grow: number,
+  backgroundColor: string,
+  strokeColor: string
 ): Promise<SVGSVGElement> => {
-    const svgNS = "http://www.w3.org/2000/svg";
-    const svgRoot = document.createElementNS(svgNS, "svg");
-    svgRoot.setAttribute("xmlns", svgNS);
-    svgRoot.setAttribute("width", width.toString());
-    svgRoot.setAttribute("height", height.toString()); 
-    console.log('viewBox test', viewBox);
-    svgRoot.setAttribute("viewBox", viewBox); 
+  const svgNS = "http://www.w3.org/2000/svg";
+  const [viewBoxX, viewBoxY, viewBoxWidth, viewBoxHeight] = viewbox.split(' ').map(Number);
 
-    const fragment = document.createDocumentFragment();
-    pixels.forEach(({ x, y }) => {
-        const rect = createSVGRect(svgNS, x, y, backgroundColor, strokeColor, grow);
-        fragment.appendChild(rect);
-    });
+  // Increase the viewBox size to accommodate the grow value
+  const expandedWidth = viewBoxWidth + grow * 2;
+  const expandedHeight = viewBoxHeight + grow * 2;
 
-    // console.log('svg drawing...');
+  // Recalculate the viewBox to keep the content centered
+  const newViewBoxX = viewBoxX - grow;
+  const newViewBoxY = viewBoxY - grow;
 
-    svgRoot.appendChild(fragment);
-    return svgRoot;
+  const svgRoot = document.createElementNS(svgNS, "svg");
+  svgRoot.setAttribute("xmlns", svgNS);
+  svgRoot.setAttribute("width", expandedWidth.toString());
+  svgRoot.setAttribute("height", expandedHeight.toString());
+  svgRoot.setAttribute("viewBox", `${newViewBoxX} ${newViewBoxY} ${expandedWidth} ${expandedHeight}`);
+
+  const fragment = document.createDocumentFragment();
+  pixels.forEach(point => {
+      const { x, y } = point;
+      const circle = document.createElementNS(svgNS, "circle");
+      circle.setAttribute("cx", x.toString());
+      circle.setAttribute("cy", y.toString());
+      circle.setAttribute("fill", backgroundColor);
+      circle.setAttribute("stroke", strokeColor);
+      circle.setAttribute("stroke-width", grow.toString());
+      circle.setAttribute("stroke-linejoin", "round");
+      circle.setAttribute("stroke-linecap", "round");
+      circle.setAttribute("vector-effect", "non-scaling-stroke");
+      circle.setAttribute("r", "5");
+        
+      svgRoot.appendChild(circle);
+  });
+
+  svgRoot.appendChild(fragment);
+  return svgRoot;
 };
 
-const createSVGRect = (
-    svgNS: string,
-    x: number,
-    y: number,
-    backgroundColor: string,
-    strokeColor: string,
-    grow: number
-): SVGRectElement => {
-    const rect = document.createElementNS(svgNS, "rect") as SVGRectElement;
-    rect.setAttribute("x", x.toString());
-    rect.setAttribute("y", y.toString());
-    rect.setAttribute("width", "1");
-    rect.setAttribute("height", "1");
-    rect.setAttribute("fill", backgroundColor);
-    rect.setAttribute("stroke", strokeColor);
-    rect.setAttribute("stroke-width", grow.toString());
-    rect.setAttribute("stroke-linejoin", "round");
-    rect.setAttribute("stroke-linecap", "round");
-    rect.setAttribute("vector-effect", "non-scaling-stroke");
-    console.log('svg rect creating...');
-    return rect;
-};
 
 const createDataURL = async (
     svgElement: SVGSVGElement,
@@ -210,14 +304,19 @@ const createDataURL = async (
     if (!svgElement) throw new Error('Invalid SVG element');
 
     const svgString = new XMLSerializer().serializeToString(svgElement);
-    const modifiedSVG = await reDrawSVGImg(svgString, width, height, backgroundColor, "rgba(0,0,0,0.3)");
+    const modifiedSVG = await reDrawSVGImg(svgString, width, height, grow, backgroundColor, "rgba(0,0,0,0.3)");
     if (!modifiedSVG) throw new Error('Failed to redraw SVG image');
 
     const modifiedSVGString = new XMLSerializer().serializeToString(modifiedSVG);
+
+    const modifiedSVG2 = await reDrawSVGImg(modifiedSVGString, width, height, 1, backgroundColor, "rgba(0,0,0,0.3)");
+    if (!modifiedSVG2) throw new Error('Failed to redraw SVG image');
+
+    const modifiedSVGString2 = new XMLSerializer().serializeToString(modifiedSVG2);
     
     console.log('Url creating...');
 
-    return window.URL.createObjectURL(new Blob([modifiedSVGString], { type: 'image/svg+xml' }));
+    return window.URL.createObjectURL(new Blob([modifiedSVGString2], { type: 'image/svg+xml' }));
 };
 
 const generateModifiedPoints = (points: any[], offset: number): any[] => points.map(([x, y]) => [x, y + offset]);
@@ -226,6 +325,7 @@ const reDrawSVGImg = async (
     svg: string,
     width: number,
     height: number,
+    grow: number,
     backgroundColor: string,
     fillColor: string
 ): Promise<SVGSVGElement | null> => {
@@ -251,7 +351,7 @@ const reDrawSVGImg = async (
                 const grid = (x: number, y: number) => imageData.data[(y * imageData.width + x) * 4 + 3] > 0;
 
                 const contours = geom.contour(grid);
-                const modifiedContours = await drawSVGLine(contours, width, height, 1, backgroundColor, fillColor);
+                const modifiedContours = await drawSVGLine(contours, width, height, grow, backgroundColor, fillColor);
 
                 resolve(modifiedContours);
             } catch (error) {
@@ -304,7 +404,7 @@ const drawSVGLine = (
 export const extractDAttributeValue = async (svgUrl: string): Promise<string | null> => {
     try {
         const svgString = await (await fetch(svgUrl)).text();
-        const formattedSvgString = svgString.startsWith("<svg>") ? svgString : `<svg xmlns="http://www.w3.org/2000/svg"> ${svgString}</svg>`;
+        const formattedSvgString = svgString.startsWith("<svg>") ? svgString : `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800"> ${svgString}</svg>`;
         const pathElement = new DOMParser().parseFromString(formattedSvgString, "image/svg+xml").querySelector('path');
         return pathElement ? pathElement.getAttribute('d') : null;
     } catch (error) {

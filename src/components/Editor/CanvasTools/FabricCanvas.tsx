@@ -13,7 +13,7 @@ import { setCanvasProperties } from '@/redux/features/canvasSlice';
 import CanvasFrame from './CanvasFrame';
 import { useDieCutEffect } from '@/hooks/useDieCutEffect';
 import { adjustViewportToElement } from './eventHandlers/adjustViewportToElement';
-import { pixelToCm } from '@/components/Utils/function';
+import { cmToPixel, pixelToCm } from '@/components/Utils/function';
 
 const FabricCanvas: React.FC = () => {
   const [isReady, setIsReady] = useState(false);
@@ -72,7 +72,7 @@ const FabricCanvas: React.FC = () => {
       if (!selectedObjects || selectedObjects.length === 0) {
         console.warn('No objects found on the canvas');
         return;
-      }
+      }      
   
       // Ensure all selected objects are instances of fabric.Object
       selectedObjects.forEach(obj => {
@@ -113,8 +113,8 @@ const FabricCanvas: React.FC = () => {
         // Calculate the new frame size with the grow value
         const groupWidth = group.width ?? 0; // Use default value of 0 if undefined
         const groupHeight = group.height ?? 0; // Use default value of 0 if undefined
-        const newWidthWithGrow = groupWidth + canvasProperties.grow * 2;
-        const newHeightWithGrow = groupHeight + canvasProperties.grow * 2;
+        const newWidthWithGrow = groupWidth;
+        const newHeightWithGrow = groupHeight;
         const newBredd = pixelToCm(newWidthWithGrow);
         const newHojd = pixelToCm(newHeightWithGrow);
         dispatch(setCanvasProperties({
@@ -148,14 +148,18 @@ const FabricCanvas: React.FC = () => {
   
         canvas.remove(group);
         canvas.renderAll();
+
+        if (canvasProperties.grow) {
+          handleDieCut(canvasProperties.grow);
+        }
       }
   
       console.log("This function runs after all objects are added and rendered.");
   
       // Your function logic here
-      if (canvasProperties.grow) {
-        // handleDieCut(canvasProperties.grow);
-      }
+      // if (canvasProperties.grow) {
+      //   handleDieCut(canvasProperties.grow);
+      // }
     };
   
     const handleAfterRender = () => {
@@ -181,6 +185,21 @@ const FabricCanvas: React.FC = () => {
 
   useEffect(() => {
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+     
+      const canvas = fabricCanvasRef.current;
+      const hasObjects = canvas?.getObjects();
+      if(hasObjects) {
+        const newBredd = cmToPixel(10);
+        const newHojd = cmToPixel(10);
+        
+        dispatch(setCanvasProperties({
+          bredd: 10,
+          hojd: 10,
+          frameWidth: newBredd,
+          frameHeight: newHojd,
+          canvasInitialZoom: 1
+        }));
+      }
       // Perform any necessary cleanup or state saving here
       console.log('Page is about to be unloaded.');
 
@@ -194,7 +213,7 @@ const FabricCanvas: React.FC = () => {
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  }, []);
+  }, [fabricCanvasRef, dispatch]);
 
   return (
     <div>
