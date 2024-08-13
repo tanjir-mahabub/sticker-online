@@ -14,6 +14,7 @@ interface GenerateSVGWithMarginOptions {
   printLine?: boolean;
   printLineWidth?: number;
   isDieCutImage?: boolean;
+  hasPath?: boolean;
 }
 
 const deletePrevDieCut = (canvas: fabric.Canvas) => {
@@ -38,7 +39,8 @@ export const generateSVGWithMargin = ({
   hasBackground = true,
   printLine = true,
   printLineWidth = 3,
-  isDieCutImage = true
+  isDieCutImage = true,
+  hasPath = true
 }: GenerateSVGWithMarginOptions): Promise<string> => {
   return new Promise((resolve, reject) => {
     try {
@@ -47,8 +49,8 @@ export const generateSVGWithMargin = ({
       const zoom = originalViewportTransform[0];
 
       // Calculate the actual frame dimensions considering the zoom level
-      const actualFrameWidth = frameWidth / zoom;
-      const actualFrameHeight = frameHeight / zoom;
+      const actualFrameWidth = frameWidth + grow / zoom;
+      const actualFrameHeight = frameHeight + grow / zoom;
       const scaledMargin = margin / zoom;
 
       // Calculate the frame's position considering the zoom level
@@ -65,7 +67,7 @@ export const generateSVGWithMargin = ({
       const frameLeft = (canvasWidth / zoom - actualFrameWidth) / 2 - offsetX;
       const frameTop = (canvasHeight / zoom - actualFrameHeight) / 2 - offsetY - 50;
 
-      console.log(`Frame: Left=${frameLeft}, Top=${frameTop}, Width=${actualFrameWidth}, Height=${actualFrameHeight}, Zoom=${zoom}`);
+      ////console.log(`Frame: Left=${frameLeft}, Top=${frameTop}, Width=${actualFrameWidth}, Height=${actualFrameHeight}, Zoom=${zoom}`);
 
       // Export canvas as SVG
       const canvasSVG = canvas.toSVG();
@@ -76,6 +78,34 @@ export const generateSVGWithMargin = ({
 
       // Get the SVG root element
       const svgRoot = svgDoc.documentElement;
+
+      // Modify any <path> elements with the specified attributes
+      if(hasPath) {
+        const paths = svgRoot.querySelectorAll('path');
+        paths.forEach((path, index) => {
+          //console.log(`Modifying path ${index + 1}`);
+          // Get the current style attribute value
+          const currentStyle = path.getAttribute('style') || '';
+          
+          // Modify the style string directly
+          const newStyle = currentStyle
+            .replace(/stroke:[^;]+/, `stroke: ${backgroundColor}`)
+            .replace(/stroke-opacity:[^;]+/, 'stroke-opacity: 1')
+            .replace(/stroke-width:[^;]+/, 'stroke-width: 5px')
+            .replace(/stroke-linecap:[^;]+/, 'stroke-linecap: round')
+            .replace(/stroke-linejoin:[^;]+/, 'stroke-linejoin: round')
+            .replace(/stroke-miterlimit:[^;]+/, 'stroke-miterlimit: 4')
+            .replace(/fill:[^;]+/, 'fill: rgb(0, 0, 0)')
+            .replace(/fill-rule:[^;]+/, 'fill-rule: nonzero')
+            .replace(/opacity:[^;]+/, 'opacity: 1');
+          
+          // Set the modified style string back to the path
+          path.setAttribute('style', newStyle);
+        });
+      }
+
+      
+      
 
       // Create a background shape element if hasBackground is true
       let backgroundShape = null;
@@ -139,7 +169,7 @@ export const generateSVGWithMargin = ({
       // Serialize the modified SVG back to string
       const serializer = new XMLSerializer();
       const newSVGString = serializer.serializeToString(svgRoot);
-
+//console.log('newSVG', newSVGString);
       resolve(newSVGString);
     } catch (error) {
       reject(error);

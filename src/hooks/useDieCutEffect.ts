@@ -60,6 +60,7 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
           printLine: true,
           printLineWidth: 2,
           isDieCutImage: true,
+          hasPath: false
         });
         // Create a Blob and download the SVG
         const blob = new Blob([svgString], { type: 'image/svg+xml' });
@@ -141,7 +142,7 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
         dieCutImage.sendToBack();
         canvas.renderAll();
 
-        console.log("This function runs after all objects are added and rendered.");
+        //console.log("This function runs after all objects are added and rendered.");
 
         setDieCutReady(true);
       }
@@ -179,9 +180,9 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
         isDieCutImage: false,
       });
 
-      console.log('die cut calling 3');
+      //console.log('die cut calling 3');
 
-      console.log('Generated SVG String:', svgString, "frame", frameWidth, frameHeight);
+      //console.log('Generated SVG String:', svgString, "frame", frameWidth, frameHeight);
 
       if (svgString && grow) {
         const modifiedSVG = await generateSVGImageData(svgString, grow, backgroundColor);
@@ -217,7 +218,7 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
 
 
   const handleDieCut = useCallback(async (grow?: number) => {
-    console.log('die cut calling 1');
+    //console.log('die cut calling 1');
     if (grow) {
       dispatch(setCanvasProperties({
         isLoading: true
@@ -234,7 +235,7 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
       canvas.discardActiveObject();
 
       const selected = itemSelection(canvas, grow, frameWidth, frameHeight);
-      console.log('die cut calling 2', canvas, canvas.getObjects(), selected, grow, frameWidth, frameHeight);
+      //console.log('die cut calling 2', canvas, canvas.getObjects(), selected, grow, frameWidth, frameHeight);
       if (!selected) {
         dispatch(setCanvasProperties({
           isLoading: false
@@ -244,7 +245,7 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
 
       selected && setSelectedItem(selected);
       selected?.forEach(item => {
-        console.log(`Object ID: ${item.object.id}, Percentage Inside: ${item.percentageInside.toFixed(2)}%`);
+        //console.log(`Object ID: ${item.object.id}, Percentage Inside: ${item.percentageInside.toFixed(2)}%`);
       });
 
       if (selected && selected.length > 0) {
@@ -436,7 +437,7 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
         grow: canvasProperties.grow
       }));
   
-      console.log('dieCut changing');
+      //console.log('dieCut changing');
   
       group.ungroupOnCanvas();
       selectedObjects.forEach((obj, index) => {

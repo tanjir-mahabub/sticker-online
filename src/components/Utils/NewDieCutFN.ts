@@ -13,54 +13,46 @@ const parseSvgString = (svgString: string): SVGSVGElement => {
     }
   
     return svgElement;
-  };
-  
-  const getSvgAttributes = (svgData: string): { width: string, height: string, viewBox: string } => {
-    console.log('Raw SVG Data:', svgData); // Log the raw SVG data
+};
+
+const getSvgAttributes = (svgData: string): { width: string, height: string, viewBox: string } => {
+    //console.log('Raw SVG Data:', svgData);
 
     const parser = new DOMParser();
     const svgDocument = parser.parseFromString(svgData, 'image/svg+xml');
     const svgElement = svgDocument.documentElement;
 
-    // Ensure the parsed element is an SVG element
     if (svgElement.tagName.toLowerCase() !== 'svg') {
         throw new Error('Parsed element is not an SVG.');
     }
 
-    // Extract width, height, and viewBox
     let width = svgElement.getAttribute('width');
     let height = svgElement.getAttribute('height');
     const viewBox = svgElement.getAttribute('viewBox');
 
-    console.log('Parsed attributes:', { width, height, viewBox }); // Log parsed attributes
+    //console.log('Parsed attributes:', { width, height, viewBox });
 
-    // Check for missing attributes and handle accordingly
     if (!width || !height || !viewBox) {
-        console.warn('SVG is missing width, height, or viewBox attributes.');
+        //console.warn('SVG is missing width, height, or viewBox attributes.');
 
         if (!viewBox) {
-            console.error('SVG must have a viewBox attribute if width and height are not provided.');
+            //console.error('SVG must have a viewBox attribute if width and height are not provided.');
             throw new Error('SVG must have a viewBox attribute if width and height are not provided.');
         }
 
-        // Extract dimensions from the viewBox if width and height are missing
         const [x, y, viewBoxWidth, viewBoxHeight] = viewBox.split(' ').map(Number);
         if (!width) {
-            console.warn(`Width is missing; using viewBox width: ${viewBoxWidth}`);
+            //console.warn(`Width is missing; using viewBox width: ${viewBoxWidth}`);
             width = viewBoxWidth.toString();
         }
         if (!height) {
-            console.warn(`Height is missing; using viewBox height: ${viewBoxHeight}`);
+            //console.warn(`Height is missing; using viewBox height: ${viewBoxHeight}`);
             height = viewBoxHeight.toString();
         }
     }
 
     return { width: width!, height: height!, viewBox: viewBox! };
 };
-
-
-
-
   
   const scaleSVG = (svgData: string, scale: number): string => {
     const parser = new DOMParser();
@@ -118,7 +110,7 @@ const parseSvgString = (svgString: string): SVGSVGElement => {
     const translateY = -y;
 
     // Set the viewBox to start at 0 0
-    svgElement.setAttribute('viewBox', `0 0 ${width} ${height}`);
+    svgElement.setAttribute('viewBox', `0 30 ${width} ${height}`);
 
     // Apply the translation to all child elements
     const children = Array.from(svgElement.children);
@@ -149,14 +141,14 @@ export const generateSVGImageData = async (
     const serializer = new XMLSerializer();
     const adjustedSvgData = serializer.serializeToString(svgElement);
 
-    console.log('Adjusted SVG:', adjustedSvgData);
+    //console.log('Adjusted SVG:', adjustedSvgData);
 
     // Continue with your existing scaling and modification logic...
     const scaledSvgData = scaleSVG(adjustedSvgData, scale);
     const { width: scaledWidth, height: scaledHeight, viewBox } = getSvgAttributes(adjustedSvgData);
 
     if (!scaledWidth || !scaledHeight) throw new Error('Invalid SVG dimensions');
-    console.log('Scaled SVG:', scaledSvgData);
+    //console.log('Scaled SVG:', scaledSvgData);
 
     const modifiedSVG = await svgModification(
         scaledSvgData,
@@ -169,15 +161,14 @@ export const generateSVGImageData = async (
     );
 
     const modifiedSVGImg = serializer.serializeToString(modifiedSVG);
-    console.log('Modified SVG:', modifiedSVG);
+    //console.log('Modified SVG:', modifiedSVG);
 
     const restoredSvgData = restoreSVG(scaledSvgData, modifiedSVGImg);
-    console.log('Restored SVG:', restoredSvgData);
 
     const { width: restoredWidth, height: restoredHeight } = getSvgAttributes(svgData);
 
     if (!restoredWidth || !restoredHeight) throw new Error('Invalid SVG dimensions');
-    console.log('Restored SVG:', restoredSvgData);
+    //console.log('Restored SVG:', restoredSvgData);
 
     return createDataURL(parseSvgString(restoredSvgData), parseInt(restoredWidth), parseInt(restoredHeight), grow, backgroundColor);
 };
@@ -201,7 +192,7 @@ const svgModification = async (
     const img = new Image();
     img.src = `data:image/svg+xml;base64,${btoa(svg)}`;
 
-    console.log('svg modifying...');
+    //console.log('svg modifying...');
 
     return new Promise<SVGSVGElement>((resolve, reject) => {
         img.onload = () => {
@@ -212,6 +203,7 @@ const svgModification = async (
             const imageData = ctx.getImageData(0, 0, width, height);
             const pixels = imageData.data;
             const nonTransparentPixels = extractNonTransparentPixels(pixels, width);
+            // //console.log(imageData.data, nonTransparentPixels);
 
             drawSVG(nonTransparentPixels, width, height, viewbox, grow, backgroundColor, strokeColor)
                 .then(resolve)
@@ -228,20 +220,25 @@ const extractNonTransparentPixels = (
 ): { x: number; y: number; r: number; g: number; b: number; a: number }[] => {
     const nonTransparentPixels: { x: number; y: number; r: number; g: number; b: number; a: number }[] = [];
 
-    console.log('Pixel extracting...');
+    //console.log('Pixel extracting...');
 
     for (let i = 0; i < pixels.length; i += 4) {
-        if (pixels[i + 3] > 0) {
+        const alpha = pixels[i + 3];
+        if (alpha > 0) {
+            const x = (i / 4) % width;
+            const y = Math.floor((i / 4) / width);
+            // //console.log(`Non-transparent pixel found at (${x}, ${y}) with alpha: ${alpha}`);
             nonTransparentPixels.push({
-                x: (i / 4) % width,
-                y: Math.floor((i / 4) / width),
-                r: 0,
-                g: 0,
-                b: 255,
-                a: pixels[i + 3]
+                x,
+                y,
+                r: pixels[i],
+                g: pixels[i + 1],
+                b: pixels[i + 2],
+                a: alpha
             });
         }
     }
+    
     return nonTransparentPixels;
 };
 
@@ -314,7 +311,7 @@ const createDataURL = async (
 
     const modifiedSVGString2 = new XMLSerializer().serializeToString(modifiedSVG2);
     
-    console.log('Url creating...');
+    //console.log('Url creating...');
 
     return window.URL.createObjectURL(new Blob([modifiedSVGString2], { type: 'image/svg+xml' }));
 };
@@ -338,7 +335,7 @@ const reDrawSVGImg = async (
     const img = new Image();
     img.src = `data:image/svg+xml;base64,${btoa(svg)}`;
 
-    console.log('SVG Image redrawing...');
+    //console.log('SVG Image redrawing...');
 
     return new Promise<SVGSVGElement | null>((resolve, reject) => {
         img.onload = async () => {
@@ -396,7 +393,7 @@ const drawSVGLine = (
 
     strokePath.datum(closedPoints).attr("d", lineGenerator);
     
-    console.log('SVG line creating...');
+    //console.log('SVG line creating...');
 
     return svgNode;
 };
@@ -408,7 +405,7 @@ export const extractDAttributeValue = async (svgUrl: string): Promise<string | n
         const pathElement = new DOMParser().parseFromString(formattedSvgString, "image/svg+xml").querySelector('path');
         return pathElement ? pathElement.getAttribute('d') : null;
     } catch (error) {
-        console.error('Error parsing SVG:', error);
+        //console.error('Error parsing SVG:', error);
         return null;
     }
 };
