@@ -6,10 +6,9 @@ import { useAppSelector } from "@/redux/store";
 import { useControlButtons } from "@/hooks/useControlButtons";
 import { fabric } from "fabric";
 import { useDieCutEffect } from "@/hooks/useDieCutEffect";
-import { findObjectById } from "./eventHandlers/canvasFunctions";
-import { checkSizeAndAdjustViewport } from "./eventHandlers/checkSizeAndAdjustViewport";
 import { useDispatch } from "react-redux";
 import { setCanvasProperties } from "@/redux/features/canvasSlice";
+import { useCanvas } from "@/context/CanvasContext";
 
 interface ControlElementsProps {
   canvasRef: React.MutableRefObject<fabric.Canvas | null>;
@@ -17,8 +16,12 @@ interface ControlElementsProps {
 }
 
 const ControlElements: React.FC<ControlElementsProps> = ({ canvasRef, selected }) => {  
+  
+  const [rangeSliderValue, setRangeSliderValue] = useState<number>(0);
 
   const dispatch = useDispatch();
+
+  const {  historyControllerRef, setGrowValue } = useCanvas();
 
   const { handleDownloadSVG, handleDieCut } = useDieCutEffect();
 
@@ -44,8 +47,12 @@ const ControlElements: React.FC<ControlElementsProps> = ({ canvasRef, selected }
 
   const DieCutHandler = (value: number) => {
     console.log('DieCutHandler', value);
-    handleDieCut(value);
-  }
+    setRangeSliderValue(value); // Update the slider's internal state
+    setGrowValue(value); // Update the grow value in the state
+    historyControllerRef.current?.setGrowValue(value); // Save the new grow value in the history
+    handleDieCut(value); // Apply the die cut effect
+  };
+  
 
   const { handleFlipX, handleFlipY, handleSendFront, handleSendBack, handleSendForward, handleSendBackward, handleDelete, handleCenterEL } = useControlButtons({ canvasRef, updateButtonStates });
 
@@ -74,10 +81,12 @@ const ControlElements: React.FC<ControlElementsProps> = ({ canvasRef, selected }
       }
     };
   }, [canvasRef, updateButtonStates]);
+   
 
   useEffect(() => {
     updateButtonStates(); // Initial update when component mounts
   }, [updateButtonStates]);
+
 
   const buttons = [
     { onClick: handleFlipY, iconSrc: "/mirrorUpDownIcon.svg", tooltip: "Flip Vertically", borderClasses: "border-r-0 border-black/20 rounded-l-full", borderRadiusClasses: "pl-3 pr-1" },
@@ -95,7 +104,7 @@ const ControlElements: React.FC<ControlElementsProps> = ({ canvasRef, selected }
       <div className='absolute z-50 left-0 bottom-0 w-full h-fit transition duration-500 delay-300 ease-in-out'>
         <div className="absolute bottom-0 left-0 w-fit mx-auto h-3 hidden lg:flex justify-start items-end gap-5 z-50">
           <div className="flex gap-3 p-4 space-y-3 w-60">
-            <RangeSlider minValue={10} maxValue={200} step={1} defaultValue={grow} handleDieCut={DieCutHandler} label="Kantlinje" />
+            <RangeSlider minValue={10} maxValue={200} step={1} defaultValue={rangeSliderValue} handleDieCut={DieCutHandler} label="Kantlinje" />
           </div>
         </div>
         <div className="absolute bottom-20 lg:bottom-2 left-0 w-full mx-auto h-3 flex justify-start items-end gap-5 z-40">

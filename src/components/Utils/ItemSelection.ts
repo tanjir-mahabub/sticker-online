@@ -6,18 +6,26 @@ export const itemSelection = (
 ): { object: fabric.Object, percentageInside: number }[] | null => {
   if (!canvas) return null;
 
-  // Define the frame area
+  console.log('Canvas state:', canvas.toJSON());
+
   const frameLeft = (canvas.getWidth() - frameWidth) / 2;
   const frameTop = (canvas.getHeight() - frameHeight) / 2;
   const frameRight = frameLeft + frameWidth;
   const frameBottom = frameTop + frameHeight;
 
-  // Ensure the objects are unique by their IDs
+  console.log('Frame area:', { frameLeft, frameTop, frameRight, frameBottom });
+
   const uniqueObjects = new Map<string, fabric.Object>();
   const objects: fabric.Object[] = canvas.getObjects().filter(obj => {
     const category = obj.data?.category;
+    console.log('Object:', obj.id, obj.data);
     return (category === 'image' || category === 'text') && obj.id !== "dieCutImage";
   });
+
+  if (objects.length === 0) {
+    console.log('No objects found with category "image" or "text"');
+    return null;
+  }
 
   objects.forEach(obj => {
     if (obj.id && !uniqueObjects.has(obj.id)) {
@@ -25,7 +33,8 @@ export const itemSelection = (
     }
   });
 
-  // Helper function to calculate the bounding box with grow factor applied
+  console.log('Unique Objects considered:', Array.from(uniqueObjects.values()));
+
   const calculateBoundingBox = (obj: fabric.Object, grow: number) => {
     const originalWidth = (obj.width ?? 0) * (obj.scaleX ?? 1);
     const originalHeight = (obj.height ?? 0) * (obj.scaleY ?? 1);
@@ -39,7 +48,6 @@ export const itemSelection = (
     };
   };
 
-  // Helper function to calculate the overlapping area of two rectangles
   const calculateOverlapArea = (box1: { left: number; top: number; right: number; bottom: number }, 
                                 box2: { left: number; top: number; right: number; bottom: number }): number => {
     const overlapWidth = Math.max(0, Math.min(box1.right, box2.right) - Math.max(box1.left, box2.left));
@@ -47,9 +55,10 @@ export const itemSelection = (
     return overlapWidth * overlapHeight;
   };
 
-  // Helper function to check if two bounding boxes overlap
-  const isOverlap = (box1: { left: number; top: number; right: number; bottom: number }, 
-                     box2: { left: number; top: number; right: number; bottom: number }): boolean => {
+  const isOverlap = (
+    box1: { left: number; top: number; right: number; bottom: number }, 
+    box2: { left: number; top: number; right: number; bottom: number }
+  ): boolean => {
     return !(
       box1.right <= box2.left || // Box1 is completely left of Box2
       box1.left >= box2.right || // Box1 is completely right of Box2
@@ -65,19 +74,20 @@ export const itemSelection = (
     const boundingBox = calculateBoundingBox(obj, grow);
     const frameBox = { left: frameLeft, top: frameTop, right: frameRight, bottom: frameBottom, width: frameWidth, height: frameHeight };
 
-    // Calculate the area of the object and the area within the frame
+    console.log('Bounding box:', boundingBox);
+    console.log('Frame box:', frameBox);
+
     const objectArea = boundingBox.width * boundingBox.height;
     const overlapArea = calculateOverlapArea(boundingBox, frameBox);
 
-    // Calculate the percentage of the object that is inside the frame
     const percentageInside = (overlapArea / objectArea) * 100;
     const correctedPercentageInside = Math.min(Math.max(percentageInside, 0), 100);
 
-    // Add the object and its percentage inside the frame to the selection
+    console.log('Object:', obj.id, 'Percentage inside frame:', correctedPercentageInside);
+
     touchedObjects.push({ object: obj, percentageInside: correctedPercentageInside });
   });
 
-  // Determine if objects touch after applying grow
   touchedObjects.forEach(obj1 => {
     let hasTouched = false;
     touchedObjects.forEach(obj2 => {
@@ -98,17 +108,16 @@ export const itemSelection = (
     }
   });
 
- // If objects do not touch, only keep the one with the highest percentage inside
-if (!selectedObjects.some(obj => touchedObjects.some(tObj => tObj.object !== obj.object && isOverlap(calculateBoundingBox(tObj.object, grow), calculateBoundingBox(obj.object, grow))))) {
-  if (selectedObjects.length > 0) {
-    selectedObjects = [selectedObjects.reduce((maxObj, obj) => 
-      obj.percentageInside > maxObj.percentageInside ? obj : maxObj, selectedObjects[0])];
-  } else {
-    selectedObjects = [];
+  if (!selectedObjects.some(obj => touchedObjects.some(tObj => tObj.object !== obj.object && isOverlap(calculateBoundingBox(tObj.object, grow), calculateBoundingBox(obj.object, grow))))) {
+    if (selectedObjects.length > 0) {
+      selectedObjects = [selectedObjects.reduce((maxObj, obj) => 
+        obj.percentageInside > maxObj.percentageInside ? obj : maxObj, selectedObjects[0])];
+    } else {
+      selectedObjects = [];
+    }
   }
-}
 
-// Return null if no objects are selected
-return selectedObjects.length > 0 ? selectedObjects : null;
+  console.log('Selected Objects:', selectedObjects);
 
+  return selectedObjects.length > 0 ? selectedObjects : null;
 };

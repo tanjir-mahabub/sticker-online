@@ -24,7 +24,7 @@ export const useCanvasSetup = (
         // console.log('use canvas setup', htmlCanvasRef.current);
       const fabricCanvas = new fabric.Canvas(htmlCanvasRef.current);
       fabricCanvasRef.current = fabricCanvas;
-      historyControllerRef.current = new HistoryController(fabricCanvas);              
+      historyControllerRef.current = new HistoryController(fabricCanvas, 10);              
 
       fabric.Object.prototype.controls.mtr = new fabric.Control({
         x: 0,
