@@ -197,6 +197,7 @@ const FabricCanvas: React.FC = () => {
           hojd: 10,
           frameWidth: newBredd,
           frameHeight: newHojd,
+          grow: canvasProperties.grow,
           canvasInitialZoom: 1
         }));
       }
@@ -213,7 +214,17 @@ const FabricCanvas: React.FC = () => {
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  }, [fabricCanvasRef, dispatch]);
+  }, [fabricCanvasRef, canvasProperties.grow, dispatch]);
+
+
+  useEffect(() => {
+    const activeObject = fabricCanvasRef.current?.getActiveObject();   
+    if (activeObject) {
+      dispatch(setCanvasProperties({ hasSelected: true }))
+    } else {
+      dispatch(setCanvasProperties({ hasSelected: false }))
+    }
+  }, [fabricCanvasRef, dispatch])
 
   return (
     <div>
