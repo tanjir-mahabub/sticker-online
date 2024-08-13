@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useMemo } from 'react';
 
 const UndoRedo = () => {
     const canvasProperties = useAppSelector(state => state.canvas);
-    const { clientWidth, clientHeight } = canvasProperties;
+    const { clientWidth, clientHeight, frameWidth, frameHeight } = canvasProperties;
     
     const {historyControllerRef, undo, redo } = useCanvas();
     
@@ -14,13 +14,13 @@ const UndoRedo = () => {
     const handleUndo = () => {
        historyControllerRef.current && setDisabledUndo(historyControllerRef.current?.history.length - 1 <= 1);
        setDisabledRedo(false); // Always enable redo after an undo
-        undo();
+        undo(frameWidth, frameHeight);
       };
     
       const handleRedo = () => {
         setDisabledUndo(false); // Always enable undo after a redo
        historyControllerRef.current && setDisabledRedo(historyControllerRef.current?.redoStack.length - 1 === 0);
-        redo();
+        redo(frameWidth, frameHeight);
       };
 
     const [responsiveTasks, setResponsiveTasks] = useState({

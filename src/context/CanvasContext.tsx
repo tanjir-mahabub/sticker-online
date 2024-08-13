@@ -6,10 +6,11 @@ interface CanvasContextProps {
   fabricCanvasRef: React.MutableRefObject<fabric.Canvas | null>;
   htmlCanvasRef: React.MutableRefObject<HTMLCanvasElement | null>;
   historyControllerRef: React.MutableRefObject<HistoryController | null>;
-  iconImageRef: React.MutableRefObject<HTMLImageElement | null>;  
+  iconImageRef: React.MutableRefObject<HTMLImageElement | null>; 
+  setGrowValue: (newGrow: number) => void; 
   saveState: () => void;
-  undo: () => void;
-  redo: () => void;
+  undo: (frameWidth: number, frameHeight: number) => void;
+  redo: (frameWidth: number, frameHeight: number) => void;
 }
 
 interface CanvasProviderProps {
@@ -28,16 +29,20 @@ export const CanvasProvider: React.FC<CanvasProviderProps> = ({ children }) => {
     historyControllerRef.current?.saveState();
   };
 
-  const undo = () => {
-    historyControllerRef.current?.undo();
+  const undo = (frameWidth: number, frameHeight: number) => {
+    historyControllerRef.current?.undo(frameWidth, frameHeight);
   };
 
-  const redo = () => {
-    historyControllerRef.current?.redo();
+  const redo = (frameWidth: number, frameHeight: number) => {
+    historyControllerRef.current?.redo(frameWidth, frameHeight);
+  };
+
+  const setGrowValue = (newGrow: number) => {
+    historyControllerRef.current?.setGrowValue(newGrow);
   };
 
   return (
-    <CanvasContext.Provider value={{ fabricCanvasRef, htmlCanvasRef, historyControllerRef, iconImageRef, saveState, undo, redo }}>
+    <CanvasContext.Provider value={{ fabricCanvasRef, htmlCanvasRef, historyControllerRef, iconImageRef, setGrowValue, saveState, undo, redo }}>
       {children}
     </CanvasContext.Provider>
   );
