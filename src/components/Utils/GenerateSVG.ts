@@ -91,7 +91,7 @@ export const generateSVGWithMargin = ({
           const newStyle = currentStyle
             .replace(/stroke:[^;]+/, `stroke: ${backgroundColor}`)
             .replace(/stroke-opacity:[^;]+/, 'stroke-opacity: 1')
-            .replace(/stroke-width:[^;]+/, 'stroke-width: 5px')
+            .replace(/stroke-width:[^;]+/, 'stroke-width: 18px')
             .replace(/stroke-linecap:[^;]+/, 'stroke-linecap: round')
             .replace(/stroke-linejoin:[^;]+/, 'stroke-linejoin: round')
             .replace(/stroke-miterlimit:[^;]+/, 'stroke-miterlimit: 4')
