@@ -81,7 +81,7 @@ export const useControlButtons = ({ canvasRef, updateButtonStates }: ControlButt
   const handleDelete = useCallback(() => {
     const activeObject = canvasRef.current?.getActiveObject();
     if (activeObject) {
-      activeObject.id && activeObject.data.category === "image" && dispatch(deleteImage(activeObject.id))  
+      activeObject.id && activeObject.type === "image" && dispatch(deleteImage(activeObject.id))        
       activeObject.id && activeObject.data.category === "text" && dispatch(removeText(activeObject.id))           
       canvasRef.current?.remove(activeObject);
       canvasRef.current?.renderAll();

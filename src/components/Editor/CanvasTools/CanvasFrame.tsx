@@ -1,3 +1,4 @@
+import { cmToPixel } from "@/components/Utils/function";
 import { setCanvasProperties } from "@/redux/features/canvasSlice";
 import { useAppSelector } from "@/redux/store";
 import { useEffect, useRef, useState } from "react";
@@ -14,7 +15,7 @@ interface FrameProps {
 const CanvasFrame: React.FC<FrameProps> = ({ fabricCanvas }) => {
     
     const CanvasProperties = useAppSelector(state => state.canvas);
-    const { canvasWidth, canvasHeight, canvasInitialZoom, frameWidth, frameHeight, bredd, hojd, backgroundColor } = CanvasProperties;
+    const { canvasWidth, canvasHeight, canvasInitialZoom, frameWidth, frameHeight, bredd, hojd, grow, backgroundColor } = CanvasProperties;
     
     const [canvasZoom, setCanvasZoom] = useState(canvasInitialZoom)
     const divElement = useRef<HTMLDivElement | null>(null); // Ref to store the created div element
@@ -101,6 +102,26 @@ const CanvasFrame: React.FC<FrameProps> = ({ fabricCanvas }) => {
             divElement.current.style.background = backgroundColor;
         }
     }, [backgroundColor]);
+
+    useEffect(() => {
+        if(fabricCanvas) {
+            const objectExists = fabricCanvas?.getObjects().length > 0;
+            console.log('objectExists', objectExists);
+            if(!objectExists) {
+                const newBredd = cmToPixel(10);
+                const newHojd = cmToPixel(10);
+                
+                dispatch(setCanvasProperties({
+                bredd: 10,
+                hojd: 10,
+                frameWidth: newBredd,
+                frameHeight: newHojd,
+                grow: grow,
+                canvasInitialZoom: 1
+                }));
+            }
+        }
+    }, [fabricCanvas, grow, dispatch])
       
 
     return (

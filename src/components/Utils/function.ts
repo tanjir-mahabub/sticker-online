@@ -45,10 +45,18 @@ export function convertTextToPath(element: any): Promise<string> {
     });
 }
 
-export const formattedTotalCost = (value: number) => {
-    const formatedCost = new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK' }).format(value);
-    return formatedCost;
+export const formattedTotalCost = (value: number, hasDecimal: boolean = true) => {
+    const options: Intl.NumberFormatOptions = {
+        style: 'currency',
+        currency: 'SEK',
+        minimumFractionDigits: hasDecimal ? 2 : 0,
+        maximumFractionDigits: hasDecimal ? 2 : 0,
+    };
+    
+    const formattedCost = new Intl.NumberFormat('sv-SE', options).format(value);
+    return formattedCost;
 }
+
 
 
 export const generateUniqueId = (): string => {

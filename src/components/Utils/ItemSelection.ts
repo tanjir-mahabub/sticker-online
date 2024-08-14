@@ -19,11 +19,11 @@ export const itemSelection = (
   const objects: fabric.Object[] = canvas.getObjects().filter(obj => {
     const category = obj.data?.category;
     console.log('Object:', obj.id, obj.data);
-    return (category === 'image' || category === 'text') && obj.id !== "dieCutImage";
+    return (category === 'image' || category === 'motiv' || category === 'text') && obj.id !== "dieCutImage";
   });
 
   if (objects.length === 0) {
-    console.log('No objects found with category "image" or "text"');
+    console.log('No objects found with category "image" or "motiv" or "text"');
     return null;
   }
 

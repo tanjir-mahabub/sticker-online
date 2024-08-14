@@ -1,11 +1,13 @@
 
-const materialStore = [
+const materialStore = [    
     {
         id: 1,
+        object_id: 1,
         label: "Vinyl",
         value: "vinyl",
         cost: 37,
         icon: "/materials/vinyl.png",
+        label_icon: "",
         src: "/materials-background/vinyl.jpg",
         popup: {
             title: "Vinyl",
@@ -15,10 +17,12 @@ const materialStore = [
     },
     {
         id: 2,
+        object_id: 2,
         label: "Holografisk",
         value: "holografisk",
         cost: 32,
         icon: "/materials/holographic.png",
+        label_icon: "",
         src: "/materials-background/holographic.jpg",
         popup: {
             title: "Holografisk",
@@ -28,10 +32,12 @@ const materialStore = [
     },
     {
         id: 3,
+        object_id: 3,
         label: "Glitter",
         value: "glitter",
         cost: 43,
         icon: "/materials/glitter.png",
+        label_icon: "",
         src: "/materials-background/glitter.jpg",
         popup: {
             title: "Glitter",
@@ -41,10 +47,12 @@ const materialStore = [
     },
     {
         id: 4,
+        object_id: 4,
         label: "Clear",
         value: "clear",
         cost: 15,
         icon: "/materials/clear.png",
+        label_icon: "",
         // src: "/materials-background/",
         src: "",
         popup: {
@@ -55,10 +63,12 @@ const materialStore = [
     },
     {
         id: 5,
+        object_id: 5,
         label: "Mirror",
         value: "mirror",
         cost: 33,
         icon: "/materials/mirror.png",
+        label_icon: "",
         src: "",
         popup: {
             title: "Mirror",
@@ -68,10 +78,12 @@ const materialStore = [
     },
     {
         id: 6,
+        object_id: 6,
         label: "Pixie Dust",
         value: "pixie-dust",
         cost: 51,
         icon: "/materials/pixie-dust.png",
+        label_icon: "",
         src: "",
         popup: {
             title: "Pixie Dust",
@@ -81,10 +93,12 @@ const materialStore = [
     },
     {
         id: 7,
+        object_id: 7,
         label: "Prismatic",
         value: "prismatic",
         cost: 48,
         icon: "/materials/prismatic.png",
+        label_icon: "",
         src: "",
         popup: {
             title: "Prismatic",
@@ -94,10 +108,12 @@ const materialStore = [
     },
     {
         id: 8,
+        object_id: 8,
         label: "Brushed Alloy",
         value: "brushed-alloy",
         cost: 49,
         icon: "/materials/burshed-alloy.png",
+        label_icon: "",
         src: "",
         popup: {
             title: "Brushed Alloy",

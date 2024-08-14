@@ -6,42 +6,39 @@ import { useDispatch } from 'react-redux';
 import { setCalculation } from '@/redux/features/calculationSlice';
 import { setMaterialLastSelected } from '@/redux/features/formSlice';
 import { useAppSelector } from '@/redux/store';
+import { useCanvas } from '@/context/CanvasContext';
+import { MaterialOptionProps } from '@/types/types';
 
-export interface MaterialOption {
-    id: number,
-    label: string,
-    value: string,
-    cost: number,
-    icon: string,
-    popup: {
-        title: string,
-        imgSrc: string,
-        content: string
-    }
-}
-
-// Assuming materialStore is correctly imported and structured
 const MaterialDropdown: React.FC = () => {
     const materialDefault = useAppSelector(state => state.formValues.materialLastSelected);
-    const selected = materialStore.find(option => option.id === materialDefault);
+    const { stickerData } = useCanvas();
+
+    const materials = stickerData?.materials || materialStore;
+
+    const selected = materials.find(option => option.id === materialDefault);
 
     const [isOpen, setIsOpen] = useState(false);
-    const [selectedOption, setSelectedOption] = useState<MaterialOption | null>(selected || null);
+    const [selectedOption, setSelectedOption] = useState<MaterialOptionProps | null>(selected || null);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     const dispatch = useDispatch();
 
+    // Determine the number of columns and split the materials accordingly
+    let columns = 1;
+    if (materials.length > 8) {
+        columns = 3;
+    } else if (materials.length > 4) {
+        columns = 2;
+    }
 
-    // Splitting the materialStore into two arrays for explicit column control
-    const halfIndex = Math.ceil(materialStore.length / 2);
-    const firstHalfOptions = materialStore.slice(0, halfIndex);
-    const secondHalfOptions = materialStore.slice(halfIndex);
+    const materialsPerColumn = Math.ceil(materials.length / columns);
+    const splitMaterials = Array.from({ length: columns }, (_, i) =>
+        materials.slice(i * materialsPerColumn, (i + 1) * materialsPerColumn)
+    );
 
-    const handleOptionChange = (option: MaterialOption) => {
+    const handleOptionChange = (option: MaterialOptionProps) => {
         setIsOpen(false);
         setSelectedOption(option);
-
-        const selectedMaterial = materialStore.find(material => material.id === option.id);
 
         dispatch(setMaterialLastSelected(option.id));
     };
@@ -59,7 +56,10 @@ const MaterialDropdown: React.FC = () => {
 
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);  
+    }, []);
+
+    // Determine the width of the material-option based on the number of columns
+    const materialOptionWidth = columns * 300;
 
     return (
         <div className="lg:relative w-full" ref={dropdownRef}>
@@ -70,17 +70,21 @@ const MaterialDropdown: React.FC = () => {
                 }}
                 className="mt-1 px-3.5 py-3 font-semibold bg-so-gray border border-gray-300 rounded-md w-full focus:outline-none focus:ring focus:border-blue-300 relative flex justify-between items-center"
             >
-                {selectedOption?.label}
+                {selectedOption?.label || "Select Material"}
                 <span className={`transition transform ${isOpen ? 'rotate-180' : ''}`}><Image src={'/downArrow.svg'} alt='down-arrow' width={11} height={11} /></span>
             </button>
             {isOpen && (
-                <div className="material-option">
-                    <ul className="w-full">
-                        <MaterialOptions materials={firstHalfOptions} onSelectOption={handleOptionChange} />
-                    </ul>
-                    <ul className="w-full">
-                        <MaterialOptions materials={secondHalfOptions} onSelectOption={handleOptionChange} />
-                    </ul>
+                <div
+                    className={`material-option`}
+                    style={{ width: `${materialOptionWidth}px` }} // Dynamic width based on columns
+                >
+                    <div className={`grid grid-cols-${columns} gap-4 divide-x`}>
+                        {splitMaterials.map((materialColumn, columnIndex) => (
+                            <ul key={columnIndex} className="w-full">
+                                <MaterialOptions materials={materialColumn} onSelectOption={handleOptionChange} />
+                            </ul>
+                        ))}
+                    </div>
                 </div>
             )}
         </div>

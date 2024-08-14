@@ -11,6 +11,56 @@ export interface ImageData {
   file: string;
 }
 
+export interface StickerData {
+  options: {
+    dimensions_rate: string;
+    api_username: string;
+    api_password: string;
+  };
+  materials: MaterialOptionProps[];
+  antals: AntalOptionProps[];
+  laminates: LaminateOptionProps[];
+}
+
+export interface MaterialOptionProps {
+  id: number;
+  object_id: number;
+  label: string;
+  value: string;
+  cost: number;
+  icon: string;
+  label_icon: string;
+  src: string;
+  popup: Popup;
+}
+
+export interface Popup {
+  title: string;
+  imgSrc: string;
+  content: string;
+}
+
+export interface AntalOptionProps {
+  id: number;
+  object_id: number;
+  st: string;
+  cost: number;
+  rate: string;
+  value: string;
+}
+
+export interface LaminateOptionProps {
+  id: number;
+  object_id: number;
+  st: string;
+  value: string;
+  cost: number;
+}
+
+export interface EditorPageProps {
+  stickerData: StickerData;
+}
+
 export interface CanvasProps {
   width?: number;
   height?: number;

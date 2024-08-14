@@ -3,18 +3,17 @@ import Image from 'next/image';
 import { useDispatch } from 'react-redux';
 import { showPopup } from '@/redux/features/popupSlice';
 import AnimateIn from '@/lib/AnimateIn';
-import { MaterialOption } from '../MaterialDropdown';
-
+import { MaterialOptionProps } from '@/types/types';
 
 interface MaterialOptionsProps {
-    materials: MaterialOption[];
-    onSelectOption: (option: MaterialOption) => void;
+    materials: MaterialOptionProps[];
+    onSelectOption: (option: MaterialOptionProps) => void;
 }
 
 const MaterialOptions: React.FC<MaterialOptionsProps> = ({ materials, onSelectOption }) => {
     const dispatch = useDispatch();
 
-    const handleOptionClick = (option: MaterialOption) => {
+    const handleOptionClick = (option: MaterialOptionProps) => {
         onSelectOption(option);
     };
 

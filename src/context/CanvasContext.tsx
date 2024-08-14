@@ -1,6 +1,7 @@
 import { fabric } from 'fabric';
 import React, { createContext, useContext, useRef, ReactNode } from 'react';
 import HistoryController from '@/components/Editor/CanvasTools/eventHandlers/historyController';
+import { StickerData } from '@/types/types';
 
 interface CanvasContextProps {
   fabricCanvasRef: React.MutableRefObject<fabric.Canvas | null>;
@@ -11,15 +12,17 @@ interface CanvasContextProps {
   saveState: () => void;
   undo: (frameWidth: number, frameHeight: number) => void;
   redo: (frameWidth: number, frameHeight: number) => void;
+  stickerData: StickerData | null;  // Add stickerData here
 }
 
 interface CanvasProviderProps {
   children: ReactNode;
+  stickerData: StickerData;  // Add stickerData as a prop
 }
 
 const CanvasContext = createContext<CanvasContextProps | undefined>(undefined);
 
-export const CanvasProvider: React.FC<CanvasProviderProps> = ({ children }) => {
+export const CanvasProvider: React.FC<CanvasProviderProps> = ({ children, stickerData }) => {  // Accept stickerData prop
   const fabricCanvasRef = useRef<fabric.Canvas | null>(null);
   const htmlCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const historyControllerRef = useRef<HistoryController | null>(null);
@@ -42,7 +45,19 @@ export const CanvasProvider: React.FC<CanvasProviderProps> = ({ children }) => {
   };
 
   return (
-    <CanvasContext.Provider value={{ fabricCanvasRef, htmlCanvasRef, historyControllerRef, iconImageRef, setGrowValue, saveState, undo, redo }}>
+    <CanvasContext.Provider 
+      value={{
+        fabricCanvasRef, 
+        htmlCanvasRef, 
+        historyControllerRef, 
+        iconImageRef, 
+        setGrowValue, 
+        saveState, 
+        undo, 
+        redo, 
+        stickerData  // Pass stickerData to the context
+      }}
+    >
       {children}
     </CanvasContext.Provider>
   );
@@ -54,4 +69,4 @@ export const useCanvas = (): CanvasContextProps => {
       throw new Error('useCanvas must be used within a CanvasProvider');
     }
     return context;
-  };
+};

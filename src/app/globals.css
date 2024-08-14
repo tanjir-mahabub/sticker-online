@@ -111,7 +111,7 @@ svg.radial-loader[data-mode=buffer] .radial-loader__circle {
 }
 
 .material-option {
-  @apply absolute left-0 bottom-[92px] mb-2 w-[600px] bg-white border border-gray-300 divide-x rounded-md z-50 grid grid-cols-2 overflow-hidden;
+  @apply absolute left-0 bottom-[92px] mb-2 w-[300px] bg-white border border-gray-300 divide-x rounded-md z-50 grid overflow-hidden;
 }
 
 .antal-option {

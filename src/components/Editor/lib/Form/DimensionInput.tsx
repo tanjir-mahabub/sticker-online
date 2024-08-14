@@ -6,12 +6,14 @@ import { setCanvasProperties } from '@/redux/features/canvasSlice';
 import { setCalculation } from '@/redux/features/calculationSlice';
 import { useAppSelector } from '@/redux/store';
 import { cmToPixel } from '@/components/Utils/function';
-import { debounce } from "lodash";
+import { debounce } from 'lodash';
+import { useCanvas } from '@/context/CanvasContext';
 
 const DimensionInput = () => {
     const dispatch = useDispatch();
     const dimensionDefault = useAppSelector(state => state.formValues);
     const CanvasProperties = useAppSelector(state => state.canvas);
+    const { stickerData } = useCanvas();
 
     const [bredd, setBredd] = useState(CanvasProperties.bredd);
     const [hojd, setHojd] = useState(CanvasProperties.hojd);
@@ -24,13 +26,12 @@ const DimensionInput = () => {
         setHojd(prevValue => prevValue + step);
     }, []);
 
-    const DimensionSettings = (frameWidth: number, frameHeight: number) => {
+    const DimensionSettings = useCallback((frameWidth: number, frameHeight: number) => {
         const maxWidth = CanvasProperties.canvasWidth * 0.8;
         const minWidth = CanvasProperties.canvasWidth * 0.3;
         const maxHeight = CanvasProperties.canvasHeight * 0.8;
         const minHeight = CanvasProperties.canvasHeight * 0.3;
 
-        // Maintain the aspect ratio
         let newFrameWidth = frameWidth;
         let newFrameHeight = frameHeight;
 
@@ -52,20 +53,20 @@ const DimensionInput = () => {
             newFrameWidth = minHeight * aspectRatio;
         }
 
-        return { newFrameWidth, newFrameHeight }
-    }
+        return { newFrameWidth, newFrameHeight };
+    }, [CanvasProperties.canvasWidth, CanvasProperties.canvasHeight]);
 
     const debouncedUpdateBredd = useCallback(debounce((newBredd) => {
-        const newBreddCost = newBredd * 10;
+        const newBreddCost = stickerData ? newBredd * parseFloat(stickerData.options.dimensions_rate) : newBredd * 10;
         dispatch(setCanvasProperties({ frameWidth: cmToPixel(newBredd), bredd: newBredd }));
         dispatch(setCalculation({ breddCost: newBreddCost }));
-    }, 300), [dispatch]);
+    }, 300), [dispatch, stickerData]);
 
     const debouncedUpdateHojd = useCallback(debounce((newHojd) => {
-        const newHojdCost = newHojd * 10;
+        const newHojdCost = stickerData ? newHojd * parseFloat(stickerData.options.dimensions_rate) : newHojd * 10;
         dispatch(setCanvasProperties({ frameHeight: cmToPixel(newHojd), hojd: newHojd }));
         dispatch(setCalculation({ HojdCost: newHojdCost }));
-    }, 300), [dispatch]);
+    }, 300), [dispatch, stickerData]);
 
     useEffect(() => {
         debouncedUpdateBredd(bredd);
@@ -76,11 +77,11 @@ const DimensionInput = () => {
     }, [hojd, debouncedUpdateHojd]);
 
     useEffect(() => {
-        if(CanvasProperties.bredd || CanvasProperties.hojd) {
-            setBredd(CanvasProperties.bredd)
-            setHojd(CanvasProperties.hojd)            
+        if (CanvasProperties.bredd || CanvasProperties.hojd) {
+            setBredd(CanvasProperties.bredd);
+            setHojd(CanvasProperties.hojd);
         }
-    }, [CanvasProperties])
+    }, [CanvasProperties]);
 
     return (
         <>

@@ -149,12 +149,13 @@ const FabricCanvas: React.FC = () => {
         canvas.remove(group);
         canvas.renderAll();
 
-        if (canvasProperties.grow) {
+        const objectExists = canvas?.getObjects().length > 0;
+        if (canvasProperties.grow && objectExists) {
           handleDieCut(canvasProperties.grow);
         }
       }
   
-      console.log("This function runs after all objects are added and rendered.");
+      console.log("This function runs after all objects are added and rendered." , canvas?.getObjects());
   
       // Your function logic here
       // if (canvasProperties.grow) {
@@ -182,39 +183,28 @@ const FabricCanvas: React.FC = () => {
   
   
   
-
   useEffect(() => {
+    
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-     
-      const canvas = fabricCanvasRef.current;
-      const hasObjects = canvas?.getObjects();
-      if(hasObjects) {
-        const newBredd = cmToPixel(10);
-        const newHojd = cmToPixel(10);
-        
-        dispatch(setCanvasProperties({
-          bredd: 10,
-          hojd: 10,
-          frameWidth: newBredd,
-          frameHeight: newHojd,
-          grow: canvasProperties.grow,
-          canvasInitialZoom: 1
-        }));
-      }
-      // Perform any necessary cleanup or state saving here
+      console.log('Before unload event triggered.');
+      
+  
       console.log('Page is about to be unloaded.');
-
+  
       // If you want to show a confirmation dialog to the user, set event.returnValue
       event.returnValue = ''; // Setting this property shows the confirmation dialog in some browsers.
       return ''; // This line is necessary for some browsers to show the confirmation dialog.
     };
-
+  
     window.addEventListener('beforeunload', handleBeforeUnload);
-
+  
     return () => {
+      console.log('Removing beforeunload event listener.');
+
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  }, [fabricCanvasRef, canvasProperties.grow, dispatch]);
+  }, [fabricCanvasRef, dispatch]);
+  
 
 
   useEffect(() => {
