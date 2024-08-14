@@ -1,8 +1,9 @@
 import { setCanvasProperties } from '@/redux/features/canvasSlice';
 import { useAppSelector } from '@/redux/store';
 import { Sketch, Compact } from '@uiw/react-color';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
+import { debounce } from 'lodash';
 
 type ColorType = 'Background' | 'Text' | 'Both';
 
@@ -28,27 +29,38 @@ const ColorInput: React.FC<ColorStyle> = ({ sketch, compact, type, showValue, st
         setHexText(defaultTextColor);
     }, [defaultBackgroundColor, defaultTextColor]);
 
-    const handleChange = (color: { hex: string }) => {
-        switch (type) {
-            case "Background":
-                setHexBackground(color.hex);
-                dispatch(setCanvasProperties({ backgroundColor: color.hex }));
-                break;
-            case "Text":
-                setHexText(color.hex);
-                dispatch(setCanvasProperties({ textColor: color.hex }));
-                break;
-            case "Both":
-                setHexBackground(color.hex);
-                setHexText(color.hex);
-                dispatch(setCanvasProperties({ backgroundColor: color.hex, textColor: color.hex }));
-                break;
-            default:
-                break;
-        }
+    const handleChange = useCallback(
+        debounce((color: { hexa: string }) => {
+            const newColor = color.hexa;
 
-        onColorChange && onColorChange(color.hex);
-    }
+            switch (type) {
+                case "Background":
+                    if (hexBackground !== newColor) {
+                        setHexBackground(newColor);
+                        dispatch(setCanvasProperties({ backgroundColor: newColor }));
+                    }
+                    break;
+                case "Text":
+                    if (hexText !== newColor) {
+                        setHexText(newColor);
+                        dispatch(setCanvasProperties({ textColor: newColor }));
+                    }
+                    break;
+                case "Both":
+                    if (hexBackground !== newColor || hexText !== newColor) {
+                        setHexBackground(newColor);
+                        setHexText(newColor);
+                        dispatch(setCanvasProperties({ backgroundColor: newColor, textColor: newColor }));
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            onColorChange && onColorChange(newColor);
+        }, 200),
+        [hexBackground, hexText, type, dispatch, onColorChange]
+    );
 
     return (
         <div className="flex flex-col gap-10">
@@ -96,7 +108,7 @@ const ColorInput: React.FC<ColorStyle> = ({ sketch, compact, type, showValue, st
                 </div>
             )}
         </div>
-    )
+    );
 };
 
 export default ColorInput;
