@@ -350,9 +350,12 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
           }
         });
       } else {
-        if (selectedMaterial?.value === "clear") {
-          dieCutImage.set({ fill: "transparent" });
-        } else {
+        // if (selectedMaterial?.value === "clear") {
+        //   dieCutImage.set({ fill: "transparent" });
+        // } else {
+        //   dieCutImage.set({ fill: backgroundColor });
+        // }
+        if (selectedMaterial?.value === "clear") {          
           dieCutImage.set({ fill: backgroundColor });
         }
       }
