@@ -1,17 +1,26 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    async rewrites() {
-        return [
-          {
-            source: '/editor/:path*',
-            destination: '/editor',
-          },
-        ];
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'sticker-be.getonnet.dev',
+        pathname: '/wp-content/uploads/**',
       },
-      webpack: (config) => {
-        config.externals = [...config.externals, { canvas: 'commonjs canvas' }];
-        return config;
+    ],
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/editor/:path*',
+        destination: '/editor',
       },
+    ];
+  },
+  webpack: (config) => {
+    config.externals = [...config.externals, { canvas: 'commonjs canvas' }];
+    return config;
+  },
 };
 
 export default nextConfig;

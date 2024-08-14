@@ -1,40 +1,53 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import AntalOptions, { AntalOption } from './child/AntalOptions';
+import AntalOptions from './child/AntalOptions';
 import { useDispatch } from 'react-redux';
 import { setCalculation } from '@/redux/features/calculationSlice';
 import { setAntalLastSelected } from '@/redux/features/formSlice';
 import { useAppSelector } from '@/redux/store';
+import { useCanvas } from '@/context/CanvasContext';
+import { AntalOptionProps } from '@/types/types';
+import { formattedTotalCost } from '@/components/Utils/function';
 
-const antalOptions = [
-    { id: 1, st: '500 st', cost: 4990, rate: '10 kr / st' },
-    { id: 2, st: '200 st', cost: 2590, rate: '13,5 kr / st' },
-    { id: 3, st: '100 st', cost: 1490, rate: '14,9 kr / st' },
-    { id: 4, st: '50 st', cost: 890, rate: '17,8 kr / st' },
-    { id: 5, st: '25 st', cost: 490, rate: '19,9 kr / st' },
-    { id: 6, st: '10 st', cost: 240, rate: '24,5 kr / st' },
+const defaultAntalOptions = [
+    { id: 1, object_id: 1, st: '500 st', cost: 4990, rate: '10', value: '500-st' },
+    { id: 2, object_id: 2, st: '200 st', cost: 2590, rate: '13,5', value: '200-st' },
+    { id: 3, object_id: 3, st: '100 st', cost: 1490, rate: '14,9', value: '100-st' },
+    { id: 4, object_id: 4, st: '50 st', cost: 890, rate: '17,8', value: '50-st' },
+    { id: 5, object_id: 5, st: '25 st', cost: 490, rate: '19,9', value: '25-st' },
+    { id: 6, object_id: 6, st: '10 st', cost: 240, rate: '24,5', value: '10-st' },
 ];
 
 const AntalDropdown: React.FC = () => {
+    const dispatch = useDispatch();
+    const { stickerData } = useCanvas();
+
+    const antalOptions = stickerData?.antals?.length ? stickerData.antals : defaultAntalOptions;
+
+    const sortedAntalOptions = [...antalOptions].sort((a, b) => {
+        const numA = parseInt(a.st); 
+        const numB = parseInt(b.st);
+        return numB - numA; 
+    });    
 
     const antalDefault = useAppSelector(state => state.formValues.antalLastSelected);
-    const selected = antalOptions.find(option => option.id === antalDefault)
+    const selected = sortedAntalOptions.find(option => option.id === antalDefault);
+    
     const [isOpen, setIsOpen] = useState(false);
-    const [selectedOption, setSelectedOption] = useState<AntalOption | null>(selected || null);
+    const [selectedOption, setSelectedOption] = useState<AntalOptionProps | null>(selected || null);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
-    const dispatch = useDispatch();
-
-    const handleOptionChange = (option: AntalOption) => {
+    const handleOptionChange = (option: AntalOptionProps) => {
         setIsOpen(false);
         setSelectedOption(option);
-
         dispatch(setAntalLastSelected(option.id));
     };
 
     useEffect(() => {
-        selectedOption && dispatch(setCalculation({ antalCost: selectedOption.cost }));
-    }, [dispatch, selectedOption])
+        if (selectedOption) {
+            dispatch(setCalculation({ antalCost: selectedOption.cost }));
+        }
+    }, [dispatch, selectedOption]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -61,7 +74,7 @@ const AntalDropdown: React.FC = () => {
                         {selectedOption?.st}
                     </div>
                     <div className='w-fit text-xs font-semibold bg-black text-white rounded px-1.5 py-1.5'>
-                        {selectedOption?.rate}
+                        {formattedTotalCost(parseInt(selectedOption?.rate || '1'))} / st
                     </div>
                 </div>
                 <span className={`transition transform ${isOpen ? 'rotate-180' : ''}`}><Image src={'/downArrow.svg'} alt='down-arrow' width={11} height={11} /></span>
@@ -69,7 +82,7 @@ const AntalDropdown: React.FC = () => {
             {isOpen && (
                 <div className="antal-option">
                     <ul className="w-full">
-                        <AntalOptions antal={antalOptions} onSelectOption={handleOptionChange} />
+                        <AntalOptions antal={sortedAntalOptions} onSelectOption={handleOptionChange} />
                     </ul>
                 </div>
             )}
@@ -78,3 +91,4 @@ const AntalDropdown: React.FC = () => {
 };
 
 export default AntalDropdown;
+

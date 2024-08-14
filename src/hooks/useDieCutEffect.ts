@@ -1,6 +1,6 @@
-import { useRef, useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { fabric } from "fabric";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { debounce } from "lodash";
 import { setCanvasProperties } from "@/redux/features/canvasSlice";
 import { pixelToCm } from "@/components/Utils/function";
@@ -30,6 +30,8 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
   const { frameWidth, frameHeight, backgroundColor } = canvasProperties;
   const StickerNavID = useAppSelector(state => state.sticker.id);
   const [dieCutReady, setDieCutReady] = useState(false);
+
+  const { stickerData } = useCanvas();
 
   const [selectedItem, setSelectedItem] = useState<ObjectsWithPercentageArray>([]);
   const dispatch = useDispatch();
@@ -90,7 +92,9 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
 
   const dieCutGenerating = useCallback((dAttributeValue: string | null) => {
     const canvas = fabricCanvasRef.current;
-    const selectedMaterial = materialStore.find(material => material.id === materialDefault);
+
+    const materials = stickerData?.materials?.length ? stickerData.materials : materialStore;
+    const selectedMaterial = materials.find(material => material.id === materialDefault);
 
     if (!canvas) {
       console.error('Canvas is not initialized');
@@ -116,8 +120,8 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
           evented: false,
         });
 
-        if (selectedMaterial && selectedMaterial.src) {
-          fabric.Image.fromURL(selectedMaterial.src, function (img) {
+        if (selectedMaterial && selectedMaterial.label_icon) {
+          fabric.Image.fromURL(selectedMaterial.label_icon, function (img) {
             const element = img.getElement();
             if (element instanceof HTMLImageElement) {
               const pattern = new fabric.Pattern({
@@ -150,7 +154,7 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
       console.error('Error while processing the canvas:', error);
     }
 
-  }, [fabricCanvasRef, canvasProperties.grow, selectedItem, backgroundColor, materialDefault])
+  }, [fabricCanvasRef, canvasProperties.grow, selectedItem, backgroundColor, materialDefault, stickerData])
 
 
   const handleSVGOperations = useCallback(async (
@@ -321,16 +325,18 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
     const canvas = fabricCanvasRef.current;
 
     if (!canvas) {
-      console.error('Canvas is not initialized');
+      //console.error('Canvas is not initialized');
       return;
     }
 
     const dieCutImage = canvas.getObjects().find(obj => obj.id === "dieCutImage");
-    const selectedMaterial = materialStore.find(material => material.id === materialDefault);
+    
+    const materials = stickerData?.materials?.length ? stickerData.materials : materialStore;
+    const selectedMaterial = materials.find(material => material.id === materialDefault);
 
     if (dieCutImage) {
-      if (selectedMaterial && selectedMaterial.src) {
-        fabric.Image.fromURL(selectedMaterial.src, function (img) {
+      if (selectedMaterial && selectedMaterial.label_icon) {
+        fabric.Image.fromURL(selectedMaterial.label_icon, function (img) {
           const element = img.getElement();
           if (element instanceof HTMLImageElement) {
             const pattern = new fabric.Pattern({
@@ -353,7 +359,7 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
 
       canvas.renderAll();
     }
-  }, [fabricCanvasRef, materialDefault, backgroundColor]); 
+  }, [fabricCanvasRef, materialDefault, backgroundColor, stickerData]); 
 
 
   useEffect(() => {

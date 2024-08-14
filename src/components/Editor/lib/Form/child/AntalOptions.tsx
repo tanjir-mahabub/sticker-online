@@ -1,22 +1,17 @@
 import React, { useState } from 'react';
 import AnimateIn from '@/lib/AnimateIn';
 import { formattedTotalCost } from '@/components/Utils/function';
+import { AntalOptionProps } from '@/types/types';
 
-export interface AntalOption {
-    id: number;
-    st: string;
-    cost: number;
-    rate: string;
+interface AntalOption {
+    antal: AntalOptionProps[];
+    onSelectOption: (option: AntalOptionProps) => void;
 }
 
-interface AntalOptionsProps {
-    antal: AntalOption[];
-    onSelectOption: (option: AntalOption) => void;
-}
 
-const AntalOptions: React.FC<AntalOptionsProps> = ({ antal, onSelectOption }) => {
+const AntalOptions: React.FC<AntalOption> = ({ antal, onSelectOption }) => {
 
-    const handleOptionClick = (option: AntalOption) => {
+    const handleOptionClick = (option: AntalOptionProps) => {
         onSelectOption(option);
     };
 
@@ -37,7 +32,7 @@ const AntalOptions: React.FC<AntalOptionsProps> = ({ antal, onSelectOption }) =>
                             {formattedTotalCost(option.cost)}
                         </div>
                         <div className='w-20 text-center text-xs font-semibold bg-black text-white rounded px-1.5 py-2'>
-                            {option.rate}
+                            {formattedTotalCost(parseInt(option.rate))} / st
                         </div>
                     </li>
                 </AnimateIn>

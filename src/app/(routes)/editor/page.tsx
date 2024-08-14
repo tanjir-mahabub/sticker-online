@@ -1,69 +1,78 @@
-"use client"
+"use client";
 
-import Script from "next/script"
-import Customize from "@/components/Editor/Customize/Customize"
-import Dashboard from "@/components/Editor/Dashboard"
-import Header from "@/components/Editor/Header"
-import Footer from "@/components/Editor/Footer"
-import Sidebar from "@/components/Editor/Sidebar"
-import OverlayPopUp from "@/components/Utils/OverlayPopUp"
-import { useDispatch } from "react-redux"
-import { useEffect } from "react"
-import { setCanvasProperties } from "@/redux/features/canvasSlice"
-import { CanvasProvider } from "@/context/CanvasContext"
+import React, { useEffect, useState } from 'react';
+import Customize from "@/components/Editor/Customize/Customize";
+import Dashboard from "@/components/Editor/Dashboard";
+import Header from "@/components/Editor/Header";
+import Footer from "@/components/Editor/Footer";
+import Sidebar from "@/components/Editor/Sidebar";
+import OverlayPopUp from "@/components/Utils/OverlayPopUp";
+import { useDispatch } from "react-redux";
+import { setCanvasProperties } from "@/redux/features/canvasSlice";
+import { CanvasProvider } from "@/context/CanvasContext";
+import { fetchStickerData } from "@/services/stickerDataService";
 
 const Editor = () => {
-
     const dispatch = useDispatch();
-    
+    const [stickerData, setStickerData] = useState(null);
+
     useEffect(() => {
-      const setInitialCanvasDimensions = () => {
-          const clientWidth = window.innerWidth;
-          const clientHeight = window.innerHeight;
+        const fetchData = async () => {
+            try {
+                const data = await fetchStickerData();
+                console.log(data);
+                setStickerData(data);
+            } catch (error) {
+                console.error("Failed to fetch sticker data:", error);
+            }
+        };
 
-          dispatch(setCanvasProperties({ clientWidth, clientHeight }));
-          console.log("window size", clientWidth, clientHeight);
-      };
+        fetchData();
+    }, []);
 
-      const handleDOMContentLoaded = () => {
-          setInitialCanvasDimensions();
-      };
+    useEffect(() => {
+        const setInitialCanvasDimensions = () => {
+            const clientWidth = window.innerWidth;
+            const clientHeight = window.innerHeight;
 
-      setInitialCanvasDimensions(); // Ensure dimensions are set on first render
+            dispatch(setCanvasProperties({ clientWidth, clientHeight }));
+            console.log("window size", clientWidth, clientHeight);
+        };
 
-      window.addEventListener("resize", setInitialCanvasDimensions);
+        setInitialCanvasDimensions(); // Ensure dimensions are set on first render
 
-      return () => {
-          window.removeEventListener("resize", setInitialCanvasDimensions);
-      };
-  }, [dispatch]);
+        window.addEventListener("resize", setInitialCanvasDimensions);
+
+        return () => {
+            window.removeEventListener("resize", setInitialCanvasDimensions);
+        };
+    }, [dispatch]);
 
     return (
         <section>
-            {/* <Script src="https://d3js.org/d3.v7.min.js" strategy="lazyOnload" />
-            <Script src="https://unpkg.com/opentype.js/dist/opentype.min.js" strategy="lazyOnload" /> */}
-
-            <CanvasProvider>
-                <div className="flex flex-col overflow-hidden w-full h-screen">
-                    <div className="h-fit">
-                        <Header />
-                    </div>
-                    <div className="flex overflow-hidden lg:divide-x h-full">
-                        <Sidebar />
-                        <div className="hidden lg:flex">
-                        <Customize />
+            {stickerData && (
+                <CanvasProvider stickerData={stickerData}>
+                    <div className="flex flex-col overflow-hidden w-full h-screen">
+                        <div className="h-fit">
+                            <Header />
                         </div>
-                        <Dashboard />
-                    </div>
-                    <div className="h-auto">
-                        <Footer />
-                    </div>
+                        <div className="flex overflow-hidden lg:divide-x h-full">
+                            <Sidebar />
+                            <div className="hidden lg:flex">
+                                <Customize />
+                            </div>
+                            <Dashboard />
+                        </div>
+                        <div className="h-auto">
+                            <Footer />
+                        </div>
 
-                    <OverlayPopUp />
-                </div>
-            </CanvasProvider>
+                        <OverlayPopUp />
+                    </div>
+                </CanvasProvider>
+            )}
         </section>
-    )
-}
+    );
+};
 
-export default Editor
+export default Editor;
