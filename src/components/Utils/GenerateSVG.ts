@@ -35,7 +35,7 @@ export const generateSVGWithMargin = ({
   backgroundColor,
   StickerNavID,
   grow,
-  margin = 10,
+  margin = 50,
   hasBackground = true,
   printLine = true,
   printLineWidth = 3,

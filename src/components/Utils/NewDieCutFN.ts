@@ -256,12 +256,12 @@ const drawSVG = async (
   const [viewBoxX, viewBoxY, viewBoxWidth, viewBoxHeight] = viewbox.split(' ').map(Number);
 
   // Increase the viewBox size to accommodate the grow value
-  const expandedWidth = viewBoxWidth + grow * 2;
-  const expandedHeight = viewBoxHeight + grow * 2;
+  const expandedWidth = viewBoxWidth + grow * 2 + 10;
+  const expandedHeight = viewBoxHeight + grow * 2 + 10;
 
   // Recalculate the viewBox to keep the content centered
-  const newViewBoxX = viewBoxX - grow;
-  const newViewBoxY = viewBoxY - grow;
+  const newViewBoxX = viewBoxX - grow / 2;
+  const newViewBoxY = viewBoxY - grow / 2;
 
   const svgRoot = document.createElementNS(svgNS, "svg");
   svgRoot.setAttribute("xmlns", svgNS);
