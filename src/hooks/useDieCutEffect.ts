@@ -475,7 +475,7 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
 
 
 
-  return { dieCutResult, handleDownloadSVG, handleDieCut };
+  return { dieCutResult, handleDownloadSVG, handleDieCut, deletePrevDieCut };
 };
 
 

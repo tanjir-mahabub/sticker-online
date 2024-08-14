@@ -1,4 +1,5 @@
 import { useCanvas } from "@/context/CanvasContext";
+import { useDieCutEffect } from "@/hooks/useDieCutEffect";
 import { useAppSelector } from "@/redux/store";
 import { useEffect, useState, useCallback, useMemo } from 'react';
 
@@ -6,21 +7,26 @@ const UndoRedo = () => {
     const canvasProperties = useAppSelector(state => state.canvas);
     const { clientWidth, clientHeight, frameWidth, frameHeight } = canvasProperties;
     
-    const {historyControllerRef, undo, redo } = useCanvas();
+    const {fabricCanvasRef, historyControllerRef, undo, redo } = useCanvas();
+    const { deletePrevDieCut } = useDieCutEffect();
     
     const [isDisabledUndo, setDisabledUndo] = useState(false);
     const [isDisabledRedo, setDisabledRedo] = useState(true);
 
     const handleUndo = () => {
+        const canvas = fabricCanvasRef.current;
        historyControllerRef.current && setDisabledUndo(historyControllerRef.current?.history.length - 1 <= 1);
        setDisabledRedo(false); // Always enable redo after an undo
         undo(frameWidth, frameHeight);
+        canvas && deletePrevDieCut(canvas);
       };
     
       const handleRedo = () => {
+        const canvas = fabricCanvasRef.current;
         setDisabledUndo(false); // Always enable undo after a redo
        historyControllerRef.current && setDisabledRedo(historyControllerRef.current?.redoStack.length - 1 === 0);
         redo(frameWidth, frameHeight);
+        canvas && deletePrevDieCut(canvas);
       };
 
     const [responsiveTasks, setResponsiveTasks] = useState({
