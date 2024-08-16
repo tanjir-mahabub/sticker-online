@@ -1,10 +1,7 @@
-import VectorStencil from "./VectorStencil"
+import VectorStencil from "./VectorStencil";
 
 const Vector = () => {
+    return <VectorStencil />;
+};
 
-    return (        
-            <VectorStencil />        
-    )
-}
-
-export default Vector
+export default Vector;

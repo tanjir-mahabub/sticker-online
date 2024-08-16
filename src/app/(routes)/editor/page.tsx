@@ -1,44 +1,43 @@
-"use client"
+"use client";
 
-import Script from "next/script"
+import Script from "next/script";
 
-import { PaperProvider } from "@/context/PaperContext"
+import { PaperProvider } from "@/context/PaperContext";
 
-import Customize from "@/components/Editor/Customize/Customize"
-import Dashboard from "@/components/Editor/Dashboard"
-import Header from "@/components/Editor/Header"
-import Footer from "@/components/Editor/Footer"
-import Sidebar from "@/components/Editor/Sidebar"
-import OverlayPopUp from "@/components/Utils/OverlayPopUp"
-import { useDispatch } from "react-redux"
-import { useEffect } from "react"
-import { setCanvasProperties } from "@/redux/features/canvasSlice"
+import Customize from "@/components/Editor/Customize/Customize";
+import Dashboard from "@/components/Editor/Dashboard";
+import Header from "@/components/Editor/Header";
+import Footer from "@/components/Editor/Footer";
+import Sidebar from "@/components/Editor/Sidebar";
+import OverlayPopUp from "@/components/Utils/OverlayPopUp";
+import { useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { setCanvasProperties } from "@/redux/features/canvasSlice";
 
 const Editor = () => {
-
     const dispatch = useDispatch();
-    
+
     useEffect(() => {
-      const setInitialCanvasDimensions = () => {
-          const clientWidth = window.innerWidth;
-          const clientHeight = window.innerHeight;
+        const setInitialCanvasDimensions = () => {
+            const clientWidth = window.innerWidth;
+            const clientHeight = window.innerHeight;
 
-          dispatch(setCanvasProperties({ clientWidth, clientHeight }));
-          console.log("window size", clientWidth, clientHeight);
-      };
+            dispatch(setCanvasProperties({ clientWidth, clientHeight }));
+            console.log("window size", clientWidth, clientHeight);
+        };
 
-      const handleDOMContentLoaded = () => {
-          setInitialCanvasDimensions();
-      };
+        const handleDOMContentLoaded = () => {
+            setInitialCanvasDimensions();
+        };
 
-      setInitialCanvasDimensions(); // Ensure dimensions are set on first render
+        setInitialCanvasDimensions(); // Ensure dimensions are set on first render
 
-      window.addEventListener("resize", setInitialCanvasDimensions);
+        window.addEventListener("resize", setInitialCanvasDimensions);
 
-      return () => {
-          window.removeEventListener("resize", setInitialCanvasDimensions);
-      };
-  }, [dispatch]);
+        return () => {
+            window.removeEventListener("resize", setInitialCanvasDimensions);
+        };
+    }, [dispatch]);
 
     return (
         <section>
@@ -53,7 +52,7 @@ const Editor = () => {
                     <div className="flex overflow-hidden lg:divide-x h-full">
                         <Sidebar />
                         <div className="hidden lg:flex">
-                        <Customize />
+                            <Customize />
                         </div>
                         <Dashboard />
                     </div>
@@ -65,7 +64,7 @@ const Editor = () => {
                 </div>
             </PaperProvider>
         </section>
-    )
-}
+    );
+};
 
-export default Editor
+export default Editor;

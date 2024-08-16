@@ -6,9 +6,8 @@ export const isElementInsideFrame = (
     centerX: number,
     centerY: number,
     frameWidth: number,
-    frameHeight: number
+    frameHeight: number,
 ): boolean => {
-
     const frameX = centerX - frameWidth / 2;
     const frameY = centerY - frameHeight / 2;
     const frameX2 = frameX + frameWidth;
@@ -19,5 +18,5 @@ export const isElementInsideFrame = (
     const imagePosition: BoundingBox = element.getBBox();
     const inside = isObjectInsideFrame(imagePosition, frameEdges);
 
-    return inside
-}
+    return inside;
+};
