@@ -23,8 +23,7 @@ export type ObjectsWithPercentageArray = ObjectWithPercentage[];
 
 
 export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
-  const { fabricCanvasRef } = useCanvas();
-  const [dieCutResult, setDieCutResult] = useState<string | null>(null);
+  const { fabricCanvasRef } = useCanvas();  
   const materialDefault = useAppSelector(state => state.formValues.materialLastSelected);
   const canvasProperties = useAppSelector(state => state.canvas);
   const { frameWidth, frameHeight, backgroundColor } = canvasProperties;
@@ -192,9 +191,7 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
         const modifiedSVG = await generateSVGImageData(svgString, grow, backgroundColor);
         const dAttributeValue = await extractDAttributeValue(modifiedSVG);
 
-        if (modifiedSVG && dAttributeValue) {
-          // setDieCutResult(dAttributeValue);
-
+        if (modifiedSVG && dAttributeValue) {          
           dieCutGenerating(dAttributeValue)
           onDieCutReady && onDieCutReady(fabricCanvasRef);
           dispatch(setCanvasProperties({
@@ -430,8 +427,9 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
   
       dieCutImage.set({
         left: dieCutImageLeft,
-        top: dieCutImageTop
+        top: dieCutImageTop,
       });
+      
   
       // Convert the new dimensions to cm and dispatch them
       const originalWidthCm = pixelToCm(newWidth);
@@ -484,7 +482,7 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
 
 
 
-  return { dieCutResult, handleDownloadSVG, handleDieCut, deletePrevDieCut };
+  return { handleDownloadSVG, handleDieCut, deletePrevDieCut };
 };
 
 
