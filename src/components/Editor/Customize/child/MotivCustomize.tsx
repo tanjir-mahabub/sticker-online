@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import MotiveCategoryDropdown from "./Input/MotiveCategoryDropdown";
-import { motiveStore } from "@/store/motiveStore";
 import Image from "next/image";
 import { useDispatch } from "react-redux";
 import { addImage, clearImages } from "@/redux/features/imagePreviewSlice";
@@ -12,78 +11,92 @@ import { setCategoryToRemove } from "@/redux/features/categoryToRemove";
 const MotivCustomize = () => {
     const [selectedMotiveCategory, setSelectedMotiveCategory] = useState('Populära');
     const dispatch = useDispatch();
+    const [motiveStore, setMotiveStore] = useState<any[]>([]); // Adjust type as needed
     const imagePreviews = useAppSelector((state: RootState) => state.imagePreview.images);
 
-    const handleMotivClick = async (icon: string) => {
-        // Create a new image element
-        const img = new window.Image();
-    
-        // Set the source of the image to the icon URL
-        img.src = icon;
-    
-        // Once the image has loaded, draw it onto a canvas
-        img.onload = function () {
-            // Calculate maximum size constraints
-            const maxWidth = 200; // Example maximum width
-            const maxHeight = 200; // Example maximum height
-    
-            // Calculate scaling factor to fit within maxWidth and maxHeight
-            let scale = 1;
-            if (img.width > maxWidth || img.height > maxHeight) {
-                const widthRatio = maxWidth / img.width;
-                const heightRatio = maxHeight / img.height;
-                scale = Math.min(widthRatio, heightRatio);
-            }
-    
-            // Create a canvas element
-            const canvas = document.createElement('canvas');
-    
-            // Set the canvas dimensions
-            canvas.width = img.width * scale;
-            canvas.height = img.height * scale;
-    
-            // Get the canvas context
-            const ctx = canvas.getContext('2d');
-    
-            // Check if the canvas context is available
-            if (ctx) {
-                // Draw the image onto the canvas
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    
-                // Convert the canvas content to a data URL
-                const dataURL = canvas.toDataURL();
-    
-                // Create a new image object with the data URL
-                const newImage = {
-                    id: generateUniqueId(),
-                    src: dataURL,
-                    width: canvas.width, // Use canvas width after scaling
-                    height: canvas.height, // Use canvas height after scaling
-                    scaleX: 0,
-                    scaleY: 0,
-                    rotate: 0,                        
-                    status: "SD",
-                    attrs: { opacity: 1, cursor: 'move' },
-                    type: "motiv",
-                    category: 'motiv',                     
-                    stackNum: 0
-                };
-    
-                // Dispatch the new image to the store
-                dispatch(addImage(newImage));
-            } else {
-                console.error('Unable to get canvas context');
+    useEffect(() => {
+        const fetchMotiveStore = async () => {
+            try {
+                // Fetch the updated motiveStore from the new API
+                const response = await fetch('/api/motive-store-modified');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch motiveStore');
+                }
+                const data = await response.json();
+                setMotiveStore(data.newMotiveStore);
+            } catch (error) {
+                console.error('Error fetching motiveStore:', error);
             }
         };
+
+        fetchMotiveStore();
+    }, []);
+
+    const handleMotivClick = async (icon: string) => {
+        try {
+            // Create a new image element
+            const img = new window.Image();
+            img.src = icon;
+
+            // Once the image has loaded, draw it onto a canvas
+            img.onload = function () {
+                // Calculate maximum size constraints
+                const maxWidth = 200;
+                const maxHeight = 200;
+
+                // Calculate scaling factor to fit within maxWidth and maxHeight
+                let scale = 1;
+                if (img.width > maxWidth || img.height > maxHeight) {
+                    const widthRatio = maxWidth / img.width;
+                    const heightRatio = maxHeight / img.height;
+                    scale = Math.min(widthRatio, heightRatio);
+                }
+
+                // Create a canvas element
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width * scale;
+                canvas.height = img.height * scale;
+
+                // Get the canvas context
+                const ctx = canvas.getContext('2d');
+                if (ctx) {
+                    // Draw the image onto the canvas
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                    // Convert the canvas content to a data URL
+                    const dataURL = canvas.toDataURL();
+
+                    // Create a new image object with the data URL
+                    const newImage = {
+                        id: generateUniqueId(),
+                        src: dataURL,
+                        width: canvas.width,
+                        height: canvas.height,
+                        scaleX: 0,
+                        scaleY: 0,
+                        rotate: 0,
+                        status: "SD",
+                        attrs: { opacity: 1, cursor: 'move' },
+                        type: "motiv",
+                        category: 'motiv',
+                        stackNum: 0
+                    };
+
+                    // Dispatch the new image to the store
+                    dispatch(addImage(newImage));
+                } else {
+                    console.error('Unable to get canvas context');
+                }
+            };
+        } catch (error) {
+            console.error('Error handling motiv click:', error);
+        }
     };
-    
 
-
-    
     const handleDeleteBTN = () => {
-        dispatch(setCategoryToRemove("motiv"))
+        dispatch(setCategoryToRemove("motiv"));
         dispatch(clearImages("motiv"));
-        dispatch(deleteAllHistoriesByCategory("motiv"))
+        dispatch(deleteAllHistoriesByCategory("motiv"));
     };
 
     return (
@@ -100,8 +113,8 @@ const MotivCustomize = () => {
                 </div>
 
                 <div className="flex flex-wrap flex-grow justify-start items-start h-fit gap-3">
-                    {motiveStore.map(motiv => (
-                        motiv.category === selectedMotiveCategory && motiv.icons.map((icon, idx) => (
+                    {motiveStore?.map(motiv => (
+                        motiv.category === selectedMotiveCategory && motiv.icons?.map((icon: any, idx: number) => (
                             <div key={idx} className="bg-so-deep-gray flex justify-center items-center w-[70px] h-16 rounded cursor-pointer hover:shadow-md border border-gray-300/70" onClick={() => handleMotivClick(icon)}>
                                 <Image src={icon} width={36} height={36} alt={`icon-${idx}`} />
                             </div>
@@ -111,7 +124,7 @@ const MotivCustomize = () => {
             </div>
 
             <div className="flex-auto flex justify-start items-center gap-1 h-[60px] bg-white border-t px-3">
-                <div className="hover:bg-so-deep-gray cursor-pointer hover:shadow-lg"  onClick={handleDeleteBTN}>
+                <div className="hover:bg-so-deep-gray cursor-pointer hover:shadow-lg" onClick={handleDeleteBTN}>
                     <Image src="/editor/sidebar/trash.svg" alt="trash-icon" width={18} height={18} className="w-fit h-fit border rounded-sm p-1" />
                 </div>
                 <p className="text-xs lg:text-sm font-semibold">Ta bort alla motiv</p>

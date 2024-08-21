@@ -23,8 +23,7 @@ export type ObjectsWithPercentageArray = ObjectWithPercentage[];
 
 
 export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
-  const { fabricCanvasRef } = useCanvas();
-  const [dieCutResult, setDieCutResult] = useState<string | null>(null);
+  const { fabricCanvasRef } = useCanvas();  
   const materialDefault = useAppSelector(state => state.formValues.materialLastSelected);
   const canvasProperties = useAppSelector(state => state.canvas);
   const { frameWidth, frameHeight, backgroundColor } = canvasProperties;
@@ -109,6 +108,8 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
         deletePrevDieCut(canvas);
 
         const dieCutImage = new fabric.Path(dAttributeValue, {
+          strokeLineJoin: "round",
+          strokeLineCap: "round",
           strokeWidth: 1,
           stroke: strokeColor,
           fill: 'transparent',
@@ -192,9 +193,7 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
         const modifiedSVG = await generateSVGImageData(svgString, grow, backgroundColor);
         const dAttributeValue = await extractDAttributeValue(modifiedSVG);
 
-        if (modifiedSVG && dAttributeValue) {
-          // setDieCutResult(dAttributeValue);
-
+        if (modifiedSVG && dAttributeValue) {          
           dieCutGenerating(dAttributeValue)
           onDieCutReady && onDieCutReady(fabricCanvasRef);
           dispatch(setCanvasProperties({
@@ -350,14 +349,11 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
           }
         });
       } else {
-        // if (selectedMaterial?.value === "clear") {
-        //   dieCutImage.set({ fill: "transparent" });
-        // } else {
-        //   dieCutImage.set({ fill: backgroundColor });
-        // }
-        if (selectedMaterial?.value === "clear") {          
+        if (selectedMaterial?.value === "clear") {
+          dieCutImage.set({ fill: "transparent" });
+        } else {
           dieCutImage.set({ fill: backgroundColor });
-        }
+        }        
       }
 
       canvas.renderAll();
@@ -412,8 +408,8 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
       const groupCenterY = group.top! + group.height! / 2;
   
       // Calculate the new size for the dieCutImage based on the grow value
-      const newWidth = dieCutImage.width! + canvasProperties.grow * 2;
-      const newHeight = dieCutImage.height! + canvasProperties.grow * 2;
+      const newWidth = dieCutImage.width!;
+      const newHeight = dieCutImage.height!;
   
       // Calculate the scale factors
       const scaleX = newWidth / dieCutImage.width!;
@@ -430,8 +426,9 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
   
       dieCutImage.set({
         left: dieCutImageLeft,
-        top: dieCutImageTop
+        top: dieCutImageTop,
       });
+      
   
       // Convert the new dimensions to cm and dispatch them
       const originalWidthCm = pixelToCm(newWidth);
@@ -484,7 +481,7 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
 
 
 
-  return { dieCutResult, handleDownloadSVG, handleDieCut, deletePrevDieCut };
+  return { handleDownloadSVG, handleDieCut, deletePrevDieCut };
 };
 
 
