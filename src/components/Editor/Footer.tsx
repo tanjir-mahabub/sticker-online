@@ -54,7 +54,7 @@ const Footer = () => {
                 <div 
                     ref={formRef}
                     className={`relative w-full transition-all duration-300 ${showForm ? 'slide-down' : 'slide-up'}`}
-                    style={{ height: showForm ? formHeight : '0', overflow: 'hidden' }}
+                    style={{ height: showForm ? formHeight : '0', overflowX: 'hidden', overflowY: 'auto' }}
                 >
                     <div className="flex flex-auto w-full lg:py-7 text-xs">
                        {(selected.id === 0) ? <Form /> : <Customize />}

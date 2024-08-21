@@ -1,4 +1,3 @@
-import { CanvasState } from "@/types/types";
 import geom from "../../lib/geom";
 import * as d3 from "d3";
 import { line } from 'd3-shape';
@@ -161,7 +160,7 @@ export const generateSVGImageData = async (
     );
 
     const modifiedSVGImg = serializer.serializeToString(modifiedSVG);
-    //console.log('Modified SVG:', modifiedSVG);
+    console.log('Modified SVG:', modifiedSVG);
 
     const restoredSvgData = restoreSVG(scaledSvgData, modifiedSVGImg);
 
@@ -256,12 +255,12 @@ const drawSVG = async (
   const [viewBoxX, viewBoxY, viewBoxWidth, viewBoxHeight] = viewbox.split(' ').map(Number);
 
   // Increase the viewBox size to accommodate the grow value
-  const expandedWidth = viewBoxWidth + grow * 2 + 10;
-  const expandedHeight = viewBoxHeight + grow * 2 + 10;
+  const expandedWidth = viewBoxWidth;
+  const expandedHeight = viewBoxHeight;
 
   // Recalculate the viewBox to keep the content centered
-  const newViewBoxX = viewBoxX - grow / 2;
-  const newViewBoxY = viewBoxY - grow / 2;
+  const newViewBoxX = viewBoxX;
+  const newViewBoxY = viewBoxY;
 
   const svgRoot = document.createElementNS(svgNS, "svg");
   svgRoot.setAttribute("xmlns", svgNS);

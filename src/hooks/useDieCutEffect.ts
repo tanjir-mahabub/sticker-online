@@ -108,6 +108,8 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
         deletePrevDieCut(canvas);
 
         const dieCutImage = new fabric.Path(dAttributeValue, {
+          strokeLineJoin: "round",
+          strokeLineCap: "round",
           strokeWidth: 1,
           stroke: strokeColor,
           fill: 'transparent',
@@ -347,14 +349,11 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
           }
         });
       } else {
-        // if (selectedMaterial?.value === "clear") {
-        //   dieCutImage.set({ fill: "transparent" });
-        // } else {
-        //   dieCutImage.set({ fill: backgroundColor });
-        // }
-        if (selectedMaterial?.value === "clear") {          
+        if (selectedMaterial?.value === "clear") {
+          dieCutImage.set({ fill: "transparent" });
+        } else {
           dieCutImage.set({ fill: backgroundColor });
-        }
+        }        
       }
 
       canvas.renderAll();
@@ -409,8 +408,8 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
       const groupCenterY = group.top! + group.height! / 2;
   
       // Calculate the new size for the dieCutImage based on the grow value
-      const newWidth = dieCutImage.width! + canvasProperties.grow * 2;
-      const newHeight = dieCutImage.height! + canvasProperties.grow * 2;
+      const newWidth = dieCutImage.width!;
+      const newHeight = dieCutImage.height!;
   
       // Calculate the scale factors
       const scaleX = newWidth / dieCutImage.width!;

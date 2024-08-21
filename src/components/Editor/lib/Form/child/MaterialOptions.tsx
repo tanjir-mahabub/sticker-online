@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux';
 import { showPopup } from '@/redux/features/popupSlice';
 import AnimateIn from '@/lib/AnimateIn';
 import { MaterialOptionProps } from '@/types/types';
+import { useAppSelector } from '@/redux/store';
 
 interface MaterialOptionsProps {
     materials: MaterialOptionProps[];
@@ -11,6 +12,8 @@ interface MaterialOptionsProps {
 }
 
 const MaterialOptions: React.FC<MaterialOptionsProps> = ({ materials, onSelectOption }) => {
+    const canvasProperties = useAppSelector(state => state.canvas);
+
     const dispatch = useDispatch();
 
     const handleOptionClick = (option: MaterialOptionProps) => {
@@ -28,7 +31,13 @@ const MaterialOptions: React.FC<MaterialOptionsProps> = ({ materials, onSelectOp
                     duration={700}>
                     <li key={index} className="lg:py-1 font-bold hover:bg-gray-100 cursor-pointer flex justify-start items-center" onClick={() => handleOptionClick(option)}>
                         <div className='w-4/12 px-1'>
-                            <Image className='w-fit object-contain h-20 lg:h-full' src={option.icon} width={100} height={100} alt={option.label} />
+                            {option.icon ? (
+                                <Image className='w-fit object-contain h-20 lg:h-full' src={option.icon} width={100} height={100} alt={option.label} />
+                            ) : (
+                                <div className='flex justify-center items-center w-full h-full'>
+                                    <div className='w-[43px] h-[43px] rounded-full' style={{ background: canvasProperties.backgroundColor}}></div>
+                                </div>
+                            )}
                         </div>
                         <div className='w-5/12'>
                             {option.label}
