@@ -13,10 +13,10 @@ interface FrameProps {
 }
 
 const CanvasFrame: React.FC<FrameProps> = ({ fabricCanvas }) => {
-    
+
     const CanvasProperties = useAppSelector(state => state.canvas);
     const { canvasWidth, canvasHeight, canvasInitialZoom, frameWidth, frameHeight, bredd, hojd, grow, backgroundColor } = CanvasProperties;
-    
+
     const [canvasZoom, setCanvasZoom] = useState(canvasInitialZoom)
     const divElement = useRef<HTMLDivElement | null>(null); // Ref to store the created div element
     const StickerNavID = useAppSelector(state => state.sticker.id);
@@ -40,17 +40,17 @@ const CanvasFrame: React.FC<FrameProps> = ({ fabricCanvas }) => {
             // Get the current zoom level of the canvas
             const zoom = fabricCanvas.getZoom() || 1;
             console.log('zoom ----', zoom);
-            
-            setCanvasZoom(zoom);   
+
+            setCanvasZoom(zoom);
             dispatch(setCanvasProperties({
                 canvasInitialZoom: zoom
-            }))    
+            }))
 
             divElement.current.style.width = `${frameWidth * zoom}px`;
             divElement.current.style.height = `${frameHeight * zoom}px`;
             divElement.current.style.top = `${(canvasHeight / 2 - frameHeight * zoom / 2) - 30}px`;
             divElement.current.style.left = `${canvasWidth / 2 - frameWidth * zoom / 2}px`;
-            
+
             // Update the canvas properties
             // dispatch(setCanvasProperties({
             //     frameWidth: adjustedFrameWidth * zoom, // Save the frame width and height in canvas units
@@ -71,14 +71,14 @@ const CanvasFrame: React.FC<FrameProps> = ({ fabricCanvas }) => {
                 divElement.current.classList.add("block");
             }
         }
-    }, [fabricCanvas, StickerNavID, frameWidth, frameHeight, canvasWidth, canvasHeight, backgroundColor, dispatch]);    
+    }, [fabricCanvas, StickerNavID, frameWidth, frameHeight, canvasWidth, canvasHeight, backgroundColor, dispatch]);
 
     useEffect(() => {
         if (divElement.current) {
             if (StickerNavID === 1) {
                 divElement.current.classList.add("hidden");
                 divElement.current.classList.remove("block");
-            } 
+            }
             else if (StickerNavID === 2) {
                 divElement.current.style.borderRadius = "0px";
                 divElement.current.classList.add("block");
@@ -93,36 +93,45 @@ const CanvasFrame: React.FC<FrameProps> = ({ fabricCanvas }) => {
                 divElement.current.style.borderRadius = "10px";
                 divElement.current.classList.add("block");
                 divElement.current.classList.remove("hidden");
-            }            
+            }
         }
     }, [StickerNavID]);
 
     useEffect(() => {
         if (divElement.current) {
             divElement.current.style.background = backgroundColor;
+
+            if (fabricCanvas) {
+                fabricCanvas.getObjects().forEach((obj) => {
+                    if (obj.type === "path") {
+                        obj.set({ fill: backgroundColor });
+                    }
+                }
+                );
+            }
         }
-    }, [backgroundColor]);
+    }, [backgroundColor, fabricCanvas]);
 
     useEffect(() => {
-        if(fabricCanvas) {
+        if (fabricCanvas) {
             const objectExists = fabricCanvas?.getObjects().length > 0;
             console.log('objectExists', objectExists);
-            if(!objectExists) {
+            if (!objectExists) {
                 const newBredd = cmToPixel(10);
                 const newHojd = cmToPixel(10);
-                
+
                 dispatch(setCanvasProperties({
-                bredd: 10,
-                hojd: 10,
-                frameWidth: newBredd,
-                frameHeight: newHojd,
-                grow: grow,
-                canvasInitialZoom: 1
+                    bredd: 10,
+                    hojd: 10,
+                    frameWidth: newBredd,
+                    frameHeight: newHojd,
+                    grow: grow,
+                    canvasInitialZoom: 1
                 }));
             }
         }
     }, [fabricCanvas, grow, dispatch])
-      
+
 
     return (
         <div className="relative flex justify-center h-full transition">

@@ -1,19 +1,19 @@
-import React, { useState, useRef, useEffect } from 'react';
-import Image from 'next/image';
-import materialStore from '@/store/materialStore';
-import MaterialOptions from './child/MaterialOptions';
-import { useDispatch } from 'react-redux';
+import { useCanvas } from '@/context/CanvasContext';
 import { setCalculation } from '@/redux/features/calculationSlice';
 import { setMaterialLastSelected } from '@/redux/features/formSlice';
 import { useAppSelector } from '@/redux/store';
-import { useCanvas } from '@/context/CanvasContext';
+import materialStore from '@/store/materialStore';
 import { MaterialOptionProps } from '@/types/types';
+import Image from 'next/image';
+import React, { useEffect, useRef, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import MaterialOptions from './child/MaterialOptions';
 
 const MaterialDropdown: React.FC = () => {
     const materialDefault = useAppSelector(state => state.formValues.materialLastSelected);
     const { stickerData } = useCanvas();
 
-    const materials = stickerData?.materials || materialStore;
+    const materials = stickerData?.materials?.length ? stickerData.materials : materialStore;
 
     const selected = materials.find(option => option.id === materialDefault);
 
