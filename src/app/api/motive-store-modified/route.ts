@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
         }
 
         // Construct the base URL dynamically
-        const baseUrl = `${req.nextUrl.protocol}//${req.nextUrl.host}`;
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';;
 
         const modifiedMotiveStore = await Promise.all(
             motiveStore.map(async (motive) => {
