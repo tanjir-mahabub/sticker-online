@@ -207,39 +207,39 @@ const FabricCanvas: React.FC = () => {
   
 
 
-  useEffect(() => {
-    const canvas = fabricCanvasRef.current;
-    if (!canvas) {
-      console.error('Canvas reference is not available');
-      return;
-    }
+  // useEffect(() => {
+  //   const canvas = fabricCanvasRef.current;
+  //   if (!canvas) {
+  //     console.error('Canvas reference is not available');
+  //     return;
+  //   }
   
-    const handleActiveObjectChange = () => {
-      const activeObject = canvas.getActiveObject();
-      if (activeObject) {
-        console.log('Active object found:', activeObject);
-        dispatch(setCanvasProperties({ hasSelected: true }));
-      } else {
-        console.log('No active object found');
-        dispatch(setCanvasProperties({ hasSelected: false }));
-      }
-    };
+  //   const handleActiveObjectChange = () => {
+  //     const activeObject = canvas.getActiveObject();
+  //     if (activeObject) {
+  //       console.log('Active object found:', activeObject);
+  //       dispatch(setCanvasProperties({ hasSelected: true }));
+  //     } else {
+  //       console.log('No active object found');
+  //       dispatch(setCanvasProperties({ hasSelected: false }));
+  //     }
+  //   };
   
-    // Set up the event listener for when objects are added or modified
-    canvas.on('object:selected', handleActiveObjectChange);
-    canvas.on('selection:cleared', handleActiveObjectChange);
-    canvas.on('object:added', handleActiveObjectChange);
+  //   // Set up the event listener for when objects are added or modified
+  //   canvas.on('object:selected', handleActiveObjectChange);
+  //   canvas.on('selection:cleared', handleActiveObjectChange);
+  //   canvas.on('object:added', handleActiveObjectChange);
   
-    // Initial check
-    handleActiveObjectChange();
+  //   // Initial check
+  //   handleActiveObjectChange();
   
-    // Clean up event listeners on component unmount
-    return () => {
-      canvas.off('object:selected', handleActiveObjectChange);
-      canvas.off('selection:cleared', handleActiveObjectChange);
-      canvas.off('object:added', handleActiveObjectChange);
-    };
-  }, [fabricCanvasRef, dispatch]);
+  //   // Clean up event listeners on component unmount
+  //   return () => {
+  //     canvas.off('object:selected', handleActiveObjectChange);
+  //     canvas.off('selection:cleared', handleActiveObjectChange);
+  //     canvas.off('object:added', handleActiveObjectChange);
+  //   };
+  // }, [fabricCanvasRef, dispatch]);
   
 
   return (

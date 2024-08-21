@@ -1,39 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
 import sharp from 'sharp';
-import { writeFileSync, mkdirSync, existsSync, readdirSync, unlinkSync } from 'fs';
+import { writeFileSync, mkdirSync, existsSync } from 'fs';
 import path from 'path';
 import { motiveStore } from "@/store/motiveStore";
-
-// Utility function to clear the directory
-const clearDirectory = (dirPath: string) => {
-    if (existsSync(dirPath)) {
-        const files = readdirSync(dirPath);
-        files.forEach(file => {
-            const filePath = path.join(dirPath, file);
-            unlinkSync(filePath); // Delete the file
-        });
-    }
-};
-
-// Utility function to get the base URL dynamically
-const getBaseUrl = (req: NextRequest) => {
-    // Construct base URL from the request
-    return `${req.nextUrl.protocol}//${req.nextUrl.host}/`;
-};
+import fs from 'fs';
 
 export async function GET(req: NextRequest) {
     try {
         const iconsDir = path.join(process.cwd(), 'public', 'motiv-uploads');
 
-        // Create the icons directory if it doesn't exist
-        if (!existsSync(iconsDir)) {
-            mkdirSync(iconsDir);
+        // Clear the icons directory before saving new files
+        if (existsSync(iconsDir)) {
+            // Delete existing files in the directory
+            const files = fs.readdirSync(iconsDir);
+            for (const file of files) {
+                fs.unlinkSync(path.join(iconsDir, file));
+            }
         } else {
-            // Clear the directory before saving new images
-            clearDirectory(iconsDir);
+            mkdirSync(iconsDir);
         }
 
-        const baseUrl = getBaseUrl(req);
+        // Construct the base URL dynamically
+        const baseUrl = `${req.nextUrl.protocol}//${req.nextUrl.host}`;
 
         const modifiedMotiveStore = await Promise.all(
             motiveStore.map(async (motive) => {
@@ -48,7 +36,7 @@ export async function GET(req: NextRequest) {
                             // Fetch the icon
                             const response = await fetch(absoluteUrl);
                             if (!response.ok) {
-                                throw new Error(`Failed to fetch icon: ${absoluteUrl}`);
+                                throw new Error(`Failed to fetch icon: ${iconUrl}`);
                             }
                             const buffer = await response.arrayBuffer();
                             const imageBuffer = Buffer.from(buffer);
@@ -57,7 +45,7 @@ export async function GET(req: NextRequest) {
                             const modifiedImageBuffer = await sharp(imageBuffer)
                                 .trim()
                                 .toFormat('png')
-                                .toBuffer(); // Keep SVG format and original size
+                                .toBuffer(); 
 
                             // Save the processed icon to the icons directory
                             //@ts-ignore
