@@ -1,8 +1,8 @@
-import { fabric } from 'fabric';
-import { useEffect, MutableRefObject, useRef } from 'react';
-import HistoryController from '@/components/Editor/CanvasTools/eventHandlers/historyController';
 import { checkAndAdjust } from '@/components/Editor/CanvasTools/eventHandlers/checkAndAdjust';
 import { handleScaling } from '@/components/Editor/CanvasTools/eventHandlers/handleScaling';
+import HistoryController from '@/components/Editor/CanvasTools/eventHandlers/historyController';
+import { fabric } from 'fabric';
+import { MutableRefObject, useEffect, useRef } from 'react';
 
 export const useCanvasSetup = (
   htmlCanvasRef: MutableRefObject<HTMLCanvasElement | null>,
@@ -21,14 +21,14 @@ export const useCanvasSetup = (
     };
 
     if (htmlCanvasRef.current) {
-        // console.log('use canvas setup', htmlCanvasRef.current);
+      // console.log('use canvas setup', htmlCanvasRef.current);
       const fabricCanvas = new fabric.Canvas(htmlCanvasRef.current);
       fabricCanvasRef.current = fabricCanvas;
-      historyControllerRef.current = new HistoryController(fabricCanvas, 10);              
+      historyControllerRef.current = new HistoryController(fabricCanvas, 10);
 
       fabric.Object.prototype.controls.mtr = new fabric.Control({
         x: 0,
-        y: 0.50,
+        y: 0.5,
         offsetY: 34,
         withConnection: true,
         visible: true,
@@ -65,6 +65,7 @@ export const useCanvasSetup = (
         rotatingPointOffset: 20,
         cornerStrokeColor: 'black',
         borderDashArray: [5, 5],
+        objectCaching: false,
       });
 
       const checkAndAdjustHandler = checkAndAdjust(fabricCanvas);
@@ -108,7 +109,6 @@ export const useCanvasSetup = (
 
       // fabricCanvas.on('mouse:wheel', handleMouseWheel(fabricCanvas));
 
-      
       checkAndAdjustHandler(); // Initial check and adjustment
       saveState(); // Save initial state
       // console.log(fabricCanvas);
@@ -118,7 +118,13 @@ export const useCanvasSetup = (
       if (fabricCanvasRef.current) {
         fabricCanvasRef.current.dispose();
         fabricCanvasRef.current = null;
-      }     
+      }
     };
-  }, [htmlCanvasRef, fabricCanvasRef, historyControllerRef, iconImageRef, saveState]);
+  }, [
+    htmlCanvasRef,
+    fabricCanvasRef,
+    historyControllerRef,
+    iconImageRef,
+    saveState,
+  ]);
 };
