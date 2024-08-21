@@ -12,22 +12,29 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'No files uploaded' }, { status: 400 });
   }
 
+  const uploadsDir = path.join(process.cwd(), 'public/uploads');
+  await fs.mkdir(uploadsDir, { recursive: true });
+
   const uploadPromises = files.map(async (file) => {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // Trim transparent areas and resize the image
     const trimmedBuffer = await sharp(buffer)
-      .trim()
-      .resize({ width: 1920, height: 1080, fit: 'inside', withoutEnlargement: true })
+      .trim()      
       .toFormat('webp')
       .toBuffer();
 
-    const outputPath = path.join(process.cwd(), 'public/uploads', `${uuidv4()}.webp`);
-    //@ts-ignore
-    await fs.writeFile(outputPath, trimmedBuffer);
+    const fileName = `${uuidv4()}.webp`;
+    const outputPath = path.join(uploadsDir, fileName);
 
-    return { path: `/uploads/${path.basename(outputPath)}` };
+    try {
+      //@ts-ignore
+      await fs.writeFile(outputPath, trimmedBuffer);
+      return { path: `/uploads/${fileName}` };
+    } catch (error) {
+      console.error('Error saving file:', error);
+      throw new Error('Failed to save file');
+    }
   });
 
   try {

@@ -130,7 +130,7 @@ export const generateSVGImageData = async (
 ): Promise<string> => {
     const scale = 0.3; // Example scale factor
 
-    console.log('Original SVG:', svgData);
+   // console.log('Original SVG:', svgData);
     const svgElement = parseSvgString(svgData);
 
     // Adjust the SVG viewBox and apply necessary transformations
@@ -160,7 +160,7 @@ export const generateSVGImageData = async (
     );
 
     const modifiedSVGImg = serializer.serializeToString(modifiedSVG);
-    console.log('Modified SVG:', modifiedSVG);
+    //console.log('Modified SVG:', modifiedSVG);
 
     const restoredSvgData = restoreSVG(scaledSvgData, modifiedSVGImg);
 
