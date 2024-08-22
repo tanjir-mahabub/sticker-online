@@ -78,61 +78,17 @@ export const useControlButtons = ({ canvasRef, updateButtonStates }: ControlButt
     }
   }, [canvasRef, updateButtonStates]);
 
-  // const handleDelete = useCallback(() => {
-  //   const activeObject = canvasRef.current?.getActiveObject();
-  //   if (activeObject) {
-  //     activeObject.id && activeObject.type === "image" && dispatch(deleteImage(activeObject.id))        
-  //     activeObject.id && activeObject.data.category === "text" && dispatch(removeText(activeObject.id))           
-  //     canvasRef.current?.remove(activeObject);
-  //     canvasRef.current?.renderAll();
-  //     updateButtonStates();
-  //   }
-  // }, [canvasRef, updateButtonStates, dispatch]);
-
   const handleDelete = useCallback(() => {
     const activeObject = canvasRef.current?.getActiveObject();
-    
-    if(!activeObject) return;
-
-    if (activeObject.data?.category === 'image') {
-      const imageObject = activeObject as fabric.Image;
-      const src = imageObject.getSrc(); // Use type assertion to access the `getSrc` method
-  
-      if (src) {
-        const fileName = src.split('/').pop();
-        if (fileName) {
-          fetch(`/api/delete-image?fileName=${encodeURIComponent(fileName)}`, {
-            method: 'DELETE',
-          })
-          .then(response => {
-            if (response.ok && activeObject.id) {
-              dispatch(deleteImage(activeObject.id));
-              canvasRef.current?.remove(activeObject);
-              canvasRef.current?.renderAll();
-              updateButtonStates();
-            } else {
-              console.error('Failed to delete image from server');
-            }
-          })
-          .catch(error => {
-            console.error('An error occurred during image deletion:', error);
-          });
-        } else {
-          console.error('Failed to extract filename from image source');
-        }
-      } else {
-        console.error('Image source is undefined');
-      }
-    } else if (activeObject.data?.category === 'motiv') {
-      activeObject.id && dispatch(deleteImage(activeObject.id));
+    if (activeObject) {
+      activeObject.id && activeObject.type === "image" && dispatch(deleteImage(activeObject.id))        
+      activeObject.id && activeObject.data.category === "motiv" && dispatch(deleteImage(activeObject.id))        
+      activeObject.id && activeObject.data.category === "text" && dispatch(removeText(activeObject.id))           
       canvasRef.current?.remove(activeObject);
       canvasRef.current?.renderAll();
       updateButtonStates();
-    } else {
-      console.error('Active object is not an image or motiv');
     }
   }, [canvasRef, updateButtonStates, dispatch]);
-  
   
 
   // const handleCenterEL = useCallback(() => {
