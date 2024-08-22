@@ -32,10 +32,10 @@ const MaterialOptions: React.FC<MaterialOptionsProps> = ({ materials, onSelectOp
                     <li key={index} className="lg:py-1 font-bold hover:bg-gray-100 cursor-pointer flex justify-start items-center" onClick={() => handleOptionClick(option)}>
                         <div className='w-4/12 px-1'>
                             {option.icon ? (
-                                <Image className='w-fit object-contain h-20 lg:h-full' src={option.icon} width={100} height={100} alt={option.label} />
+                                <Image className='w-fit object-contain h-20 drop-shadow-sm lg:h-full' src={option.icon} width={100} height={100} alt={option.label} />
                             ) : (
                                 <div className='flex justify-center items-center w-full h-full'>
-                                    <div className='w-[43px] h-[43px] rounded-full' style={{ background: canvasProperties.backgroundColor}}></div>
+                                    <div className='w-[43px] h-[43px] border drop-shadow rounded-full' style={{ background: canvasProperties.backgroundColor}}></div>
                                 </div>
                             )}
                         </div>
