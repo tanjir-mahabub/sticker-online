@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'export',
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
@@ -8,14 +10,6 @@ const nextConfig = {
         pathname: '/wp-content/uploads/**',
       },
     ],
-  },
-  async rewrites() {
-    return [
-      {
-        source: '/editor/:path*',
-        destination: '/editor',
-      },
-    ];
   },
   webpack: (config) => {
     config.externals = [...config.externals, { canvas: 'commonjs canvas' }];

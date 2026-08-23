@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Stickora Studio
 
-## Getting Started
+A browser-based sticker design engine built as a real creative tool—not a static UI concept. Stickora combines responsive canvas interactions, artwork import, editable typography, die-cut preparation, material configuration, pricing, and export workflows.
 
-First, run the development server:
+## Product highlights
+
+- Fabric.js canvas with selection, transform, layering, mirroring, and history controls
+- Image upload and live artwork manipulation
+- Straight and curved editable text
+- Die-cut contour workflow and production-oriented preview
+- Material, laminate, dimension, and quantity configuration
+- Resilient configuration loading with local fallback data
+- Responsive editor shell and portfolio-quality product landing page
+- Static-safe architecture for reliable GitHub Pages deployment
+
+## Architecture
+
+- **Next.js 14 App Router** for routing, metadata, and static delivery
+- **TypeScript** for component and service contracts
+- **Fabric.js** isolated behind a client-only workspace boundary
+- **Redux Toolkit** for shared editor state
+- **Tailwind CSS + scoped product CSS** for editor utilities and the marketing surface
+
+The Fabric.js workspace is dynamically loaded on the client. This prevents browser canvas dependencies from leaking into server-side prerendering, while a typed data service uses a bounded request and complete fallback configuration to keep the editor usable when the external catalogue API is unavailable.
+
+## Run locally
 
 ```bash
+npm ci --legacy-peer-deps
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000`, then launch the studio at `/editor`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Quality checks
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+```bash
+npm run lint
+npm run typecheck
+npm run build
+```
 
-## Learn More
+## Deployment
 
-To learn more about Next.js, take a look at the following resources:
+Pushes to `main` build a static production artifact and deploy it with GitHub Actions to GitHub Pages.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Author
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Designed and engineered by [Md. Tanjir Mahabub](https://github.com/tanjir-mahabub).

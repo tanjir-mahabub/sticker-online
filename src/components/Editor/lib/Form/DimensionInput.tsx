@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import BreddInput from './BreddInput';
 import HojdInput from './HojdInput';
 import { useDispatch } from 'react-redux';
@@ -56,17 +56,22 @@ const DimensionInput = () => {
         return { newFrameWidth, newFrameHeight };
     }, [CanvasProperties.canvasWidth, CanvasProperties.canvasHeight]);
 
-    const debouncedUpdateBredd = useCallback(debounce((newBredd) => {
+    const debouncedUpdateBredd = useMemo(() => debounce((newBredd: number) => {
         const newBreddCost = stickerData ? newBredd * parseFloat(stickerData.options.dimensions_rate) : newBredd * 10;
         dispatch(setCanvasProperties({ frameWidth: cmToPixel(newBredd), bredd: newBredd }));
         dispatch(setCalculation({ breddCost: newBreddCost }));
     }, 300), [dispatch, stickerData]);
 
-    const debouncedUpdateHojd = useCallback(debounce((newHojd) => {
+    const debouncedUpdateHojd = useMemo(() => debounce((newHojd: number) => {
         const newHojdCost = stickerData ? newHojd * parseFloat(stickerData.options.dimensions_rate) : newHojd * 10;
         dispatch(setCanvasProperties({ frameHeight: cmToPixel(newHojd), hojd: newHojd }));
         dispatch(setCalculation({ HojdCost: newHojdCost }));
     }, 300), [dispatch, stickerData]);
+
+    useEffect(() => () => {
+        debouncedUpdateBredd.cancel();
+        debouncedUpdateHojd.cancel();
+    }, [debouncedUpdateBredd, debouncedUpdateHojd]);
 
     useEffect(() => {
         debouncedUpdateBredd(bredd);

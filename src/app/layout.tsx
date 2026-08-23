@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Red_Hat_Display } from "next/font/google";
 import "./globals.css";
+import "./studio.css";
 import ReduxProvider from "@/redux/Provider";
 
 const RedHatDisplay = Red_Hat_Display({
@@ -9,8 +10,9 @@ const RedHatDisplay = Red_Hat_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Sticker Online App",
-  description: "Du designar, vi trycker och skickar dina stickers på nolltid.",
+  title: "Stickora Studio — Browser Sticker Design Engine",
+  description: "A production-minded sticker design studio built with Next.js, TypeScript, Fabric.js, and robust canvas interactions.",
+  keywords: ["sticker editor", "Fabric.js", "Next.js", "creative tooling", "canvas editor"],
 };
 
 export default function RootLayout({

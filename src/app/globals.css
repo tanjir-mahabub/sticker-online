@@ -4,7 +4,7 @@
 
 body {
   overflow-x: hidden;
-  user-select: none;
+  user-select: text;
 }
 
 .so-textpath {

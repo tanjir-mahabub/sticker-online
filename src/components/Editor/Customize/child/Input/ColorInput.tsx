@@ -1,7 +1,7 @@
 import { setCanvasProperties } from '@/redux/features/canvasSlice';
 import { useAppSelector } from '@/redux/store';
 import { Sketch, Compact } from '@uiw/react-color';
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import { debounce } from 'lodash';
 
@@ -29,8 +29,8 @@ const ColorInput: React.FC<ColorStyle> = ({ sketch, compact, type, showValue, st
         setHexText(defaultTextColor);
     }, [defaultBackgroundColor, defaultTextColor]);
 
-    const handleChange = useCallback(
-        debounce((color: { hexa: string }) => {
+    const handleChange = useMemo(
+        () => debounce((color: { hexa: string }) => {
             const newColor = color.hexa;
 
             switch (type) {
@@ -61,6 +61,8 @@ const ColorInput: React.FC<ColorStyle> = ({ sketch, compact, type, showValue, st
         }, 200),
         [hexBackground, hexText, type, dispatch, onColorChange]
     );
+
+    useEffect(() => () => handleChange.cancel(), [handleChange]);
 
     return (
         <div className="flex flex-col gap-10">
