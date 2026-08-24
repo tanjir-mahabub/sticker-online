@@ -34,11 +34,11 @@ const SidebarNav = () => {
     };
 
     return (
-        <div className="flex lg:flex-col bg-black w-full justify-start divide-y divide-white/30 lg:pb-5">
+        <nav className="editor-toolnav flex lg:flex-col w-full justify-start lg:pb-5" aria-label="Editor tools">
             {sideNavs && sideNavs.map(nav => (
                 <div
                     key={nav.id}
-                    className={`flex flex-col items-center w-full 2xl:gap-1.5 pt-2 lg:pt-2.5 pb-2 lg:pb-3 px-3 cursor-pointer group ${selected.id === nav.id ? "bg-white" : "lg:hover:bg-so-deep-gray/80"}`}
+                    className={`editor-tool flex flex-col items-center w-full 2xl:gap-1.5 pt-2 lg:pt-3 pb-2 lg:pb-3 px-3 cursor-pointer group ${selected.id === nav.id ? "editor-tool-active" : ""}`}
                     onClick={() => handleNavClick(nav.id)}
                 >
                     <div className="w-[22px]">
@@ -47,7 +47,7 @@ const SidebarNav = () => {
                     <h4 className={`text-xxs xl:text-xs font-semibold lg:group-hover:text-black ${selected.id === nav.id ? "lg:text-black" : "text-white"}`}>{nav.name}</h4>
                 </div>
             ))}
-        </div>
+        </nav>
     );
 };
 

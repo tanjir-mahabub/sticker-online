@@ -3,9 +3,9 @@ import SidebarNav from "./Nav/SidebarNav"
 
 const Sidebar = () => {
     return (
-        <div className="hidden lg:flex w-[5vw] bg-so-black text-white">
+        <aside className="editor-sidebar hidden lg:flex w-[76px] text-white">
             <SidebarNav />
-        </div>
+        </aside>
     )
 }
 

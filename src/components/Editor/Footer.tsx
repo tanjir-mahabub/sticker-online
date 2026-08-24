@@ -37,7 +37,7 @@ const Footer = () => {
     return (
         <>
             {/* Desktop version */}
-            <footer className="hidden lg:flex h-fit items-center border-t px-3 xl:px-7">
+            <footer className="editor-footer hidden lg:flex h-fit items-center px-4 xl:px-7">
                 <div className="flex-auto pr-3 py-2.5 lg:py-2 3xl:py-6 border-r border-so-black/20 text-sm">
                     <Form />
                 </div>
@@ -47,7 +47,7 @@ const Footer = () => {
             </footer>
 
             {/* Mobile version */}
-            <footer className="fixed bottom-0 left-0 z-[100] bg-white flex lg:hidden flex-col lg:flex-auto w-full h-fit justify-center items-center px-0 xl:px-7 border-t border-so-black/10 shadow">
+            <footer className="editor-footer-mobile fixed bottom-0 left-0 z-[100] flex lg:hidden flex-col lg:flex-auto w-full h-fit justify-center items-center px-0 xl:px-7">
                 <button className="py-2" onClick={toggleFormVisibility}>
                     <div className="w-12 h-[5px] rounded shadow bg-so-deep-gray border border-so-black/10"></div>
                 </button>

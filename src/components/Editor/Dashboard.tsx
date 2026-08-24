@@ -39,9 +39,9 @@ const Dashboard = () => {
   }, [dispatch]);
 
   return (
-    <div ref={divRef} className="relative top-0 left-0 w-full h-full overflow-hidden lg:border-l bg-so-deep-gray">
+    <main ref={divRef} className="editor-canvas relative top-0 left-0 w-full h-full overflow-hidden">
       <FabricCanvasNoSSR />
-    </div>
+    </main>
   );
 };
 

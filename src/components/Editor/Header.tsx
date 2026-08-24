@@ -19,8 +19,8 @@ const Header = () => {
     return (
         <>
             {/* Desktop version */}
-            <header className="hidden lg:flex items-center border-b border-black/10 shadow-sm px-3 py-3">
-                <div className="flex w-40">
+            <header className="editor-header hidden lg:flex items-center px-5 py-3">
+                <div className="editor-wordmark flex w-40">
                     <Link href={"/"}>
                         <div className="w-full h-auto">
                             <Image className="w-full h-auto" src="/logo.png" alt="logo" width={130} height={100} />
@@ -28,13 +28,13 @@ const Header = () => {
                     </Link>
                 </div>
 
-                <div className="flex-auto flex justify-center items-center gap-2">
+                <div className="editor-history flex-auto flex justify-center items-center gap-2">
                     <UndoRedo />
                 </div>
             </header>
 
             {/* Mobile version */}
-            <header className="flex lg:hidden items-center bg-black border-b border-black/10 shadow-sm px-1.5 sm:px-3 py-1 lg:py-3">
+            <header className="editor-header-mobile flex lg:hidden items-center px-2 sm:px-3 py-2">
 
                 <div className="flex-auto flex justify-between items-center gap-2">
 
