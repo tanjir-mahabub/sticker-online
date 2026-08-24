@@ -13,12 +13,12 @@ const MaterialDropdown: React.FC = () => {
     const materialDefault = useAppSelector(state => state.formValues.materialLastSelected);
     const { stickerData } = useCanvas();
 
-    const materials = stickerData?.materials || materialStore;
+    const materials = stickerData?.materials?.length ? stickerData.materials : materialStore;
 
     const selected = materials.find(option => option.id === materialDefault);
 
     const [isOpen, setIsOpen] = useState(false);
-    const [selectedOption, setSelectedOption] = useState<MaterialOptionProps | null>(selected || null);
+    const [selectedOption, setSelectedOption] = useState<MaterialOptionProps | null>(selected || materials[0] || null);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     const dispatch = useDispatch();

@@ -34,7 +34,7 @@ const AntalDropdown: React.FC = () => {
     const selected = sortedAntalOptions.find(option => option.id === antalDefault);
     
     const [isOpen, setIsOpen] = useState(false);
-    const [selectedOption, setSelectedOption] = useState<AntalOptionProps | null>(selected || null);
+    const [selectedOption, setSelectedOption] = useState<AntalOptionProps | null>(selected || sortedAntalOptions[0] || null);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     const handleOptionChange = (option: AntalOptionProps) => {
@@ -91,4 +91,3 @@ const AntalDropdown: React.FC = () => {
 };
 
 export default AntalDropdown;
-

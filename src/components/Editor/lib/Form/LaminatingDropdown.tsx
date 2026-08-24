@@ -43,7 +43,7 @@ const LaminatingDropdown: React.FC = () => {
     const selected = laminatOptions.find(option => option.id === laminatingDefault);
 
     const [isOpen, setIsOpen] = useState(false);
-    const [selectedOption, setSelectedOption] = useState<LaminateOptionProps | null>(selected || null);
+    const [selectedOption, setSelectedOption] = useState<LaminateOptionProps | null>(selected || laminatOptions[0] || null);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     const handleOptionChange = (option: LaminateOptionProps) => {
