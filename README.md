@@ -1,48 +1,70 @@
-# Stickora Studio
+# Sticker Online
 
-A browser-based sticker design engine built as a real creative tool—not a static UI concept. Stickora combines responsive canvas interactions, artwork import, editable typography, die-cut preparation, material configuration, pricing, and export workflows.
+A full-stack, browser-based sticker design engine built with Next.js, TypeScript, Fabric.js, Redux Toolkit, and versioned serverless APIs. The product combines real canvas editing, resilient catalogue delivery, live production configuration, pricing, and print-oriented export.
 
-## Product highlights
+## Product capabilities
 
-- Fabric.js canvas with selection, transform, layering, mirroring, and history controls
-- Image upload and live artwork manipulation
-- Straight and curved editable text
-- Die-cut contour workflow and production-oriented preview
-- Material, laminate, dimension, and quantity configuration
-- Resilient configuration loading with local fallback data
-- Responsive editor shell and portfolio-quality product landing page
-- Static-safe architecture for reliable GitHub Pages deployment
+- Fabric.js canvas selection, scaling, rotation, layering, mirroring, zoom, and history
+- Image upload with drag-and-drop and client-side file constraints
+- Straight and curved editable typography
+- Die-cut contour generation and border controls
+- Eight material finishes, three laminates, six quantity tiers, and dimension pricing
+- Responsive desktop/mobile editor controls
+- SVG/PDF-oriented production export workflow
+- Same-origin catalogue and quote APIs with validated offline-safe defaults
+
+## API
+
+### `GET /api/v1/sticker-data`
+
+Returns the typed material catalogue, laminate options, quantity tiers, and pricing configuration. Responses are CDN-cacheable and versioned with `X-API-Version`.
+
+### `POST /api/v1/quote`
+
+Creates a deterministic SEK quote from production selections.
+
+```json
+{
+  "widthCm": 10,
+  "heightCm": 8,
+  "materialId": 1,
+  "laminateId": 1,
+  "quantityId": 3
+}
+```
+
+### `GET /api/health`
+
+Provides a lightweight deployment health signal.
+
+## Resilience model
+
+The editor uses its own versioned API instead of the discontinued external service. The catalogue is also shared as a typed local domain module. A bounded request, response-shape validation, and complete fallback data ensure that a temporary API failure never prevents the canvas from loading.
 
 ## Architecture
 
-- **Next.js 14 App Router** for routing, metadata, and static delivery
-- **TypeScript** for component and service contracts
-- **Fabric.js** isolated behind a client-only workspace boundary
-- **Redux Toolkit** for shared editor state
-- **Tailwind CSS + scoped product CSS** for editor utilities and the marketing surface
+- Next.js 14 App Router for UI and serverless route handlers
+- Fabric.js isolated behind a client-only editor boundary
+- Redux Toolkit for editor and production configuration state
+- Shared TypeScript contracts between catalogue, API, and UI
+- Vercel deployment for dynamic API routes and edge caching
+- GitHub Actions quality gates for type checking and production builds
 
-The Fabric.js workspace is dynamically loaded on the client. This prevents browser canvas dependencies from leaking into server-side prerendering, while a typed data service uses a bounded request and complete fallback configuration to keep the editor usable when the external catalogue API is unavailable.
-
-## Run locally
+## Local development
 
 ```bash
 npm ci --legacy-peer-deps
 npm run dev
 ```
 
-Open `http://localhost:3000`, then launch the studio at `/editor`.
+Open `http://localhost:3000` and launch `/editor`.
 
-## Quality checks
+## Quality gates
 
 ```bash
-npm run lint
 npm run typecheck
 npm run build
 ```
-
-## Deployment
-
-Pushes to `main` build a static production artifact and deploy it with GitHub Actions to GitHub Pages.
 
 ## Author
 

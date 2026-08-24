@@ -10,9 +10,9 @@ const RedHatDisplay = Red_Hat_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Stickora Studio — Browser Sticker Design Engine",
-  description: "A production-minded sticker design studio built with Next.js, TypeScript, Fabric.js, and robust canvas interactions.",
-  keywords: ["sticker editor", "Fabric.js", "Next.js", "creative tooling", "canvas editor"],
+  title: "Sticker Online — Browser-based Sticker Design Engine",
+  description: "Design print-ready stickers with a production-minded vector editor, live pricing API, material catalogue, and export workflow.",
+  keywords: ["Sticker Online", "sticker editor", "Fabric.js", "Next.js", "creative tooling", "canvas editor"],
 };
 
 export default function RootLayout({
