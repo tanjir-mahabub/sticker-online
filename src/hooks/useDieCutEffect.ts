@@ -83,9 +83,9 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
     try {
       const result = await engine.generate(canvas, {
         padding: safePadding,
-        resolution: 3,
+        resolution: 4,
         alphaThreshold: 12,
-        simplifyTolerance: 0.3,
+        simplifyTolerance: 0.16,
       });
       if (generation !== generationRef.current || !result) return;
 
@@ -106,8 +106,8 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
         data: { category: "generated", role: "cutline" },
         fill: "transparent",
         stroke: "#7c3aed",
-        strokeWidth: 1.25,
-        strokeDashArray: [7, 5],
+        strokeWidth: 1.1,
+        strokeDashArray: [3.5, 3],
         strokeUniform: true,
         selectable: false,
         evented: false,

@@ -1,5 +1,5 @@
 import { fabric } from "fabric";
-import { curveLinearClosed, line } from "d3-shape";
+import { curveCatmullRomClosed, line } from "d3-shape";
 import geom from "@/lib/geom";
 
 export const DIE_CUT_BACKGROUND_ID = "dieCutImage";
@@ -177,7 +177,7 @@ const simplify = (points: number[][], tolerance: number): number[][] => {
   return [...first.slice(0, -1), ...second];
 };
 
-const smoothClosed = (points: number[][], passes = 2) => {
+const smoothClosed = (points: number[][], passes = 1) => {
   let result = points;
   for (let pass = 0; pass < passes; pass += 1) {
     const next:number[][]=[];
@@ -236,7 +236,9 @@ export class StickerContourEngine {
     const pathBuilder = line<[number, number]>()
       .x((point) => point[0])
       .y((point) => point[1])
-      .curve(curveLinearClosed);
+      // Centripetal Catmull-Rom avoids loops at sharp corners while producing
+      // a print-ready closed curve from the raster contour.
+      .curve(curveCatmullRomClosed.alpha(0.5));
     const paths: string[] = [];
     for (const component of components) {
       const componentMask = new Set(component.pixels);
@@ -245,9 +247,11 @@ export class StickerContourEngine {
         return componentMask.has(y * rasterWidth + x);
       }, component.start) as number[][];
       const scenePoints = points.map(([x, y]) => [bounds.left + x / resolution, bounds.top + y / resolution]);
-      const tolerance = options.simplifyTolerance ?? Math.max(.35,.8/resolution);
+      // Keep tolerance in scene units so changing die-cut padding does not
+      // noticeably change the character of the source silhouette.
+      const tolerance = options.simplifyTolerance ?? Math.max(.14, .6 / resolution);
       const simplified = simplify([...scenePoints, scenePoints[0]], tolerance).slice(0, -1);
-      const smoothed = smoothClosed(simplified, 2) as [number,number][];
+      const smoothed = smoothClosed(simplified, 1) as [number,number][];
       const path = smoothed.length >= 3 ? pathBuilder(smoothed) : null;
       if (path) paths.push(path);
     }
