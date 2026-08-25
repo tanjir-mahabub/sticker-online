@@ -2,7 +2,7 @@
 export const sideNavs = [
     {
         id: 1,
-        name: "Bilder",
+        name: "Images",
         icon: "/editor/sidebar/insert-raster-image.svg"
     },    
     {
@@ -12,17 +12,17 @@ export const sideNavs = [
     },
     {
         id: 3,
-        name: "Motiv",
+        name: "Graphics",
         icon: "/editor/sidebar/metamorphose.svg"
     },    
     {
         id: 4,
-        name: "Färg",
+        name: "Color",
         icon: "/editor/sidebar/illustrator.svg"
     },
     {
         id: 5,
-        name: "Form",
+        name: "Shapes",
         icon: "/editor/sidebar/starburst-shape.svg"
     }
 ]

@@ -7,13 +7,15 @@ import RangeSlider from '../../Customize/child/Input/RangeSlider';
 import { Tooltip } from '@/components/Utils/ToolTips';
 import { useAppSelector } from '@/redux/store';
 import { useDieCutEffect } from '@/hooks/useDieCutEffect';
+import { useEditorI18n } from '@/context/EditorI18nContext';
 
 const Form = () => {
 
     const CanvasProperties = useAppSelector(state => state.canvas);
     const { grow } = CanvasProperties;
 
-    const { handleDownloadSVG, handleDieCut } = useDieCutEffect();
+    const { handleDieCut } = useDieCutEffect();
+    const { t } = useEditorI18n();
 
     const DieCutHandler = (value: number) => {
         console.log('DieCutHandler', value);
@@ -30,21 +32,21 @@ const Form = () => {
 
                 <div className=''>
                     <label htmlFor="laminat" className="block text-sm 3xl:text-sm font-bold text-gray-700">
-                        Laminat
+                        {t('laminate')}
                     </label>
                     <LaminatingDropdown />
                 </div>
 
                 <div className='w-40'>
                     <label htmlFor="material" className="block text-sm 3xl:text-sm font-bold text-gray-700">
-                        Material
+                        {t('material')}
                     </label>
                     <MaterialDropdown />
                 </div>
 
                 <div>
                     <label htmlFor="antal" className="block text-sm 3xl:text-sm font-bold text-gray-700">
-                        Antal
+                        {t('quantity')}
                     </label>
                     <AntalDropdown />
 
@@ -58,14 +60,14 @@ const Form = () => {
                 <div className='flex w-full gap-2 px-3'>
                     <div className='w-1/2'>
                         <label htmlFor="laminat" className="block text-xs lg:text-sm font-bold text-gray-700">
-                            Laminat
+                            {t('laminate')}
                         </label>
                         <LaminatingDropdown />
                     </div>
 
                     <div className='w-1/2'>
                         <label htmlFor="material" className="block text-xs lg:text-sm font-bold text-gray-700">
-                            Material
+                            {t('material')}
                         </label>
                         <MaterialDropdown />
                     </div>
@@ -80,7 +82,7 @@ const Form = () => {
                 <div>
                     <div className='w-full px-3'>
                         <label htmlFor="antal" className="block text-xs lg:text-sm font-bold text-gray-700">
-                            Antal
+                            {t('quantity')}
                         </label>
                         <AntalDropdown />
                     </div>
@@ -88,7 +90,7 @@ const Form = () => {
                 
                 <div>
                 <div className="flex gap-2 pb-3 w-full px-3">
-                            <RangeSlider minValue={20} maxValue={120} step={1} defaultValue={grow} label="Kantlinje" handleDieCut={DieCutHandler} />
+                            <RangeSlider minValue={8} maxValue={120} step={1} defaultValue={grow} label={t('edge')} handleDieCut={DieCutHandler} />
                             {/* <Tooltip message='Die Cut Effect'>
                                 <button onClick={handleDieCut} className='text-sm font-semibold bg-white hover:bg-so-deep-gray cursor-pointer border border-black/20 hover:border-black/50 shadow-sm hover:shadow-lg rounded-full px-2 pt-1 pb-1.5'>Apply</button>
                             </Tooltip>

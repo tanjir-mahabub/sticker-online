@@ -4,9 +4,11 @@ import UndoRedo from "./Child/UndoRedo";
 import PriceCartBtn from "./Child/PriceCartBtn";
 import { Tooltip } from "../Utils/ToolTips";
 import { useRouter } from "next/navigation";
+import { useEditorI18n } from "@/context/EditorI18nContext";
 
 const Header = () => {
     const router = useRouter();    
+    const { language, setLanguage } = useEditorI18n();
 
     const handleExitClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         e.preventDefault();
@@ -31,6 +33,7 @@ const Header = () => {
                 <div className="editor-history flex-auto flex justify-center items-center gap-2">
                     <UndoRedo />
                 </div>
+                <div className="editor-language" aria-label="Language"><button className={language==="en"?"is-active":""} onClick={()=>setLanguage("en")}>EN</button><button className={language==="sv"?"is-active":""} onClick={()=>setLanguage("sv")}>SV</button></div>
             </header>
 
             {/* Mobile version */}

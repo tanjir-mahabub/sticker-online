@@ -18,14 +18,14 @@ const materialStore = [
     {
         id: 2,
         object_id: 2,
-        label: "Holografisk",
+        label: "Holographic",
         value: "holografisk",
         cost: 32,
         icon: "/materials/holographic.png",
         label_icon: "",
         src: "/materials-background/holographic.jpg",
         popup: {
-            title: "Holografisk",
+            title: "Holographic",
             imgSrc: "/Holo.png",
             content: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Suscipit assumenda delectus hic officia iure necessitatibus excepturi laudantium, sunt eligendi, maiores velit tempora aliquam exercitationem a expedita odio facere modi sequi?"
         }

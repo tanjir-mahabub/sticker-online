@@ -8,12 +8,14 @@ import { useAppSelector } from '@/redux/store';
 import { cmToPixel } from '@/components/Utils/function';
 import { debounce } from 'lodash';
 import { useCanvas } from '@/context/CanvasContext';
+import { useEditorI18n } from '@/context/EditorI18nContext';
 
 const DimensionInput = () => {
     const dispatch = useDispatch();
     const dimensionDefault = useAppSelector(state => state.formValues);
     const CanvasProperties = useAppSelector(state => state.canvas);
     const { stickerData } = useCanvas();
+    const { t } = useEditorI18n();
 
     const [bredd, setBredd] = useState(CanvasProperties.bredd);
     const [hojd, setHojd] = useState(CanvasProperties.hojd);
@@ -92,14 +94,14 @@ const DimensionInput = () => {
         <>
             <div className='w-full lg:w-fit'>
                 <label htmlFor="bredd" className="block text-xs lg:text-sm font-bold text-gray-700">
-                    Bredd
+                    {t('width')}
                 </label>
                 <BreddInput value={bredd} onChange={setBredd} onStepUp={() => handleBreddStep(0.1)} onStepDown={() => handleBreddStep(-0.1)} />
             </div>
 
             <div className='w-full lg:w-fit'>
                 <label htmlFor="hojd" className="block text-xs lg:text-sm font-bold text-gray-700">
-                    Höjd
+                    {t('height')}
                 </label>
                 <HojdInput value={hojd} onChange={setHojd} onStepUp={() => handleHojdStep(0.1)} onStepDown={() => handleHojdStep(-0.1)} />
             </div>

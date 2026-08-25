@@ -12,6 +12,8 @@ import { setCanvasProperties } from "@/redux/features/canvasSlice";
 import { CanvasProvider } from "@/context/CanvasContext";
 import { fetchStickerData } from "@/services/stickerDataService";
 import type { StickerData } from "@/types/types";
+import { EditorI18nProvider } from "@/context/EditorI18nContext";
+import OrderReviewModal from "./OrderReviewModal";
 
 export default function EditorWorkspace() {
   const dispatch = useDispatch();
@@ -35,7 +37,7 @@ export default function EditorWorkspace() {
     return <div className="editor-boot" role="status"><span /><strong>Preparing your studio</strong><small>Loading canvas tools and materials…</small></div>;
   }
 
-  return <CanvasProvider stickerData={stickerData}>
+  return <EditorI18nProvider><CanvasProvider stickerData={stickerData}>
     <div className="editor-shell flex h-[100dvh] min-h-[100dvh] w-full flex-col overflow-hidden">
       <Header />
       <div className="flex min-h-0 flex-1 overflow-hidden lg:divide-x">
@@ -45,6 +47,7 @@ export default function EditorWorkspace() {
       </div>
       <Footer />
       <OverlayPopUp />
+      <OrderReviewModal />
     </div>
-  </CanvasProvider>;
+  </CanvasProvider></EditorI18nProvider>;
 }

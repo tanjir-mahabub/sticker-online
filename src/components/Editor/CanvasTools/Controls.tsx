@@ -1,6 +1,6 @@
 import React from 'react';
 import { fabric } from 'fabric';
-import { useDieCutEffect } from '@/hooks/useDieCutEffect';
+import { useEditorI18n } from '@/context/EditorI18nContext';
 
 interface ControlsProps {
   canvasRef: React.MutableRefObject<fabric.Canvas | null>;
@@ -8,10 +8,10 @@ interface ControlsProps {
 
 const Controls: React.FC<ControlsProps> = ({ canvasRef }) => {  
 
-  const { handleDownloadSVG } = useDieCutEffect();
+  const { t } = useEditorI18n();
 
-  return <button className="editor-export-button" onClick={handleDownloadSVG} title="Export a print-ready vector file">
-    <span>↗</span><div><small>Print ready</small><strong>Export SVG</strong></div>
+  return <button className="editor-export-button" onClick={()=>window.dispatchEvent(new Event('sticker:open-order'))} title={t('print')}>
+    <span>↗</span><div><small>{t('print')}</small><strong>{t('review')}</strong></div>
   </button>;
 };
 

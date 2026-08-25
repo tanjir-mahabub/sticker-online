@@ -1,5 +1,5 @@
 import { fabric } from "fabric";
-import { curveCatmullRomClosed, line } from "d3-shape";
+import { curveBasisClosed, line } from "d3-shape";
 import geom from "@/lib/geom";
 
 export const DIE_CUT_BACKGROUND_ID = "dieCutImage";
@@ -176,12 +176,26 @@ const simplify = (points: number[][], tolerance: number): number[][] => {
   return [...first.slice(0, -1), ...second];
 };
 
+const smoothClosed = (points: number[][], passes = 2) => {
+  let result = points;
+  for (let pass = 0; pass < passes; pass += 1) {
+    const next:number[][]=[];
+    for(let index=0;index<result.length;index+=1){
+      const a=result[index],b=result[(index+1)%result.length];
+      next.push([a[0]*.75+b[0]*.25,a[1]*.75+b[1]*.25],[a[0]*.25+b[0]*.75,a[1]*.25+b[1]*.75]);
+    }
+    result=next;
+  }
+  return result;
+};
+
 export class StickerContourEngine {
   async generate(canvas: fabric.Canvas, options: ContourOptions): Promise<ContourResult | null> {
     const objects = canvas.getObjects().filter(isArtwork);
     if (!objects.length) return null;
 
-    const resolution = Math.min(4, Math.max(1, options.resolution ?? 2));
+    const requestedResolution = options.resolution ?? (options.padding >= 45 ? 3 : 2.5);
+    const resolution = Math.min(4, Math.max(1, requestedResolution));
     const padding = Math.max(1, options.padding);
     const bounds = unionBounds(objects, padding + 4);
     const rasterWidth = Math.max(1, Math.ceil(bounds.width * resolution));
@@ -221,7 +235,7 @@ export class StickerContourEngine {
     const pathBuilder = line<[number, number]>()
       .x((point) => point[0])
       .y((point) => point[1])
-      .curve(curveCatmullRomClosed.alpha(0.5));
+      .curve(curveBasisClosed);
     const paths: string[] = [];
     for (const component of components) {
       const componentMask = new Set(component.pixels);
@@ -230,8 +244,10 @@ export class StickerContourEngine {
         return componentMask.has(y * rasterWidth + x);
       }, component.start) as number[][];
       const scenePoints = points.map(([x, y]) => [bounds.left + x / resolution, bounds.top + y / resolution]);
-      const simplified = simplify([...scenePoints, scenePoints[0]], options.simplifyTolerance ?? 0.7).slice(0, -1) as [number, number][];
-      const path = simplified.length >= 3 ? pathBuilder(simplified) : null;
+      const tolerance = options.simplifyTolerance ?? Math.max(.35,.8/resolution);
+      const simplified = simplify([...scenePoints, scenePoints[0]], tolerance).slice(0, -1);
+      const smoothed = smoothClosed(simplified, options.padding >= 35 ? 2 : 1) as [number,number][];
+      const path = smoothed.length >= 3 ? pathBuilder(smoothed) : null;
       if (path) paths.push(path);
     }
     if (!paths.length) return null;

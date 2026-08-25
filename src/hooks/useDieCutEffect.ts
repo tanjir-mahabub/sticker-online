@@ -21,13 +21,14 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
   const { fabricCanvasRef, stickerData } = useCanvas();
   const canvasProperties = useAppSelector((state) => state.canvas);
   const materialId = useAppSelector((state) => state.formValues.materialLastSelected);
+  const laminateId = useAppSelector((state) => state.formValues.laminatingLastSelected);
   const dispatch = useDispatch();
   const engine = useMemo(() => new StickerContourEngine(), []);
   const generationRef = useRef(0);
 
   const deletePrevDieCut = useCallback((canvas: fabric.Canvas) => {
     const generated = canvas.getObjects().filter((object) =>
-      object.id === DIE_CUT_BACKGROUND_ID || object.id === DIE_CUT_LINE_ID
+      object.id === DIE_CUT_BACKGROUND_ID || object.id === DIE_CUT_LINE_ID || object.id === "dieCutLaminate"
     );
     generated.forEach((object) => canvas.remove(object));
     if (generated.length) canvas.requestRenderAll();
@@ -40,17 +41,31 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
       background.set({ fill: "rgba(255,255,255,0.06)" });
       return;
     }
-    if (!material?.label_icon) {
+    if (!material?.src) {
+      const colors:Record<string,string>={mirror:"#d9e2ec","pixie-dust":"#eadcff",prismatic:"#d8f8f0","brushed-alloy":"#cbd5e1"};
+      if(material?.value && colors[material.value]) background.set({fill:colors[material.value]});
+      else
       background.set({ fill: canvasProperties.backgroundColor });
       return;
     }
-    fabric.Image.fromURL(material.label_icon, (image) => {
+    fabric.Image.fromURL(material.src, (image) => {
       const element = image.getElement();
       if (!(element instanceof HTMLImageElement)) return;
       background.set({ fill: new fabric.Pattern({ source: element, repeat: "repeat" }) });
       fabricCanvasRef.current?.requestRenderAll();
     }, { crossOrigin: "anonymous" });
   }, [canvasProperties.backgroundColor, fabricCanvasRef, materialId, stickerData]);
+
+  const applyLaminate = useCallback((pathData:string, canvas:fabric.Canvas) => {
+    const laminate=stickerData?.laminates.find(item=>item.id===laminateId);
+    if(!laminate)return;
+    const source=document.createElement("canvas");source.width=160;source.height=160;const context=source.getContext("2d");if(!context)return;
+    if(laminate.value==="glossy"){const gradient=context.createLinearGradient(0,0,160,160);gradient.addColorStop(0,"rgba(255,255,255,0)");gradient.addColorStop(.45,"rgba(255,255,255,.58)");gradient.addColorStop(.58,"rgba(255,255,255,0)");context.fillStyle=gradient;context.fillRect(0,0,160,160)}
+    else if(laminate.value==="matte"){context.fillStyle="rgba(255,255,255,.16)";context.fillRect(0,0,160,160);for(let i=0;i<260;i++){context.fillStyle="rgba(255,255,255,.2)";context.fillRect(Math.random()*160,Math.random()*160,1,1)}}
+    else {const gradient=context.createRadialGradient(60,50,5,80,80,110);gradient.addColorStop(0,"rgba(255,255,255,.2)");gradient.addColorStop(1,"rgba(230,226,255,.04)");context.fillStyle=gradient;context.fillRect(0,0,160,160)}
+    const overlay=new fabric.Path(pathData,{id:"dieCutLaminate",data:{category:"generated",role:"laminate",finish:laminate.value},fill:new fabric.Pattern({source:source as unknown as HTMLImageElement,repeat:"repeat"}),opacity:.32,selectable:false,evented:false,objectCaching:true});
+    canvas.add(overlay);
+  },[laminateId,stickerData]);
 
   const handleDieCut = useCallback(async (padding = canvasProperties.grow) => {
     const canvas = fabricCanvasRef.current;
@@ -66,7 +81,7 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
     try {
       const result = await engine.generate(canvas, {
         padding,
-        resolution: 2,
+        resolution: padding >= 45 ? 3 : 2.5,
         alphaThreshold: 28,
         simplifyTolerance: 0.65,
       });
@@ -99,6 +114,8 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
       canvas.insertAt(background, 0, false);
       canvas.insertAt(cutline, 1, false);
       applyMaterial(background);
+      applyLaminate(result.pathData,canvas);
+      cutline.bringToFront();
 
       const box = background.getBoundingRect(true, true);
       dispatch(setCanvasProperties({
@@ -113,7 +130,7 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
         dispatch(setCanvasProperties({ isLoading: false }));
       }
     }
-  }, [applyMaterial, canvasProperties.backgroundColor, canvasProperties.grow, deletePrevDieCut, dispatch, engine, fabricCanvasRef, onDieCutReady]);
+  }, [applyLaminate, applyMaterial, canvasProperties.backgroundColor, canvasProperties.grow, deletePrevDieCut, dispatch, engine, fabricCanvasRef, onDieCutReady]);
 
   const handleDownloadSVG = useCallback(async () => {
     const canvas = fabricCanvasRef.current;
