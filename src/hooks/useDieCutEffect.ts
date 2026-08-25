@@ -36,7 +36,8 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
   }, []);
 
   const applyMaterial = useCallback((background: fabric.Path) => {
-    const materials = stickerData?.materials?.length ? stickerData.materials : materialStore;
+    const remoteMaterials = stickerData?.materials?.length ? stickerData.materials : materialStore;
+    const materials = remoteMaterials.some((entry) => entry.value === "solid-color") ? remoteMaterials : [materialStore[0], ...remoteMaterials];
     const material = materials.find((entry) => entry.id === materialId);
     if (material?.value === "clear") {
       background.set({ fill: "rgba(255,255,255,0.06)" });

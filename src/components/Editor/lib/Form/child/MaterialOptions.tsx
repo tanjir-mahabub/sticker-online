@@ -5,6 +5,7 @@ import { showPopup } from '@/redux/features/popupSlice';
 import AnimateIn from '@/lib/AnimateIn';
 import { MaterialOptionProps } from '@/types/types';
 import { useAppSelector } from '@/redux/store';
+import { useEditorI18n } from '@/context/EditorI18nContext';
 
 interface MaterialOptionsProps {
     materials: MaterialOptionProps[];
@@ -13,6 +14,7 @@ interface MaterialOptionsProps {
 
 const MaterialOptions: React.FC<MaterialOptionsProps> = ({ materials, onSelectOption }) => {
     const canvasProperties = useAppSelector(state => state.canvas);
+    const { t } = useEditorI18n();
 
     const dispatch = useDispatch();
 
@@ -40,14 +42,14 @@ const MaterialOptions: React.FC<MaterialOptionsProps> = ({ materials, onSelectOp
                             )}
                         </div>
                         <div className='w-5/12'>
-                            {option.label}
+                            {option.value === "solid-color" ? t('solidColor') : option.label}
                         </div>
                         <div onClick={() => dispatch(showPopup({
                             title: option.popup.title,
                             imgSrc: option.popup.imgSrc,
                             content: option.popup.content
                         }))} className='w-3/12 text-xs font-semibold underline'>
-                            Mer info
+                            {t('moreInfo')}
                         </div>
                     </li>
                 </AnimateIn>

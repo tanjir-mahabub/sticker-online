@@ -5,11 +5,13 @@ import { useDispatch } from "react-redux";
 import { selectedSideNav } from "@/redux/features/sideNavSlice";
 import { useEffect, useState } from "react";
 import { SideNavState } from "@/types/types";
+import { useEditorI18n, type EditorCopyKey } from "@/context/EditorI18nContext";
 
 const SidebarNav = () => {
     const sideNavDispatch = useDispatch<AppDispatch>();
     const SideNavSelected = useAppSelector(state => state.sideNav);
     const [selected, setSelected] = useState<SideNavState>(SideNavSelected);
+    const { t } = useEditorI18n();
 
     const CanvasProperties = useAppSelector(state => state.canvas);
 
@@ -44,7 +46,7 @@ const SidebarNav = () => {
                     <div className="w-[22px]">
                         <Image src={nav.icon} alt={nav.name} width={20} height={20} className={`w-full h-auto lg:group-hover:filter lg:group-hover:invert ${selected.id === nav.id ? "filter invert" : ""}`} />
                     </div>
-                    <h4 className={`text-xxs xl:text-xs font-semibold lg:group-hover:text-black ${selected.id === nav.id ? "lg:text-black" : "text-white"}`}>{nav.name}</h4>
+                    <h4 className={`text-xxs xl:text-xs font-semibold lg:group-hover:text-black ${selected.id === nav.id ? "lg:text-black" : "text-white"}`}>{t(nav.name.toLowerCase() as EditorCopyKey)}</h4>
                 </div>
             ))}
         </nav>

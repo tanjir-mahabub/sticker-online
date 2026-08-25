@@ -2,8 +2,10 @@ import { useCanvas } from "@/context/CanvasContext";
 import { useDieCutEffect } from "@/hooks/useDieCutEffect";
 import { useAppSelector } from "@/redux/store";
 import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEditorI18n } from '@/context/EditorI18nContext';
 
 const UndoRedo = () => {
+    const { t } = useEditorI18n();
     const canvasProperties = useAppSelector(state => state.canvas);
     const { clientWidth, clientHeight, frameWidth, frameHeight } = canvasProperties;
     
@@ -64,7 +66,7 @@ const UndoRedo = () => {
                     <path d="M20.7449 7.49885C20.2377 6.06564 19.3757 4.78426 18.2394 3.77427C17.1031 2.76429 15.7294 2.05862 14.2466 1.72311C12.7638 1.38761 11.2201 1.4332 9.75969 1.85563C8.29926 2.27806 6.96963 3.06357 5.89488 4.13885L1.25488 8.49885" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
 
-                <span className={`group-hover:opacity-30 text-xxs lg:text-xs text-white lg:text-so-black ${isDisabledUndo ? 'text-white lg:text-gray-500' : 'group-hover:text-white lg:group-hover:text-so-black'}`}>Undo</span>
+                <span className={`group-hover:opacity-30 text-xxs lg:text-xs text-white lg:text-so-black ${isDisabledUndo ? 'text-white lg:text-gray-500' : 'group-hover:text-white lg:group-hover:text-so-black'}`}>{t('undo')}</span>
             </div>
             <div
                 onClick={handleRedo}
@@ -80,7 +82,7 @@ const UndoRedo = () => {
                     <path d="M1.75488 7.49885C2.26205 6.06564 3.12402 4.78426 4.26035 3.77427C5.39668 2.76429 6.77035 2.05862 8.25317 1.72311C9.73599 1.38761 11.2796 1.4332 12.7401 1.85563C14.2005 2.27806 15.5301 3.06357 16.6049 4.13885L21.2449 8.49885" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
 
-                <span className={`group-hover:opacity-30 text-xxs lg:text-xs text-white lg:text-so-black ${isDisabledRedo ? 'text-white lg:text-gray-500' : 'group-hover:text-white lg:group-hover:text-so-black'}`}>Redo</span>
+                <span className={`group-hover:opacity-30 text-xxs lg:text-xs text-white lg:text-so-black ${isDisabledRedo ? 'text-white lg:text-gray-500' : 'group-hover:text-white lg:group-hover:text-so-black'}`}>{t('redo')}</span>
             </div>
         </>
     )

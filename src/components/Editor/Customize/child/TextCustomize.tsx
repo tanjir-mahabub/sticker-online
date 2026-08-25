@@ -9,9 +9,11 @@ import Image from 'next/image';
 import { deleteAllHistoriesByCategory } from '@/redux/features/historySlice';
 import { generateUniqueId } from '@/components/Utils/function';
 import { setCategoryToRemove } from '@/redux/features/categoryToRemove';
+import { useEditorI18n } from '@/context/EditorI18nContext';
 
 const TextCustomize: React.FC = () => {
     const dispatch = useDispatch();
+    const { t } = useEditorI18n();
     // Use useAppSelector to get texts from the state
     const texts = useAppSelector((state) => state.text.texts);
 
@@ -73,7 +75,7 @@ const TextCustomize: React.FC = () => {
         <div className="flex flex-col w-full h-full">
             <div className='flex-auto space-y-3 h-full overflow-y-auto bg-white p-4'>
                 <div className="space-y-3 lg:space-y-5">
-                    <h2 className="text-sm sm:text-base lg:text-lg font-bold">Lägg till text</h2>
+                    <h2 className="text-sm sm:text-base lg:text-lg font-bold">{t('addText')}</h2>
                 </div>
 
                 <div className="grid grid-cols-2 xl:grid-cols-3 justify-start items-center gap-3">
@@ -82,7 +84,7 @@ const TextCustomize: React.FC = () => {
                             onClick={() => setSelectedFont(customFonts.id)}
                         >
                             <p className={`${customFonts.font.className} text-lg`}>
-                                Text
+                                {t('text')}
                             </p>
                         </div>
                     ))}
@@ -113,12 +115,12 @@ const TextCustomize: React.FC = () => {
                                 />
                             </div>
                         )}
-                        <p className='text-xs font-bold leading-7'>Color</p>
+                        <p className='text-xs font-bold leading-7'>{t('textColor')}</p>
                         <button onClick={toggleColorPicker} className="w-7 h-7 border border-black/30 rounded shadow" style={{ background: `${selectedColor}` }}></button>
                     </div>
 
                     <div>
-                        <button onClick={AddText} className='bg-black text-white rounded shadow px-3 py-1'>Add Text</button>
+                        <button onClick={AddText} className='bg-black text-white rounded shadow px-3 py-1'>{t('addText')}</button>
                     </div>
                 </div>
             </div>
@@ -135,7 +137,7 @@ const TextCustomize: React.FC = () => {
                         className="w-fit h-fit border rounded-sm p-1"
                     />
                 </div>
-                <p className="text-xs md:text-sm font-semibold">Ta bort alla bilder</p>
+                <p className="text-xs md:text-sm font-semibold">{t('removeTexts')}</p>
             </div>
         </div>
     );

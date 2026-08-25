@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { fabric } from "fabric";
 import { useCanvas } from "@/context/CanvasContext";
 import { DIE_CUT_BACKGROUND_ID, DIE_CUT_LINE_ID, getArtworkObjects } from "@/lib/sticker-contour/StickerContourEngine";
+import { useEditorI18n } from "@/context/EditorI18nContext";
 
 const clampZoom = (value: number) => Math.min(3, Math.max(0.2, value));
 const labelFor = (object: fabric.Object, index: number) => {
@@ -14,6 +15,7 @@ const labelFor = (object: fabric.Object, index: number) => {
 
 export default function EditorCommandBar() {
   const { fabricCanvasRef, saveState } = useCanvas();
+  const { t } = useEditorI18n();
   const [zoom, setZoom] = useState(1);
   const [layersOpen, setLayersOpen] = useState(false);
   const [, setRevision] = useState(0);
@@ -100,11 +102,11 @@ export default function EditorCommandBar() {
       <span>{Math.round(zoom * 100)}%</span>
       <button onClick={() => setCanvasZoom(zoom + 0.1)} aria-label="Zoom in">+</button>
       <i />
-      <button onClick={duplicate} aria-label="Duplicate selected layer">Duplicate</button>
-      <button className={layersOpen ? "is-active" : ""} onClick={() => setLayersOpen((value) => !value)} aria-expanded={layersOpen}>Layers <b>{artwork.length}</b></button>
+      <button onClick={duplicate} aria-label={t('duplicate')}>{t('duplicate')}</button>
+      <button className={layersOpen ? "is-active" : ""} onClick={() => setLayersOpen((value) => !value)} aria-expanded={layersOpen}>{t('layers')} <b>{artwork.length}</b></button>
     </div>
     {layersOpen && <aside className="editor-layers" aria-label="Layers panel">
-      <header><div><small>Workspace</small><strong>Layers</strong></div><button onClick={() => setLayersOpen(false)} aria-label="Close layers">×</button></header>
+      <header><div><small>{t('workspace')}</small><strong>{t('layers')}</strong></div><button onClick={() => setLayersOpen(false)} aria-label={t('close')}>×</button></header>
       {artwork.length === 0 ? <div className="editor-layers-empty"><span>◇</span><strong>Your canvas is ready</strong><p>Add an image, motif, or text to create the first layer.</p></div> :
         <ol>{artwork.map((object, index) => <li key={object.id ?? index}>
           <button className="layer-select" onClick={() => { fabricCanvasRef.current?.setActiveObject(object); fabricCanvasRef.current?.requestRenderAll(); }}>

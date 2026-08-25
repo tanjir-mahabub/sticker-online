@@ -1,5 +1,6 @@
 
-const materialStore = [    
+const materialStore = [
+    { id: 9, object_id: 9, label: "Solid color", value: "solid-color", cost: 37, icon: "", label_icon: "", src: "", popup: { title: "Solid color", imgSrc: "", content: "A clean, printable solid fill using the color selected in the Color panel." } },
     {
         id: 1,
         object_id: 1,

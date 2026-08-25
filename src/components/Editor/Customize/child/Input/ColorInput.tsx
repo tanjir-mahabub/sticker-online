@@ -4,6 +4,7 @@ import { Sketch, Compact } from '@uiw/react-color';
 import React, { useEffect, useState, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import { debounce } from 'lodash';
+import { useEditorI18n } from '@/context/EditorI18nContext';
 
 type ColorType = 'Background' | 'Text' | 'Both';
 
@@ -23,6 +24,7 @@ const ColorInput: React.FC<ColorStyle> = ({ sketch, compact, type, showValue, st
     const [hexText, setHexText] = useState(defaultTextColor);
 
     const dispatch = useDispatch();
+    const { t } = useEditorI18n();
 
     useEffect(() => {
         setHexBackground(defaultBackgroundColor);
@@ -86,24 +88,24 @@ const ColorInput: React.FC<ColorStyle> = ({ sketch, compact, type, showValue, st
                 <div className='flex flex-col gap-3'>
                     {showValue === 'Background' && (
                         <>
-                            <p className='text-xs lg:text-sm font-bold text-so-black'>Färgkod (Bakgrund)</p>
+                            <p className='text-xs lg:text-sm font-bold text-so-black'>{t('colorCodeBackground')}</p>
                             <p className="bg-so-deep-gray font-bold px-3 py-2 border rounded">{hexBackground}</p>
                         </>
                     )}
 
                     {showValue === 'Text' && (
                         <>
-                            <p className='text-xs lg:text-sm font-bold text-so-black'>Färgkod (Text)</p>
+                            <p className='text-xs lg:text-sm font-bold text-so-black'>{t('colorCodeText')}</p>
                             <p className="bg-so-deep-gray font-bold px-3 py-2 border rounded">{hexText}</p>
                         </>
                     )}
 
                     {showValue === 'Both' && (
                         <>
-                            <p className='text-xs lg:text-sm font-bold text-so-black'>Färgkod (Bakgrund)</p>
+                            <p className='text-xs lg:text-sm font-bold text-so-black'>{t('colorCodeBackground')}</p>
                             <p className="bg-so-deep-gray font-bold px-3 py-2 border rounded">{hexBackground}</p>
 
-                            <p className='text-xs lg:text-sm font-bold text-so-black'>Färgkod (Text)</p>
+                            <p className='text-xs lg:text-sm font-bold text-so-black'>{t('colorCodeText')}</p>
                             <p className="bg-so-deep-gray font-bold px-3 py-2 border rounded">{hexText}</p>
                         </>
                     )}

@@ -8,11 +8,11 @@ import { useEditorI18n } from "@/context/EditorI18nContext";
 
 const Header = () => {
     const router = useRouter();    
-    const { language, setLanguage } = useEditorI18n();
+    const { language, setLanguage, t } = useEditorI18n();
 
     const handleExitClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         e.preventDefault();
-        if (window.confirm("Are you sure you want to exit?")) {
+        if (window.confirm(t('exitConfirm'))) {
             router.push("/");
         }
     };
@@ -43,7 +43,7 @@ const Header = () => {
 
                     <div className="flex justify-center items-center gap-2">
                         <div className="w-full h-auto" onClick={handleExitClick}>
-                            <Tooltip message={"Exit"}>
+                            <Tooltip message={t('exit')}>
                                 <Image className="w-full h-auto" src="/editor/icon/return.svg" alt="logo" width={100} height={100} />
                             </Tooltip>
                         </div>

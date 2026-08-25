@@ -8,12 +8,15 @@ import { setMaterialLastSelected } from '@/redux/features/formSlice';
 import { useAppSelector } from '@/redux/store';
 import { useCanvas } from '@/context/CanvasContext';
 import { MaterialOptionProps } from '@/types/types';
+import { useEditorI18n } from '@/context/EditorI18nContext';
 
 const MaterialDropdown: React.FC = () => {
     const materialDefault = useAppSelector(state => state.formValues.materialLastSelected);
     const { stickerData } = useCanvas();
 
-    const materials = stickerData?.materials?.length ? stickerData.materials : materialStore;
+    const remoteMaterials = stickerData?.materials?.length ? stickerData.materials : materialStore;
+    const materials = remoteMaterials.some(option => option.value === "solid-color") ? remoteMaterials : [materialStore[0], ...remoteMaterials];
+    const { t } = useEditorI18n();
 
     const selected = materials.find(option => option.id === materialDefault);
 
@@ -70,7 +73,7 @@ const MaterialDropdown: React.FC = () => {
                 }}
                 className="mt-1 px-3.5 py-3 font-semibold bg-so-gray border border-gray-300 rounded-md w-full focus:outline-none focus:ring focus:border-blue-300 relative flex justify-between items-center"
             >
-                {selectedOption?.label || "Select Material"}
+                {selectedOption?.value === "solid-color" ? t('solidColor') : selectedOption?.label || t('selectMaterial')}
                 <span className={`transition transform ${isOpen ? 'rotate-180' : ''}`}><Image src={'/downArrow.svg'} alt='down-arrow' width={11} height={11} /></span>
             </button>
             {isOpen && (

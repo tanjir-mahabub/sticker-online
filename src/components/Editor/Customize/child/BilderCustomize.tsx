@@ -8,9 +8,11 @@ import { deleteAllHistoriesByCategory } from "@/redux/features/historySlice";
 import { generateUniqueId } from "@/components/Utils/function";
 import { setCategoryToRemove } from "@/redux/features/categoryToRemove";
 import { generateModifiedDataURL } from "@/app/api/generateModifiedDataURL";
+import { useEditorI18n } from "@/context/EditorI18nContext";
 
 const BilderCustomize = () => {
     const dispatch = useDispatch();
+    const { t } = useEditorI18n();
 
     const imagePreviews = useAppSelector((state: RootState) => state.imagePreview.images);
 
@@ -62,7 +64,7 @@ const BilderCustomize = () => {
     return (
         <div className="flex flex-col w-full h-full">
             <div className="flex-auto space-y-3 h-full overflow-y-auto bg-white p-4">
-                <h2 className="text-sm md:text-base xl:text-lg font-bold">Ladda upp bild</h2>
+                <h2 className="text-sm md:text-base xl:text-lg font-bold">{t('uploadImage')}</h2>
                 <ImageUpload onImageUpload={handleImageUpload} />
                 <div className="py-3">
                     {imagePreviews && <ImagePreview images={imagePreviews} />}
@@ -79,7 +81,7 @@ const BilderCustomize = () => {
                         priority
                     />
                 </div>
-                <p className="text-xs md:text-sm font-semibold">Ta bort alla bilder</p>
+                <p className="text-xs md:text-sm font-semibold">{t('removeImages')}</p>
             </div>
         </div>
     );

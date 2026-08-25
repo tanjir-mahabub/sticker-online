@@ -1,12 +1,14 @@
 import Image from 'next/image';
 import React, { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
+import { useEditorI18n } from '@/context/EditorI18nContext';
 
 interface ImageUploadProps {
     onImageUpload: (files: File[]) => void;
 }
 
 const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload }) => {
+    const { t } = useEditorI18n();
 
     const [selectedImages, setSelectedImages] = useState<string[]>([]);
 
@@ -46,15 +48,15 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload }) => {
                 </div>
                 <input {...getInputProps()} />
                 {isDragActive ? (
-                    <p className="text-xs lg:text-sm font-bold">Släpp bilderna här...</p>
+                    <p className="text-xs lg:text-sm font-bold">{t('dropPrompt')}</p>
                 ) : (
-                    <p className="text-xs lg:text-sm font-bold">Lägg till eller dra filer</p>
+                    <p className="text-xs lg:text-sm font-bold">{t('uploadPrompt')}</p>
                 )}
             </div>
 
             <div className="text-xs lg:text-sm">
-                <p><b>Accept file types:</b> png, jpg, svg, pdf</p>
-                <p><b>Max file size:</b> 10 MB</p>
+                <p><b>{t('acceptedTypes')}:</b> png, jpg, svg, pdf</p>
+                <p><b>{t('maxFileSize')}:</b> 10 MB</p>
             </div>
 
         </div>
