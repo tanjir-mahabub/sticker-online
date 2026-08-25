@@ -4,6 +4,7 @@ import geom from "@/lib/geom";
 
 export const DIE_CUT_BACKGROUND_ID = "dieCutImage";
 export const DIE_CUT_LINE_ID = "dieCutCutline";
+export const DIE_CUT_LAMINATE_ID = "dieCutLaminate";
 
 export interface ContourOptions {
   padding: number;

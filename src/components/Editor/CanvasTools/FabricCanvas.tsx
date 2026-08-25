@@ -11,7 +11,7 @@ import { useDispatch } from 'react-redux';
 import { setCanvasProperties } from '@/redux/features/canvasSlice';
 import CanvasFrame from './CanvasFrame';
 import { useDieCutEffect } from '@/hooks/useDieCutEffect';
-import { DIE_CUT_BACKGROUND_ID, DIE_CUT_LINE_ID } from '@/lib/sticker-contour/StickerContourEngine';
+import { DIE_CUT_BACKGROUND_ID, DIE_CUT_LAMINATE_ID, DIE_CUT_LINE_ID } from '@/lib/sticker-contour/StickerContourEngine';
 import EditorCommandBar from './EditorCommandBar';
 
 const FabricCanvas: React.FC = () => {
@@ -78,7 +78,12 @@ const FabricCanvas: React.FC = () => {
 
     const scheduleContour = (event?: { target?: { id?: string } }) => {
       const id = event?.target?.id;
-      if (id === DIE_CUT_BACKGROUND_ID || id === DIE_CUT_LINE_ID) return;
+      const category = event?.target && 'data' in event.target
+        ? (event.target as fabric.Object).data?.category
+        : undefined;
+      // Background, laminate and cutline are derived output. Observing their
+      // own add/remove events creates an endless contour regeneration loop.
+      if (category === 'generated' || id === DIE_CUT_BACKGROUND_ID || id === DIE_CUT_LINE_ID || id === DIE_CUT_LAMINATE_ID) return;
       if (contourTimerRef.current) clearTimeout(contourTimerRef.current);
       contourTimerRef.current = setTimeout(() => handleDieCut(canvasProperties.grow), 220);
     };

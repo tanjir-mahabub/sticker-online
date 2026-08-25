@@ -7,6 +7,7 @@ import { setCanvasProperties } from "@/redux/features/canvasSlice";
 import materialStore from "@/store/materialStore";
 import {
   DIE_CUT_BACKGROUND_ID,
+  DIE_CUT_LAMINATE_ID,
   DIE_CUT_LINE_ID,
   StickerContourEngine,
   getArtworkObjects,
@@ -28,7 +29,7 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
 
   const deletePrevDieCut = useCallback((canvas: fabric.Canvas) => {
     const generated = canvas.getObjects().filter((object) =>
-      object.id === DIE_CUT_BACKGROUND_ID || object.id === DIE_CUT_LINE_ID || object.id === "dieCutLaminate"
+      object.id === DIE_CUT_BACKGROUND_ID || object.id === DIE_CUT_LINE_ID || object.id === DIE_CUT_LAMINATE_ID
     );
     generated.forEach((object) => canvas.remove(object));
     if (generated.length) canvas.requestRenderAll();
@@ -63,7 +64,7 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
     if(laminate.value==="glossy"){const gradient=context.createLinearGradient(0,0,160,160);gradient.addColorStop(0,"rgba(255,255,255,0)");gradient.addColorStop(.45,"rgba(255,255,255,.58)");gradient.addColorStop(.58,"rgba(255,255,255,0)");context.fillStyle=gradient;context.fillRect(0,0,160,160)}
     else if(laminate.value==="matte"){context.fillStyle="rgba(255,255,255,.16)";context.fillRect(0,0,160,160);for(let i=0;i<260;i++){context.fillStyle="rgba(255,255,255,.2)";context.fillRect(Math.random()*160,Math.random()*160,1,1)}}
     else {const gradient=context.createRadialGradient(60,50,5,80,80,110);gradient.addColorStop(0,"rgba(255,255,255,.2)");gradient.addColorStop(1,"rgba(230,226,255,.04)");context.fillStyle=gradient;context.fillRect(0,0,160,160)}
-    const overlay=new fabric.Path(pathData,{id:"dieCutLaminate",data:{category:"generated",role:"laminate",finish:laminate.value},fill:new fabric.Pattern({source:source as unknown as HTMLImageElement,repeat:"repeat"}),opacity:.32,selectable:false,evented:false,objectCaching:true});
+    const overlay=new fabric.Path(pathData,{id:DIE_CUT_LAMINATE_ID,data:{category:"generated",role:"laminate",finish:laminate.value},fill:new fabric.Pattern({source:source as unknown as HTMLImageElement,repeat:"repeat"}),opacity:.32,selectable:false,evented:false,objectCaching:true});
     canvas.add(overlay);
   },[laminateId,stickerData]);
 
