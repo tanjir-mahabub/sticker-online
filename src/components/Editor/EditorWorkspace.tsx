@@ -14,13 +14,18 @@ import { fetchStickerData } from "@/services/stickerDataService";
 import type { StickerData } from "@/types/types";
 import { EditorI18nProvider } from "@/context/EditorI18nContext";
 import OrderReviewModal from "./OrderReviewModal";
+import { stickerCatalog } from "@/data/stickerCatalog";
 
 export default function EditorWorkspace() {
   const dispatch = useDispatch();
-  const [stickerData, setStickerData] = useState<StickerData | null>(null);
+  // The bundled catalogue makes first paint deterministic. The API refresh is
+  // progressive, so a slow request can never replace the editor with a loader.
+  const [stickerData, setStickerData] = useState<StickerData>(stickerCatalog);
 
   useEffect(() => {
-    fetchStickerData().then(setStickerData);
+    let active = true;
+    fetchStickerData().then((data) => { if (active) setStickerData(data); });
+    return () => { active = false; };
   }, []);
 
   useEffect(() => {
@@ -32,10 +37,6 @@ export default function EditorWorkspace() {
     window.addEventListener("resize", syncViewport, { passive: true });
     return () => window.removeEventListener("resize", syncViewport);
   }, [dispatch]);
-
-  if (!stickerData) {
-    return <div className="editor-boot" role="status"><span /><strong>Preparing your studio</strong><small>Loading canvas tools and materials…</small></div>;
-  }
 
   return <EditorI18nProvider><CanvasProvider stickerData={stickerData}>
     <div className="editor-shell flex h-[100dvh] min-h-[100dvh] w-full flex-col overflow-hidden">
