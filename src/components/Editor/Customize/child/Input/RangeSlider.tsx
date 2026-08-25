@@ -1,7 +1,6 @@
 import { setCanvasProperties } from '@/redux/features/canvasSlice';
 import React, { useEffect, useState, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '@/redux/store';
+import { useDispatch } from 'react-redux';
 
 interface RangeSliderProps {
     minValue: number;
@@ -32,6 +31,10 @@ const RangeSlider: React.FC<RangeSliderProps> = ({ minValue, maxValue, step, lab
             handleDieCut && handleDieCut(value, false);
         }
     };    
+
+    useEffect(() => {
+        if (typeof defaultValue === 'number') setValue(defaultValue);
+    }, [defaultValue]);
 
     return (
         <div className="flex flex-col gap-2 lg:gap-3 w-full">

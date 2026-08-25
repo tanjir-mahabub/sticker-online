@@ -1,7 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import ButtonControl from "../lib/ButtonControl";
 import RangeSlider from "../Customize/child/Input/RangeSlider";
-import { Tooltip } from "@/components/Utils/ToolTips";
 import { useAppSelector } from "@/redux/store";
 import { useControlButtons } from "@/hooks/useControlButtons";
 import { fabric } from "fabric";
@@ -23,7 +22,7 @@ const ControlElements: React.FC<ControlElementsProps> = ({ canvasRef, selected }
 
   const {  historyControllerRef, setGrowValue } = useCanvas();
 
-  const { handleDownloadSVG, handleDieCut } = useDieCutEffect();
+  const { handleDieCut } = useDieCutEffect();
 
   const updateButtonStates = useCallback(() => {
     const activeObject = canvasRef.current?.getActiveObject();   
@@ -46,7 +45,6 @@ const ControlElements: React.FC<ControlElementsProps> = ({ canvasRef, selected }
   }, [canvasRef, selected, dispatch]);
 
   const DieCutHandler = (value: number) => {
-    console.log('DieCutHandler', value);
     setRangeSliderValue(value); // Update the slider's internal state
     setGrowValue(value); // Update the grow value in the state
     historyControllerRef.current?.setGrowValue(value); // Save the new grow value in the history
@@ -104,12 +102,12 @@ const ControlElements: React.FC<ControlElementsProps> = ({ canvasRef, selected }
       <div className='absolute z-50 left-0 bottom-0 w-full h-fit transition duration-500 delay-300 ease-in-out'>
         <div className="absolute bottom-0 left-0 w-fit mx-auto h-3 hidden lg:flex justify-start items-end gap-5 z-50">
           <div className="flex gap-3 p-4 space-y-3 w-60">
-            <RangeSlider minValue={10} maxValue={150} step={1} defaultValue={rangeSliderValue} handleDieCut={DieCutHandler} label="Kantlinje" />
+            <RangeSlider minValue={4} maxValue={80} step={1} defaultValue={grow} handleDieCut={DieCutHandler} label="Cutline spacing" />
           </div>
         </div>
         <div className="absolute bottom-20 lg:bottom-2 left-0 w-full mx-auto h-3 flex justify-start items-end gap-5 z-40">
           <div className="flex justify-center items-center w-full">
-            <div className='flex justify-center items-center bg-white shadow-sm border rounded-full'>
+            <div className='editor-selection-tools flex justify-center items-center rounded-full'>
               {selected && buttons.map((button, index) => (
                 <ButtonControl key={index} {...button} />
               ))}

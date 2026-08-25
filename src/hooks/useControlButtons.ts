@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import { deleteImage } from "@/redux/features/imagePreviewSlice";
 import { removeText } from "@/redux/features/textSlice";
 import { setCanvasProperties } from "@/redux/features/canvasSlice";
+import { useCanvas } from "@/context/CanvasContext";
 
 interface ControlButtonsProps {
   canvasRef: React.MutableRefObject<fabric.Canvas | null>;
@@ -23,72 +24,72 @@ const isFirstItem = (canvas: fabric.Canvas, object: fabric.Object): boolean => {
 export const useControlButtons = ({ canvasRef, updateButtonStates }: ControlButtonsProps) => {
   
   const dispatch = useDispatch();
+  const { saveState } = useCanvas();
+
+  const commit = useCallback(() => {
+    canvasRef.current?.requestRenderAll();
+    saveState();
+    updateButtonStates();
+  }, [canvasRef, saveState, updateButtonStates]);
 
   const handleFlipX = useCallback(() => {
     const activeObject = canvasRef.current?.getActiveObject();
     if (activeObject) {
       activeObject.set('flipX', !activeObject.flipX);
-      canvasRef.current?.renderAll();
-      updateButtonStates();
+      commit();
     }
-  }, [canvasRef, updateButtonStates]);
+  }, [canvasRef, commit]);
 
   const handleFlipY = useCallback(() => {
     const activeObject = canvasRef.current?.getActiveObject();
     if (activeObject) {
       activeObject.set('flipY', !activeObject.flipY);
-      canvasRef.current?.renderAll();
-      updateButtonStates();
+      commit();
     }
-  }, [canvasRef, updateButtonStates]);
+  }, [canvasRef, commit]);
 
   const handleSendFront = useCallback(() => {
     const activeObject = canvasRef.current?.getActiveObject();
     if (activeObject && !isLastItem(canvasRef.current!, activeObject)) {
       canvasRef.current?.bringToFront(activeObject);
-      canvasRef.current?.renderAll();
-      updateButtonStates();
+      commit();
     }
-  }, [canvasRef, updateButtonStates]);
+  }, [canvasRef, commit]);
 
   const handleSendBack = useCallback(() => {
     const activeObject = canvasRef.current?.getActiveObject();
     if (activeObject && !isFirstItem(canvasRef.current!, activeObject)) {
       canvasRef.current?.sendToBack(activeObject);
-      canvasRef.current?.renderAll();
-      updateButtonStates();
+      commit();
     }
-  }, [canvasRef, updateButtonStates]);
+  }, [canvasRef, commit]);
 
   const handleSendForward = useCallback(() => {
     const activeObject = canvasRef.current?.getActiveObject();
     if (activeObject && !isLastItem(canvasRef.current!, activeObject)) {
       canvasRef.current?.bringForward(activeObject);
-      canvasRef.current?.renderAll();
-      updateButtonStates();
+      commit();
     }
-  }, [canvasRef, updateButtonStates]);
+  }, [canvasRef, commit]);
 
   const handleSendBackward = useCallback(() => {
     const activeObject = canvasRef.current?.getActiveObject();
     if (activeObject && !isFirstItem(canvasRef.current!, activeObject)) {
       canvasRef.current?.sendBackwards(activeObject);
-      canvasRef.current?.renderAll();
-      updateButtonStates();
+      commit();
     }
-  }, [canvasRef, updateButtonStates]);
+  }, [canvasRef, commit]);
 
   const handleDelete = useCallback(() => {
     const activeObject = canvasRef.current?.getActiveObject();
     if (activeObject) {
       activeObject.id && activeObject.type === "image" && dispatch(deleteImage(activeObject.id))        
-      activeObject.id && activeObject.data.category === "motiv" && dispatch(deleteImage(activeObject.id))        
-      activeObject.id && activeObject.data.category === "text" && dispatch(removeText(activeObject.id))           
+      activeObject.id && activeObject.data?.category === "motiv" && dispatch(deleteImage(activeObject.id))        
+      activeObject.id && activeObject.data?.category === "text" && dispatch(removeText(activeObject.id))           
       canvasRef.current?.remove(activeObject);
-      canvasRef.current?.renderAll();
-      updateButtonStates();
+      commit();
     }
-  }, [canvasRef, updateButtonStates, dispatch]);
+  }, [canvasRef, commit, dispatch]);
   
 
   // const handleCenterEL = useCallback(() => {
@@ -120,10 +121,9 @@ export const useControlButtons = ({ canvasRef, updateButtonStates }: ControlButt
       });
   
       activeObject.setCoords();
-      canvas.renderAll();
-      updateButtonStates();
+      commit();
     }
-  }, [canvasRef, updateButtonStates]);
+  }, [canvasRef, commit]);
 
   useEffect(() => {
     const activeObject = canvasRef.current?.getActiveObject();

@@ -10,7 +10,9 @@ const Controls: React.FC<ControlsProps> = ({ canvasRef }) => {
 
   const { handleDownloadSVG } = useDieCutEffect();
 
-  return <button onClick={handleDownloadSVG}>Export to SVG</button>;
+  return <button className="editor-export-button" onClick={handleDownloadSVG} title="Export a print-ready vector file">
+    <span>↗</span><div><small>Print ready</small><strong>Export SVG</strong></div>
+  </button>;
 };
 
 export default Controls;

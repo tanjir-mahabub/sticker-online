@@ -1,4 +1,3 @@
-import { fabric } from 'fabric';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Controls from './Controls';
 import TextPath from './TextPath';
@@ -12,12 +11,12 @@ import { useDispatch } from 'react-redux';
 import { setCanvasProperties } from '@/redux/features/canvasSlice';
 import CanvasFrame from './CanvasFrame';
 import { useDieCutEffect } from '@/hooks/useDieCutEffect';
-import { adjustViewportToElement } from './eventHandlers/adjustViewportToElement';
-import { pixelToCm } from '@/components/Utils/function';
+import { DIE_CUT_BACKGROUND_ID, DIE_CUT_LINE_ID } from '@/lib/sticker-contour/StickerContourEngine';
+import EditorCommandBar from './EditorCommandBar';
 
 const FabricCanvas: React.FC = () => {
   const [isReady, setIsReady] = useState(false);
-  const hasRun = useRef(false);
+  const contourTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { fabricCanvasRef, htmlCanvasRef, historyControllerRef, iconImageRef, saveState } = useCanvas();
   const canvasProperties = useAppSelector((state) => state.canvas);
@@ -75,125 +74,27 @@ const FabricCanvas: React.FC = () => {
   
   useEffect(() => {
     const canvas = fabricCanvasRef.current;
-  
-    if (!canvas) {
-      console.error('Canvas is not initialized');
-      return;
-    }
-  
-    const runAfterReload = () => {
-      const zoom = canvas.getZoom();
-      const selectedObjects = canvas.getObjects();
-  
-      if (!selectedObjects || selectedObjects.length === 0) {
-        console.warn('No objects found on the canvas');
-        return;
-      }      
-  
-      // Ensure all selected objects are instances of fabric.Object
-      selectedObjects.forEach(obj => {
-        if (!(obj instanceof fabric.Object)) {
-          console.error('Object is not a fabric.Object:', obj);
-        } else {
-          // Valid Fabric objects are handled below as a single temporary group.
-        }
-      });
-  
-      const originalStates = selectedObjects.map(obj => ({
-        left: obj.left,
-        top: obj.top,
-        scaleX: obj.scaleX,
-        scaleY: obj.scaleY,
-        angle: obj.angle,
-        originX: obj.originX,
-        originY: obj.originY,
-        flipX: obj.flipX,
-        flipY: obj.flipY,
-      }));
-  
-      // Create a group from the selected items
-      const group = new fabric.Group(selectedObjects, {
-        id: 'dieCutGroupNew', // Custom property to identify the group
-        selectable: true,  // Set whether the group should be selectable
-        evented: true      // Set whether the group should trigger events
-      });
-  
-      // Add the group to the canvas
-      canvas.add(group);
-      canvas.renderAll(); // Render the canvas to show the new group
-  
-      if (group) {
-        // Center the group on the canvas
-        adjustViewportToElement({ canvas, obj: group });
-  
-        // Calculate the new frame size with the grow value
-        const groupWidth = group.width ?? 0; // Use default value of 0 if undefined
-        const groupHeight = group.height ?? 0; // Use default value of 0 if undefined
-        const newWidthWithGrow = groupWidth;
-        const newHeightWithGrow = groupHeight;
-        const newBredd = pixelToCm(newWidthWithGrow);
-        const newHojd = pixelToCm(newHeightWithGrow);
-        dispatch(setCanvasProperties({
-          bredd: newBredd,
-          hojd: newHojd,
-          frameWidth: newWidthWithGrow,
-          frameHeight: newHeightWithGrow,
-          canvasInitialZoom: zoom
-        }));
-  
-        // Adjust the group size based on the grow value
-        group.set({
-          scaleX: newWidthWithGrow / groupWidth,
-          scaleY: newHeightWithGrow / groupHeight
-        });
-        group.setCoords(); // Update the group's coordinates
-  
-        canvas.renderAll();
-  
-        // Ungroup the objects and restore original positions
-        if (typeof group.ungroupOnCanvas === 'function') {
-          group.ungroupOnCanvas();
-        } else {
-          console.error('Group does not have ungroupOnCanvas method', group);
-        }
-  
-        selectedObjects.forEach((obj, index) => {
-          obj.set(originalStates[index]);
-          obj.setCoords(); // Update the object's coordinates
-        });
-  
-        canvas.remove(group);
-        canvas.renderAll();
+    if (!canvas || !isReady) return;
 
-        const objectExists = canvas?.getObjects().length > 0;
-        if (canvasProperties.grow && objectExists) {
-          handleDieCut(canvasProperties.grow);
-        }
-      }
-  
-  
-      // Your function logic here
-      // if (canvasProperties.grow) {
-      //   handleDieCut(canvasProperties.grow);
-      // }
+    const scheduleContour = (event?: { target?: { id?: string } }) => {
+      const id = event?.target?.id;
+      if (id === DIE_CUT_BACKGROUND_ID || id === DIE_CUT_LINE_ID) return;
+      if (contourTimerRef.current) clearTimeout(contourTimerRef.current);
+      contourTimerRef.current = setTimeout(() => handleDieCut(canvasProperties.grow), 220);
     };
-  
-    const handleAfterRender = () => {
-      // Check if all objects are rendered and we haven't run the function yet
-      if (!hasRun.current && canvas.getObjects().length > 0) {
-        hasRun.current = true;
-        runAfterReload();
-      }
-    };
-  
-    // Attach the after:render event listener
-    canvas.on('after:render', handleAfterRender);
-  
-    // Clean up event listener on component unmount
+
+    canvas.on('object:added', scheduleContour);
+    canvas.on('object:modified', scheduleContour);
+    canvas.on('object:removed', scheduleContour);
+    if (canvas.getObjects().some((object) => object.data?.category)) scheduleContour();
+
     return () => {
-      canvas.off('after:render', handleAfterRender);
+      if (contourTimerRef.current) clearTimeout(contourTimerRef.current);
+      canvas.off('object:added', scheduleContour);
+      canvas.off('object:modified', scheduleContour);
+      canvas.off('object:removed', scheduleContour);
     };
-  }, [fabricCanvasRef, canvasProperties.grow, dispatch, handleDieCut]);
+  }, [canvasProperties.grow, fabricCanvasRef, handleDieCut, isReady]);
   
   
   
@@ -259,6 +160,7 @@ const FabricCanvas: React.FC = () => {
       <div className='absolute left-3 top-3 z-[100]'>
         <Controls canvasRef={fabricCanvasRef} />
       </div>
+      <EditorCommandBar />
       {fabricCanvasRef.current && isReady && <TextPath fabricCanvas={fabricCanvasRef} saveState={saveState} />}
       {fabricCanvasRef.current && isReady && <ImageComponent fabricCanvas={fabricCanvasRef} images={imagePreviews} saveState={saveState} />}
       <ControlElements canvasRef={fabricCanvasRef} selected={canvasProperties.hasSelected} />
