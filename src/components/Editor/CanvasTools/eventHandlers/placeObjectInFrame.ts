@@ -6,15 +6,17 @@ interface FramePlacementOptions {
   frameHeight: number;
   coverage?: number;
   verticalOffset?: number;
+  centerX?: number | null;
+  centerY?: number | null;
 }
 
 /** Places a new object in frame space, independent of viewport pan and zoom. */
 export const placeObjectInFrame = (
   canvas: fabric.Canvas,
   object: fabric.Object,
-  { frameWidth, frameHeight, coverage = 0.68, verticalOffset = -30 }: FramePlacementOptions,
+  { frameWidth, frameHeight, coverage = 0.68, verticalOffset = -30, centerX = null, centerY = null }: FramePlacementOptions,
 ) => {
-  const bounds = getFrameBounds(canvas, frameWidth, frameHeight, verticalOffset);
+  const bounds = getFrameBounds(canvas, frameWidth, frameHeight, verticalOffset, { x: centerX, y: centerY });
   const frameCenter = new fabric.Point((bounds.left + bounds.right) / 2, (bounds.top + bounds.bottom) / 2);
 
   const safeWidth = Math.max(40, frameWidth * coverage);

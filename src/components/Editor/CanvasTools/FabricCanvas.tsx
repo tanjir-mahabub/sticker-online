@@ -26,11 +26,15 @@ const FabricCanvas: React.FC = () => {
     frameWidth: canvasProperties.frameWidth,
     frameHeight: canvasProperties.frameHeight,
     grow: canvasProperties.grow,
+    centerX: canvasProperties.centerX,
+    centerY: canvasProperties.centerY,
   });
   artboardStateRef.current = {
     frameWidth: canvasProperties.frameWidth,
     frameHeight: canvasProperties.frameHeight,
     grow: canvasProperties.grow,
+    centerX: canvasProperties.centerX,
+    centerY: canvasProperties.centerY,
   };
   const imagePreviews = useAppSelector((state) => state.imagePreview.images);
 
@@ -129,14 +133,18 @@ const FabricCanvas: React.FC = () => {
         frameHeight: current.frameHeight,
         cutlinePadding: Math.min(30, Math.max(4, current.grow)),
         fitViewport,
+        frameCenterX: current.centerX,
+        frameCenterY: current.centerY,
       });
-      if (!result || (!result.expanded && !result.zoomChanged)) return;
+      if (!result || (!result.resized && !result.moved && !result.zoomChanged)) return;
       // Update synchronously as well as Redux. Subsequent Fabric events can
       // arrive before React renders the new store snapshot.
       artboardStateRef.current = {
         ...current,
         frameWidth: result.frameWidth,
         frameHeight: result.frameHeight,
+        centerX: result.centerX,
+        centerY: result.centerY,
       };
       dispatch(setCanvasProperties({
         frameWidth: result.frameWidth,
@@ -144,6 +152,8 @@ const FabricCanvas: React.FC = () => {
         bredd: result.bredd,
         hojd: result.hojd,
         canvasInitialZoom: result.zoom,
+        centerX: result.centerX,
+        centerY: result.centerY,
       }));
       canvas.requestRenderAll();
     };

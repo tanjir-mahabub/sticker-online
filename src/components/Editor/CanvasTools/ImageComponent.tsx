@@ -16,7 +16,7 @@ interface ImageComponentProps {
 const ImageComponent: React.FC<ImageComponentProps> = ({ fabricCanvas, images, saveState }) => {
   const CategoryToRemove = useAppSelector(state => state.categoryToRemove);
   const CanvasProperties = useAppSelector(state => state.canvas);
-  const { frameWidth, frameHeight } = CanvasProperties;
+  const { frameWidth, frameHeight, centerX, centerY } = CanvasProperties;
 
   const dispatch = useDispatch();
 
@@ -43,7 +43,7 @@ const ImageComponent: React.FC<ImageComponentProps> = ({ fabricCanvas, images, s
 
           const objectExists = findObjectById(canvas, image.id);
           if (!objectExists) {
-            placeObjectInFrame(canvas, oImg, { frameWidth, frameHeight });
+            placeObjectInFrame(canvas, oImg, { frameWidth, frameHeight, centerX, centerY });
             canvas.add(oImg);
             canvas.setActiveObject(oImg);
             canvas.requestRenderAll();
@@ -66,7 +66,7 @@ const ImageComponent: React.FC<ImageComponentProps> = ({ fabricCanvas, images, s
       active = false;
       dispatch(setCategoryToRemove(''));
     };
-  }, [fabricCanvas, frameWidth, frameHeight, CategoryToRemove, images, saveState, dispatch]);
+  }, [fabricCanvas, frameWidth, frameHeight, centerX, centerY, CategoryToRemove, images, saveState, dispatch]);
 
   return null;
 };

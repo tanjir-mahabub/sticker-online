@@ -94,8 +94,8 @@ export interface CanvasState {
   canvasY: number,
   canvasWidth: number,
   canvasHeight: number,
-  centerX: number;
-  centerY: number;
+  centerX: number | null;
+  centerY: number | null;
   frameWidth: number;
   frameHeight: number;
   bredd: number;

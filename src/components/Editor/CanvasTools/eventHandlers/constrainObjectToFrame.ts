@@ -12,10 +12,14 @@ export const getFrameBounds = (
   frameWidth: number,
   frameHeight: number,
   verticalOffset = -30,
+  frameCenter?: { x: number | null; y: number | null },
 ) => {
+  const hasStoredCenter = Number.isFinite(frameCenter?.x) && Number.isFinite(frameCenter?.y);
   const viewport = canvas.viewportTransform ?? fabric.iMatrix.concat();
   const screenCenter = new fabric.Point(canvas.getWidth() / 2, canvas.getHeight() / 2 + verticalOffset);
-  const center = fabric.util.transformPoint(screenCenter, fabric.util.invertTransform(viewport));
+  const center = hasStoredCenter
+    ? new fabric.Point(frameCenter!.x!, frameCenter!.y!)
+    : fabric.util.transformPoint(screenCenter, fabric.util.invertTransform(viewport));
   return {
     left: center.x - frameWidth / 2,
     top: center.y - frameHeight / 2,

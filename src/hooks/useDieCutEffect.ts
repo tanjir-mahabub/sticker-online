@@ -127,15 +127,19 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
         frameHeight: canvasProperties.frameHeight,
         cutlinePadding: safePadding,
         fitViewport: true,
+        frameCenterX: canvasProperties.centerX,
+        frameCenterY: canvasProperties.centerY,
       });
       dispatch(setCanvasProperties({
         isLoading: false,
-        ...(artboard?.expanded || artboard?.zoomChanged ? {
+        ...(artboard?.resized || artboard?.moved || artboard?.zoomChanged ? {
           frameWidth: artboard.frameWidth,
           frameHeight: artboard.frameHeight,
           bredd: artboard.bredd,
           hojd: artboard.hojd,
           canvasInitialZoom: artboard.zoom,
+          centerX: artboard.centerX,
+          centerY: artboard.centerY,
         } : {}),
       }));
       canvas.requestRenderAll();
@@ -146,7 +150,7 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
         dispatch(setCanvasProperties({ isLoading: false }));
       }
     }
-  }, [applyLaminate, applyMaterial, canvasProperties.backgroundColor, canvasProperties.frameHeight, canvasProperties.frameWidth, canvasProperties.grow, deletePrevDieCut, dispatch, engine, fabricCanvasRef, onDieCutReady]);
+  }, [applyLaminate, applyMaterial, canvasProperties.backgroundColor, canvasProperties.centerX, canvasProperties.centerY, canvasProperties.frameHeight, canvasProperties.frameWidth, canvasProperties.grow, deletePrevDieCut, dispatch, engine, fabricCanvasRef, onDieCutReady]);
 
   const handleDownloadSVG = useCallback(async () => {
     const canvas = fabricCanvasRef.current;

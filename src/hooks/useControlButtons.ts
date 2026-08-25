@@ -19,7 +19,7 @@ export const useControlButtons = ({ canvasRef, updateButtonStates }: ControlButt
   
   const dispatch = useDispatch();
   const { saveState } = useCanvas();
-  const { frameWidth, frameHeight } = useAppSelector((state) => state.canvas);
+  const { frameWidth, frameHeight, centerX, centerY } = useAppSelector((state) => state.canvas);
 
   const commit = useCallback(() => {
     canvasRef.current?.requestRenderAll();
@@ -115,7 +115,7 @@ export const useControlButtons = ({ canvasRef, updateButtonStates }: ControlButt
     const activeObject = canvas?.getActiveObject();
   
     if (canvas && activeObject) {
-      const bounds = getFrameBounds(canvas, frameWidth, frameHeight);
+      const bounds = getFrameBounds(canvas, frameWidth, frameHeight, -30, { x: centerX, y: centerY });
       activeObject.set({
         originX: "center",
         originY: "center",
@@ -126,7 +126,7 @@ export const useControlButtons = ({ canvasRef, updateButtonStates }: ControlButt
       activeObject.setCoords();
       commit();
     }
-  }, [canvasRef, commit, frameHeight, frameWidth]);
+  }, [canvasRef, centerX, centerY, commit, frameHeight, frameWidth]);
 
   useEffect(() => {
     const activeObject = canvasRef.current?.getActiveObject();

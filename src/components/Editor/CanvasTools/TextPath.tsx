@@ -60,6 +60,8 @@ const TextPath: React.FC<TextPathProps> = ({ fabricCanvas, saveState }) => {
                 placeObjectInFrame(canvas, textPath, {
                   frameWidth: CanvasProperties.frameWidth,
                   frameHeight: CanvasProperties.frameHeight,
+                  centerX: CanvasProperties.centerX,
+                  centerY: CanvasProperties.centerY,
                   coverage: 0.72,
                 });
                 canvas.add(textPath);

@@ -1,8 +1,9 @@
 import { cmToPixel } from "@/components/Utils/function";
 import { setCanvasProperties } from "@/redux/features/canvasSlice";
 import { useAppSelector } from "@/redux/store";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useDispatch } from "react-redux";
+import { fabric } from "fabric";
 
 interface CustomFabricCanvas extends fabric.Canvas {
     wrapperEl?: HTMLElement | null; // Add wrapperEl property
@@ -15,9 +16,7 @@ interface FrameProps {
 const CanvasFrame: React.FC<FrameProps> = ({ fabricCanvas }) => {
     
     const CanvasProperties = useAppSelector(state => state.canvas);
-    const { canvasWidth, canvasHeight, canvasInitialZoom, frameWidth, frameHeight, bredd, hojd, grow, backgroundColor } = CanvasProperties;
-    
-    const [canvasZoom, setCanvasZoom] = useState(canvasInitialZoom)
+    const { canvasWidth, canvasHeight, canvasInitialZoom, frameWidth, frameHeight, centerX, centerY, bredd, hojd, grow, backgroundColor } = CanvasProperties;
     const StickerNavID = useAppSelector(state => state.sticker.id);
 
     const dispatch = useDispatch();
@@ -27,7 +26,6 @@ const CanvasFrame: React.FC<FrameProps> = ({ fabricCanvas }) => {
             // Get the current zoom level of the canvas
             const zoom = fabricCanvas.getZoom() || 1;
             
-            setCanvasZoom(zoom);   
             dispatch(setCanvasProperties({
                 canvasInitialZoom: zoom
             }))    
@@ -47,6 +45,8 @@ const CanvasFrame: React.FC<FrameProps> = ({ fabricCanvas }) => {
                 hojd: 10,
                 frameWidth: newBredd,
                 frameHeight: newHojd,
+                centerX: null,
+                centerY: null,
                 grow: grow,
                 canvasInitialZoom: 1
                 }));
@@ -55,14 +55,23 @@ const CanvasFrame: React.FC<FrameProps> = ({ fabricCanvas }) => {
     }, [fabricCanvas, grow, dispatch])
       
 
+    const canvasZoom = fabricCanvas?.getZoom() || canvasInitialZoom || 1;
+    const viewport = fabricCanvas?.viewportTransform;
+    const hasContentCenter = Number.isFinite(centerX) && Number.isFinite(centerY);
+    const screenCenter = hasContentCenter && viewport
+        ? fabric.util.transformPoint(new fabric.Point(centerX!, centerY!), viewport)
+        : new fabric.Point(canvasWidth / 2, canvasHeight / 2 - 30);
+    const frameLeft = screenCenter.x - frameWidth * canvasZoom / 2;
+    const frameTop = screenCenter.y - frameHeight * canvasZoom / 2;
+
     return (
         <div className="relative flex justify-center h-full transition">
             <div
                 aria-hidden="true"
                 className={`${StickerNavID === 1 ? 'hidden' : 'block'} absolute border border-gray-300 transition-all duration-300`}
                 style={{
-                    top: `${(canvasHeight / 2 - frameHeight * canvasZoom / 2) - 30}px`,
-                    left: `${canvasWidth / 2 - frameWidth * canvasZoom / 2}px`,
+                    top: `${frameTop}px`,
+                    left: `${frameLeft}px`,
                     width: `${frameWidth * canvasZoom}px`,
                     height: `${frameHeight * canvasZoom}px`,
                     background: backgroundColor,
@@ -72,8 +81,8 @@ const CanvasFrame: React.FC<FrameProps> = ({ fabricCanvas }) => {
             <div
                 className="absolute h-3 flex justify-center items-center border-x border-gray-800/20 -my-[35px] transition-all duration-300"
                 style={{
-                    top: `${(canvasHeight / 2 - frameHeight * canvasZoom / 2) - 30}px`,
-                    left: `${canvasWidth / 2 - frameWidth * canvasZoom / 2}px`,
+                    top: `${frameTop}px`,
+                    left: `${frameLeft}px`,
                     width: `${frameWidth * canvasZoom}px`,
                 }}
             >
@@ -85,8 +94,8 @@ const CanvasFrame: React.FC<FrameProps> = ({ fabricCanvas }) => {
 
             <div className="absolute flex justify-center items-center border-gray-800/20 border-r mx-[30px] transition-all duration-300"
                 style={{
-                    top: `${(canvasHeight / 2 - frameHeight * canvasZoom / 2) - 30}px`,
-                    left: `${canvasWidth / 2 - frameWidth * canvasZoom / 2}px`,
+                    top: `${frameTop}px`,
+                    left: `${frameLeft}px`,
                     width: `${frameWidth * canvasZoom}px`,
                     height: `${frameHeight * canvasZoom}px`,
                 }}>
