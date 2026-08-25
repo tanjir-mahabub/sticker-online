@@ -30,28 +30,6 @@ export default function EditorCommandBar() {
     setZoom(value);
   }, [fabricCanvasRef]);
 
-  const fitArtwork = useCallback(() => {
-    const canvas = fabricCanvasRef.current;
-    if (!canvas) return;
-    const objects = getArtworkObjects(canvas);
-    if (!objects.length) { canvas.setViewportTransform([1, 0, 0, 1, 0, 0]); setZoom(1); return; }
-    const boxes = objects.map((object) => object.getBoundingRect(true, true));
-    const left = Math.min(...boxes.map((box) => box.left));
-    const top = Math.min(...boxes.map((box) => box.top));
-    const right = Math.max(...boxes.map((box) => box.left + box.width));
-    const bottom = Math.max(...boxes.map((box) => box.top + box.height));
-    const width = Math.max(1, right - left);
-    const height = Math.max(1, bottom - top);
-    const next = clampZoom(Math.min((canvas.getWidth() - 140) / width, (canvas.getHeight() - 180) / height, 1.5));
-    canvas.setViewportTransform([
-      next, 0, 0, next,
-      canvas.getWidth() / 2 - (left + width / 2) * next,
-      canvas.getHeight() / 2 - (top + height / 2) * next,
-    ]);
-    canvas.requestRenderAll();
-    setZoom(next);
-  }, [fabricCanvasRef]);
-
   const duplicate = useCallback(() => {
     const canvas = fabricCanvasRef.current;
     const active = canvas?.getActiveObject();
@@ -110,12 +88,11 @@ export default function EditorCommandBar() {
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "d") { event.preventDefault(); duplicate(); }
       if (event.key === "+" || event.key === "=") setCanvasZoom(zoom + 0.1);
       if (event.key === "-") setCanvasZoom(zoom - 0.1);
-      if (event.key === "0") fitArtwork();
       if (event.key === "Escape") fabricCanvasRef.current?.discardActiveObject().requestRenderAll();
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [duplicate, fabricCanvasRef, fitArtwork, setCanvasZoom, zoom]);
+  }, [duplicate, fabricCanvasRef, setCanvasZoom, zoom]);
 
   return <>
     <div className="editor-commandbar" aria-label="Canvas controls">
@@ -123,7 +100,6 @@ export default function EditorCommandBar() {
       <span>{Math.round(zoom * 100)}%</span>
       <button onClick={() => setCanvasZoom(zoom + 0.1)} aria-label="Zoom in">+</button>
       <i />
-      <button onClick={fitArtwork} aria-label="Fit artwork">Fit</button>
       <button onClick={duplicate} aria-label="Duplicate selected layer">Duplicate</button>
       <button className={layersOpen ? "is-active" : ""} onClick={() => setLayersOpen((value) => !value)} aria-expanded={layersOpen}>Layers <b>{artwork.length}</b></button>
     </div>
@@ -137,7 +113,7 @@ export default function EditorCommandBar() {
           <button onClick={() => toggleVisibility(object)} aria-label="Toggle visibility">{object.visible === false ? "○" : "●"}</button>
           <button onClick={() => toggleLock(object)} aria-label="Toggle lock">{object.selectable === false ? "Locked" : "Free"}</button>
         </li>)}</ol>}
-      <footer><span>Tip</span><p>Ctrl/⌘ + D duplicates · 0 fits artwork</p></footer>
+      <footer><span>Tip</span><p>Ctrl/⌘ + D duplicates the selected layer</p></footer>
     </aside>}
   </>;
 }
