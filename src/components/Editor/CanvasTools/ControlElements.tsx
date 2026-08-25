@@ -12,9 +12,10 @@ import { useCanvas } from "@/context/CanvasContext";
 interface ControlElementsProps {
   canvasRef: React.MutableRefObject<fabric.Canvas | null>;
   selected: boolean;
+  ready: boolean;
 }
 
-const ControlElements: React.FC<ControlElementsProps> = ({ canvasRef, selected }) => {  
+const ControlElements: React.FC<ControlElementsProps> = ({ canvasRef, ready }) => {  
   
   const [, setRangeSliderValue] = useState<number>(0);
   const [hasActiveObject, setHasActiveObject] = useState(false);
@@ -66,6 +67,7 @@ const ControlElements: React.FC<ControlElementsProps> = ({ canvasRef, selected }
   const [sendBackwardBTN, setSendBackwardBTN] = useState(false);
 
   useEffect(() => {
+    if (!ready) return;
     const canvas = canvasRef.current;
     if (canvas) {
       canvas.on('selection:created', updateButtonStates);
@@ -81,12 +83,12 @@ const ControlElements: React.FC<ControlElementsProps> = ({ canvasRef, selected }
         canvas.off('object:modified', updateButtonStates);
       }
     };
-  }, [canvasRef, updateButtonStates]);
+  }, [canvasRef, ready, updateButtonStates]);
    
 
   useEffect(() => {
-    updateButtonStates(); // Initial update when component mounts
-  }, [updateButtonStates]);
+    if (ready) updateButtonStates();
+  }, [ready, updateButtonStates]);
 
 
   const buttons = [

@@ -205,7 +205,7 @@ const FabricCanvas: React.FC = () => {
       <EditorCommandBar />
       {fabricCanvasRef.current && isReady && <TextPath fabricCanvas={fabricCanvasRef} saveState={saveState} />}
       {fabricCanvasRef.current && isReady && <ImageComponent fabricCanvas={fabricCanvasRef} images={imagePreviews} saveState={saveState} />}
-      {isReady && <ControlElements canvasRef={fabricCanvasRef} selected={canvasProperties.hasSelected} />}
+      <ControlElements canvasRef={fabricCanvasRef} selected={canvasProperties.hasSelected} ready={isReady} />
       <canvas ref={htmlCanvasRef} width={Math.max(1, Math.round(canvasProperties.canvasWidth))} height={Math.max(1, Math.round(canvasProperties.canvasHeight))} className="absolute inset-0 bg-transparent" />
     </div>
   );
