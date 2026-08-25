@@ -21,10 +21,12 @@ const ImageComponent: React.FC<ImageComponentProps> = ({ fabricCanvas, images, s
   const dispatch = useDispatch();
 
   useEffect(() => {
+    let active = true;
     if (fabricCanvas.current && images) {
       const canvas = fabricCanvas.current;
       images.forEach((image) => {
         fabric.Image.fromURL(image.src, (oImg) => {
+          if (!active || fabricCanvas.current !== canvas) return;
           oImg.set({
             id: image.id,
             // left: canvasCenter.left - imgWidth / 2,
@@ -61,6 +63,7 @@ const ImageComponent: React.FC<ImageComponentProps> = ({ fabricCanvas, images, s
     }
 
     return () => {
+      active = false;
       dispatch(setCategoryToRemove(''));
     };
   }, [fabricCanvas, frameWidth, frameHeight, CategoryToRemove, images, saveState, dispatch]);

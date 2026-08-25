@@ -20,11 +20,14 @@ const TextPath: React.FC<TextPathProps> = ({ fabricCanvas, saveState }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (fabricCanvas.current) {
+    const canvasAtStart = fabricCanvas.current;
+    let active = true;
+    if (canvasAtStart) {
       // console.log(textPreviews);
       textPreviews?.forEach((text: any) => {        
         convertTextToPath(text)
           .then((pathData) => {                                            
+            if (!active || fabricCanvas.current !== canvasAtStart) return;
             if (pathData) {
               const textPath = new fabric.Path(pathData);
               textPath.set({
@@ -50,8 +53,9 @@ const TextPath: React.FC<TextPathProps> = ({ fabricCanvas, saveState }) => {
               //  textPath.left = canvasCenterX - textPathCenterX;
               //  textPath.top = canvasCenterY - textPathCenterY - 30;
 
-              const objectExists = findObjectById(fabricCanvas.current!, text.id);       
               const canvas = fabricCanvas.current;
+              if (!canvas) return;
+              const objectExists = findObjectById(canvas, text.id);       
               if (!objectExists && canvas) {
                 placeObjectInFrame(canvas, textPath, {
                   frameWidth: CanvasProperties.frameWidth,
@@ -68,21 +72,22 @@ const TextPath: React.FC<TextPathProps> = ({ fabricCanvas, saveState }) => {
             }
           })
           .catch((error: any) => {
-            console.error('Error converting text to path:', error);
+            if (active) console.error('Error converting text to path:', error);
           });
       });
 
       if(CategoryToRemove) {                
-        const texts = fabricCanvas.current.getObjects('path') as fabric.Path[];                       
+        const texts = canvasAtStart.getObjects('path') as fabric.Path[];                       
         texts?.forEach(obj => {
             if(obj?.data?.category === CategoryToRemove) {
-                fabricCanvas?.current?.remove(obj)
+                canvasAtStart.remove(obj)
             }
         })          
     }
     }
 
     return () => {
+      active = false;
       dispatch(setCategoryToRemove(""))
   };
   }, [fabricCanvas, textPreviews, CategoryToRemove, CanvasProperties, saveState, dispatch]);
