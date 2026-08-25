@@ -34,9 +34,11 @@ const svgModification = async (
     backgroundColor: string,
     strokeColor: string
 ): Promise<SVGSVGElement> => {
+    const rasterWidth = Math.max(1, Math.round(width));
+    const rasterHeight = Math.max(1, Math.round(height));
     const canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
+    canvas.width = rasterWidth;
+    canvas.height = rasterHeight;
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
     if (!ctx) throw new Error('Canvas context is null');
 
@@ -49,9 +51,9 @@ const svgModification = async (
         img.onload = () => {
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = 'high';
-            ctx.drawImage(img, 0, 0, width, height);
+            ctx.drawImage(img, 0, 0, rasterWidth, rasterHeight);
 
-            const imageData = ctx.getImageData(0, 0, width, height);
+            const imageData = ctx.getImageData(0, 0, rasterWidth, rasterHeight);
             const pixels = imageData.data;
             const nonTransparentPixels = extractNonTransparentPixels(pixels, width);
 
@@ -165,9 +167,11 @@ const reDrawSVGImg = async (
     backgroundColor: string,
     fillColor: string
 ): Promise<SVGSVGElement | null> => {
+    const rasterWidth = Math.max(1, Math.round(width));
+    const rasterHeight = Math.max(1, Math.round(height));
     const canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
+    canvas.width = rasterWidth;
+    canvas.height = rasterHeight;
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
     if (!ctx) throw new Error('Canvas context is null');
 
@@ -181,9 +185,9 @@ const reDrawSVGImg = async (
             try {
                 ctx.imageSmoothingEnabled = true;
                 ctx.imageSmoothingQuality = 'high';
-                ctx.drawImage(img, 0, 0, width, height);
+                ctx.drawImage(img, 0, 0, rasterWidth, rasterHeight);
 
-                const imageData = ctx.getImageData(0, 0, width, height);
+                const imageData = ctx.getImageData(0, 0, rasterWidth, rasterHeight);
                 const grid = (x: number, y: number) => imageData.data[(y * imageData.width + x) * 4 + 3] > 0;
 
                 const contours = geom.contour(grid);

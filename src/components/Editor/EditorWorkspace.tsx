@@ -36,7 +36,7 @@ export default function EditorWorkspace() {
   }
 
   return <CanvasProvider stickerData={stickerData}>
-    <div className="editor-shell flex min-h-[100dvh] w-full flex-col overflow-hidden">
+    <div className="editor-shell flex h-[100dvh] min-h-[100dvh] w-full flex-col overflow-hidden">
       <Header />
       <div className="flex min-h-0 flex-1 overflow-hidden lg:divide-x">
         <Sidebar />

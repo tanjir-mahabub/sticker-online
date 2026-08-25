@@ -13,11 +13,9 @@ export function convertTextToPath(element: any): Promise<string> {
     return new Promise<string>((resolve) => {
         if (element.type === "text") {
             const fontFamily = element.fontFamily;
-            console.log('checking.....');
-
             opentype?.load(fontMapping[fontFamily], (err: any, font: any) => {
                 if (err) {
-                    console.log('Something wrongs in convert text to path.', err);                    
+                    console.error('Unable to convert text to a path.', err);
                     return;
                 }
 

@@ -1,6 +1,5 @@
 import dynamic from 'next/dynamic';
-import { useRef, useEffect, useState } from 'react';
-import { useAppSelector } from '@/redux/store';
+import { useRef, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { setCanvasProperties } from '@/redux/features/canvasSlice';
 
@@ -11,35 +10,31 @@ const FabricCanvasNoSSR = dynamic(() => import('@/components/Editor/CanvasTools/
 const Dashboard = () => {
   const divRef = useRef<HTMLDivElement | null>(null);
 
-  const [containerDimensions, setContainerDimensions] = useState<{
-    width: number;
-    height: number;
-  }>({ width: 0, height: 0 });
-
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const handleResize = () => {
-      if (divRef.current) {
-        const { clientWidth, clientHeight } = divRef.current;
-        setContainerDimensions({ width: clientWidth, height: clientHeight });
-        dispatch(setCanvasProperties({
-          canvasWidth: clientWidth,
-          canvasHeight: clientHeight
-        }));
-      }
+    const element = divRef.current;
+    if (!element) return;
+
+    const syncDimensions = () => {
+      const width = Math.round(element.clientWidth);
+      const height = Math.round(element.clientHeight);
+
+      // Fabric cannot recover from a zero-sized backstore or viewport matrix.
+      if (width < 1 || height < 1) return;
+
+      dispatch(setCanvasProperties({ canvasWidth: width, canvasHeight: height }));
     };
 
-    handleResize();
-    window.addEventListener('resize', handleResize);
+    const observer = new ResizeObserver(syncDimensions);
+    observer.observe(element);
+    syncDimensions();
 
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
+    return () => observer.disconnect();
   }, [dispatch]);
 
   return (
-    <main ref={divRef} className="editor-canvas relative top-0 left-0 w-full h-full overflow-hidden">
+    <main ref={divRef} className="editor-canvas relative min-h-0 min-w-0 flex-1 overflow-hidden">
       <FabricCanvasNoSSR />
     </main>
   );

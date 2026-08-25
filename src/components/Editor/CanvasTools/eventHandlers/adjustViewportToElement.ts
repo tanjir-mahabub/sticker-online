@@ -24,7 +24,7 @@ export const adjustViewportToElement = ({
     const canvasHeight = frame && frameHeight ? frameHeight : canvas.getHeight();
     const rectWidth = obj.getScaledWidth();
     const rectHeight = obj.getScaledHeight();
-console.log('image die---', canvasWidth, canvasHeight, rectWidth, rectHeight, '50%', canvasWidth * 0.5, canvasHeight * 0.5);
+    if (![canvasWidth, canvasHeight, rectWidth, rectHeight].every(Number.isFinite) || canvasWidth <= 0 || canvasHeight <= 0 || rectWidth <= 0 || rectHeight <= 0) return;
     const scaleX = (canvasWidth * setPercent) / rectWidth;
     const scaleY = (canvasHeight * setPercent) / rectHeight;
     const scale = Math.min(scaleX, scaleY);
@@ -41,10 +41,7 @@ console.log('image die---', canvasWidth, canvasHeight, rectWidth, rectHeight, '5
 
     viewportTransform[4] = centerX;
     viewportTransform[5] = centerY - setOffsetY;
-console.log(viewportTransform);
     canvas.setViewportTransform(viewportTransform);
     canvas.requestRenderAll();
-
-    console.log('Adjusted canvas viewport to fit element within 50% of canvas size.');
   }
 };

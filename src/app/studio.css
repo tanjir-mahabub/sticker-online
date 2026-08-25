@@ -25,3 +25,24 @@
 @keyframes stamp-spin{to{transform:rotate(370deg)}}
 @media(max-width:900px){.studio-nav{margin:10px 12px}.hero-stamp{right:20px;left:auto;top:70px}.preview-sticker-label{right:8%}}
 @media(max-width:600px){.hero-stamp{width:70px;height:70px;font-size:8px;top:48px}.preview-shell{box-shadow:8px 8px 0 var(--purple)}.preview-sticker-label{top:-16px}.feature-grid article{transform:none!important}}
+
+/* Refined product studio — calm, distinct from the portfolio, and editor-led. */
+.studio-home{--ink:#101828;--muted:#536174;--paper:#f7f9fc;--card:#fff;--accent:#5b5ce2;--purple:#5b5ce2;--lime:#59d9c4;background:linear-gradient(180deg,#fbfcff 0,#f6f8fc 52%,#f8fafc 100%);background-image:none}
+.studio-nav{margin-top:12px;padding:15px 18px;border:1px solid rgba(16,24,40,.09);border-radius:16px;background:rgba(255,255,255,.8);box-shadow:0 12px 38px rgba(36,48,72,.07);backdrop-filter:blur(18px)}
+.studio-brand>span{background:linear-gradient(135deg,#5856e8,#29b9d3);box-shadow:0 6px 18px rgba(80,82,218,.24)}
+.nav-cta{border-color:rgba(16,24,40,.16);background:#101828;color:#fff!important}.nav-cta:hover{background:#292fdd}
+.studio-hero{min-height:750px}.studio-hero::before{content:"";position:absolute;z-index:-2;inset:0;background:radial-gradient(circle at 16% 30%,rgba(91,92,226,.12),transparent 33%),radial-gradient(circle at 88% 24%,rgba(53,202,211,.14),transparent 30%)}
+.hero-orb{opacity:.38;filter:blur(50px)}.hero-orb-one{background:#8ddfe6}.hero-orb-two{background:#aaa7ff}
+.hero-stamp{left:52%;top:72px;width:auto;height:auto;padding:9px 13px;border:1px solid rgba(91,92,226,.2);border-radius:999px;background:rgba(255,255,255,.84);color:#4547bf;font-size:9px;line-height:1;letter-spacing:.1em;box-shadow:0 9px 28px rgba(41,45,90,.1);transform:none;animation:none;backdrop-filter:blur(12px)}
+.hero-copy h1{letter-spacing:-.065em}.hero-copy h1 em{background:linear-gradient(100deg,#5254dc,#1fb8d0,#5254dc);background-size:180% auto}
+.hero-primary{background:linear-gradient(135deg,#5556df,#4446c8);box-shadow:0 13px 32px rgba(68,70,200,.23)}.hero-primary:hover{box-shadow:0 17px 40px rgba(68,70,200,.29)}.hero-secondary{border-color:rgba(16,24,40,.13);background:rgba(255,255,255,.72)}
+.preview-shell{border:1px solid rgba(16,24,40,.12);border-radius:24px;background:#fff;box-shadow:0 36px 90px rgba(37,52,83,.17),0 2px 8px rgba(37,52,83,.07);transform:perspective(1200px) rotateY(-2deg) rotateX(1deg)}.hero-visual:hover .preview-shell{transform:perspective(1200px) rotateY(0) translateY(-6px)}
+.preview-toolbar{background:#fff;border-bottom:1px solid rgba(16,24,40,.08)}.preview-canvas{background-color:#f2f4f8;background-image:linear-gradient(45deg,#e8ebf1 25%,transparent 25%),linear-gradient(-45deg,#e8ebf1 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#e8ebf1 75%),linear-gradient(-45deg,transparent 75%,#e8ebf1 75%)}
+.floating-tool{border:1px solid rgba(16,24,40,.1);box-shadow:0 12px 34px rgba(30,42,70,.13)}.preview-sticker-label{right:13%;top:-16px;padding:8px 13px;border:1px solid rgba(16,24,40,.1);background:#fff;color:#4145b8;box-shadow:0 8px 24px rgba(30,42,70,.12);transform:rotate(-2deg)}
+.capability-strip{background:#111827;border-block:0;box-shadow:none;transform:none;color:#e8edf7}.capability-strip i{background:#5de0c9}
+.feature-grid{gap:16px}.feature-grid article,.feature-grid article:nth-child(n){border:1px solid rgba(16,24,40,.09);border-radius:18px;background:rgba(255,255,255,.8);box-shadow:0 8px 30px rgba(31,45,72,.055);transform:none}.feature-grid article:hover{border-color:rgba(91,92,226,.28);background:#fff;box-shadow:0 22px 52px rgba(45,53,113,.12);transform:translateY(-6px)}
+.workflow-section{background:linear-gradient(135deg,#edf2ff,#edfafa);border-block:1px solid rgba(16,24,40,.07)}
+.architecture-section{background:linear-gradient(145deg,#111827,#1c1e52);border-block:0}.architecture-grid article:hover{background:rgba(93,224,201,.08)}
+.portfolio-note{background:radial-gradient(circle at 50% 100%,rgba(91,92,226,.09),transparent 50%)}.portfolio-note a:first-child{background:#5052d6;border-color:#5052d6;box-shadow:0 10px 26px rgba(66,68,190,.2)}
+@media(max-width:900px){.hero-stamp{right:24px;left:auto;top:74px}}
+@media(max-width:600px){.studio-nav{margin:8px 10px}.hero-stamp{display:none}.preview-shell{box-shadow:0 24px 55px rgba(37,52,83,.16);transform:none}.preview-sticker-label{top:-14px}.feature-grid article{transform:none!important}}

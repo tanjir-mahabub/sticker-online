@@ -39,7 +39,6 @@ const CanvasFrame: React.FC<FrameProps> = ({ fabricCanvas }) => {
         if (divElement.current && frameWidth && frameHeight && fabricCanvas) {
             // Get the current zoom level of the canvas
             const zoom = fabricCanvas.getZoom() || 1;
-            console.log('zoom ----', zoom);
             
             setCanvasZoom(zoom);   
             dispatch(setCanvasProperties({
@@ -106,7 +105,6 @@ const CanvasFrame: React.FC<FrameProps> = ({ fabricCanvas }) => {
     useEffect(() => {
         if(fabricCanvas) {
             const objectExists = fabricCanvas?.getObjects().length > 0;
-            console.log('objectExists', objectExists);
             if(!objectExists) {
                 const newBredd = cmToPixel(10);
                 const newHojd = cmToPixel(10);

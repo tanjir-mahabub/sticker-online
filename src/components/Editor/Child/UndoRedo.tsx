@@ -39,12 +39,10 @@ const UndoRedo = () => {
                 setResponsiveTasks({
                     color: "#121212",
                 })
-                console.log('clientWidth', clientWidth);
             } else {
                 setResponsiveTasks({
                     color: "white",
                 })
-                console.log('clientWidth', clientWidth);
             }
         }
     }, [setResponsiveTasks, clientWidth])

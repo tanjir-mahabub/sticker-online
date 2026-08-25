@@ -62,7 +62,6 @@ const ImageComponent: React.FC<ImageComponentProps> = ({ fabricCanvas, images, s
           const objectExists = findObjectById(canvas, image.id);
           if (!objectExists) {
             canvas.add(oImg);
-            console.log("Image Dimensions", oImg.width, oImg.height);
             //if (image.category === "image") adjustViewportToElement({ canvas, obj: oImg, setOffsetY: 50 });
             saveState();
           }

@@ -13,7 +13,7 @@ import { setCanvasProperties } from '@/redux/features/canvasSlice';
 import CanvasFrame from './CanvasFrame';
 import { useDieCutEffect } from '@/hooks/useDieCutEffect';
 import { adjustViewportToElement } from './eventHandlers/adjustViewportToElement';
-import { cmToPixel, pixelToCm } from '@/components/Utils/function';
+import { pixelToCm } from '@/components/Utils/function';
 
 const FabricCanvas: React.FC = () => {
   const [isReady, setIsReady] = useState(false);
@@ -28,6 +28,22 @@ const FabricCanvas: React.FC = () => {
   useCanvasSetup(htmlCanvasRef, fabricCanvasRef, historyControllerRef, iconImageRef, saveState);
 
   const { handleDieCut } = useDieCutEffect();
+
+  useEffect(() => {
+    const canvas = fabricCanvasRef.current;
+    const width = Math.round(canvasProperties.canvasWidth);
+    const height = Math.round(canvasProperties.canvasHeight);
+    if (!canvas || width < 1 || height < 1) return;
+
+    canvas.setDimensions({ width, height });
+
+    const viewport = canvas.viewportTransform;
+    if (!viewport || !viewport.every(Number.isFinite) || viewport[0] <= 0 || viewport[3] <= 0) {
+      canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
+    }
+    canvas.calcOffset();
+    canvas.requestRenderAll();
+  }, [canvasProperties.canvasHeight, canvasProperties.canvasWidth, fabricCanvasRef]);
 
   const handleMouseDown = useCallback((e: any) => {
     if (e.target !== null) {
@@ -79,7 +95,7 @@ const FabricCanvas: React.FC = () => {
         if (!(obj instanceof fabric.Object)) {
           console.error('Object is not a fabric.Object:', obj);
         } else {
-          console.log('Valid fabric.Object:', obj);
+          // Valid Fabric objects are handled below as a single temporary group.
         }
       });
   
@@ -155,7 +171,6 @@ const FabricCanvas: React.FC = () => {
         }
       }
   
-      console.log("This function runs after all objects are added and rendered." , canvas?.getObjects());
   
       // Your function logic here
       // if (canvasProperties.grow) {
@@ -186,11 +201,6 @@ const FabricCanvas: React.FC = () => {
   useEffect(() => {
     
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      console.log('Before unload event triggered.');
-      
-  
-      console.log('Page is about to be unloaded.');
-  
       // If you want to show a confirmation dialog to the user, set event.returnValue
       event.returnValue = ''; // Setting this property shows the confirmation dialog in some browsers.
       return ''; // This line is necessary for some browsers to show the confirmation dialog.
@@ -199,8 +209,6 @@ const FabricCanvas: React.FC = () => {
     window.addEventListener('beforeunload', handleBeforeUnload);
   
     return () => {
-      console.log('Removing beforeunload event listener.');
-
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, [fabricCanvasRef, dispatch]);
@@ -243,7 +251,7 @@ const FabricCanvas: React.FC = () => {
   
 
   return (
-    <div>
+    <div className="absolute inset-0">
       {canvasProperties.isLoading && <Spinner />}
       <CanvasFrame fabricCanvas={fabricCanvasRef.current} />
       <div className='absolute z-[100]'>
@@ -252,7 +260,7 @@ const FabricCanvas: React.FC = () => {
       {fabricCanvasRef.current && isReady && <TextPath fabricCanvas={fabricCanvasRef} saveState={saveState} />}
       {fabricCanvasRef.current && isReady && <ImageComponent fabricCanvas={fabricCanvasRef} images={imagePreviews} saveState={saveState} />}
       <ControlElements canvasRef={fabricCanvasRef} selected={canvasProperties.hasSelected} />
-      <canvas ref={htmlCanvasRef} width={canvasProperties.canvasWidth} height={canvasProperties.canvasHeight} className="bg-transparent" />
+      <canvas ref={htmlCanvasRef} width={Math.max(1, Math.round(canvasProperties.canvasWidth))} height={Math.max(1, Math.round(canvasProperties.canvasHeight))} className="bg-transparent" />
     </div>
   );
 };
