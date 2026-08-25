@@ -14,6 +14,7 @@ import { useDieCutEffect } from '@/hooks/useDieCutEffect';
 import { DIE_CUT_BACKGROUND_ID, DIE_CUT_LAMINATE_ID, DIE_CUT_LINE_ID } from '@/lib/sticker-contour/StickerContourEngine';
 import EditorCommandBar from './EditorCommandBar';
 import { expandArtboardToArtwork } from './eventHandlers/expandArtboardToArtwork';
+import { cmToPixel } from '@/components/Utils/function';
 
 const FabricCanvas: React.FC = () => {
   const [isReady, setIsReady] = useState(false);
@@ -136,7 +137,27 @@ const FabricCanvas: React.FC = () => {
         frameCenterX: current.centerX,
         frameCenterY: current.centerY,
       });
-      if (!result || (!result.resized && !result.moved && !result.zoomChanged)) return;
+      if (!result) {
+        const hasArtwork = canvas.getObjects().some((object) =>
+          object.visible !== false && object.data?.category !== 'generated' &&
+          ['image', 'motiv', 'text'].includes(object.data?.category),
+        );
+        if (!hasArtwork && (current.centerX !== null || current.centerY !== null)) {
+          const defaultSize = cmToPixel(10);
+          artboardStateRef.current = { ...current, frameWidth: defaultSize, frameHeight: defaultSize, centerX: null, centerY: null };
+          dispatch(setCanvasProperties({
+            frameWidth: defaultSize,
+            frameHeight: defaultSize,
+            bredd: 10,
+            hojd: 10,
+            centerX: null,
+            centerY: null,
+            canvasInitialZoom: 1,
+          }));
+        }
+        return;
+      }
+      if (!result.resized && !result.moved && !result.zoomChanged) return;
       // Update synchronously as well as Redux. Subsequent Fabric events can
       // arrive before React renders the new store snapshot.
       artboardStateRef.current = {
