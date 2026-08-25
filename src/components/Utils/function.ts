@@ -72,7 +72,7 @@ export const cmToPixel = (cm: number, dpi = 96) => {
 export const pixelToCm = (pixels: number, dpi = 96) => {
     const inches = pixels / dpi;
     const cm = inches * 2.54;
-    return Math.round(cm);
+    return Math.round(cm * 100) / 100;
 }
 
 

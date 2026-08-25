@@ -13,11 +13,12 @@ import CanvasFrame from './CanvasFrame';
 import { useDieCutEffect } from '@/hooks/useDieCutEffect';
 import { DIE_CUT_BACKGROUND_ID, DIE_CUT_LAMINATE_ID, DIE_CUT_LINE_ID } from '@/lib/sticker-contour/StickerContourEngine';
 import EditorCommandBar from './EditorCommandBar';
-import { constrainObjectToFrame } from './eventHandlers/constrainObjectToFrame';
+import { expandArtboardToArtwork } from './eventHandlers/expandArtboardToArtwork';
 
 const FabricCanvas: React.FC = () => {
   const [isReady, setIsReady] = useState(false);
   const contourTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const artboardFrameRef = useRef<number | null>(null);
 
   const { fabricCanvasRef, htmlCanvasRef, historyControllerRef, iconImageRef, saveState } = useCanvas();
   const canvasProperties = useAppSelector((state) => state.canvas);
@@ -105,38 +106,51 @@ const FabricCanvas: React.FC = () => {
   useEffect(() => {
     const canvas = fabricCanvasRef.current;
     if (!canvas || !isReady) return;
-    const keepInsideFrame = (event: { target?: fabric.Object }) => {
-      if (!event.target) return;
-      const changed = constrainObjectToFrame(canvas, event.target, {
+
+    const resizeArtboard = (fitViewport: boolean) => {
+      const result = expandArtboardToArtwork(canvas, {
         frameWidth: canvasProperties.frameWidth,
         frameHeight: canvasProperties.frameHeight,
         cutlinePadding: Math.min(30, Math.max(4, canvasProperties.grow)),
+        fitViewport,
       });
-      if (changed) canvas.requestRenderAll();
-    };
-    canvas.on('object:moving', keepInsideFrame);
-    canvas.on('object:scaling', keepInsideFrame);
-    canvas.on('object:rotating', keepInsideFrame);
-    canvas.on('object:modified', keepInsideFrame);
-    let adjusted = false;
-    canvas.getObjects().forEach((object) => {
-      adjusted = constrainObjectToFrame(canvas, object, {
-        frameWidth: canvasProperties.frameWidth,
-        frameHeight: canvasProperties.frameHeight,
-        cutlinePadding: Math.min(30, Math.max(4, canvasProperties.grow)),
-      }) || adjusted;
-    });
-    if (adjusted) {
+      if (!result || (!result.expanded && !result.zoomChanged)) return;
+      dispatch(setCanvasProperties({
+        frameWidth: result.frameWidth,
+        frameHeight: result.frameHeight,
+        bredd: result.bredd,
+        hojd: result.hojd,
+        canvasInitialZoom: result.zoom,
+      }));
       canvas.requestRenderAll();
-      void handleDieCut(Math.min(30, Math.max(4, canvasProperties.grow)));
-    }
-    return () => {
-      canvas.off('object:moving', keepInsideFrame);
-      canvas.off('object:scaling', keepInsideFrame);
-      canvas.off('object:rotating', keepInsideFrame);
-      canvas.off('object:modified', keepInsideFrame);
     };
-  }, [canvasProperties.frameHeight, canvasProperties.frameWidth, canvasProperties.grow, fabricCanvasRef, handleDieCut, isReady]);
+
+    const scheduleLiveResize = () => {
+      if (artboardFrameRef.current !== null) return;
+      artboardFrameRef.current = requestAnimationFrame(() => {
+        artboardFrameRef.current = null;
+        resizeArtboard(false);
+      });
+    };
+    const settleArtboard = () => resizeArtboard(true);
+
+    canvas.on('object:moving', scheduleLiveResize);
+    canvas.on('object:scaling', scheduleLiveResize);
+    canvas.on('object:rotating', scheduleLiveResize);
+    canvas.on('object:modified', settleArtboard);
+    resizeArtboard(true);
+
+    return () => {
+      if (artboardFrameRef.current !== null) {
+        cancelAnimationFrame(artboardFrameRef.current);
+        artboardFrameRef.current = null;
+      }
+      canvas.off('object:moving', scheduleLiveResize);
+      canvas.off('object:scaling', scheduleLiveResize);
+      canvas.off('object:rotating', scheduleLiveResize);
+      canvas.off('object:modified', settleArtboard);
+    };
+  }, [canvasProperties.frameHeight, canvasProperties.frameWidth, canvasProperties.grow, dispatch, fabricCanvasRef, isReady]);
   
   
   
