@@ -5,6 +5,7 @@ import { convertTextToPath } from '@/components/Utils/function';
 import { findObjectById } from './eventHandlers/canvasFunctions';
 import { useDispatch } from 'react-redux';
 import { setCategoryToRemove } from '@/redux/features/categoryToRemove';
+import { placeObjectInFrame } from './eventHandlers/placeObjectInFrame';
 
 interface TextPathProps {
   fabricCanvas: React.MutableRefObject<fabric.Canvas | null>;
@@ -50,8 +51,18 @@ const TextPath: React.FC<TextPathProps> = ({ fabricCanvas, saveState }) => {
               //  textPath.top = canvasCenterY - textPathCenterY - 30;
 
               const objectExists = findObjectById(fabricCanvas.current!, text.id);       
-              
-              !objectExists && fabricCanvas.current?.add(textPath) && saveState();
+              const canvas = fabricCanvas.current;
+              if (!objectExists && canvas) {
+                placeObjectInFrame(canvas, textPath, {
+                  frameWidth: CanvasProperties.frameWidth,
+                  frameHeight: CanvasProperties.frameHeight,
+                  coverage: 0.72,
+                });
+                canvas.add(textPath);
+                canvas.setActiveObject(textPath);
+                canvas.requestRenderAll();
+                saveState();
+              }
             } else {
               console.error('Invalid path data:', pathData);
             }

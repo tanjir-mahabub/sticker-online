@@ -5,7 +5,7 @@ import { findObjectById } from './eventHandlers/canvasFunctions';
 import { useAppSelector } from '@/redux/store';
 import { useDispatch } from 'react-redux';
 import { setCategoryToRemove } from '@/redux/features/categoryToRemove';
-import { adjustViewportToElement } from './eventHandlers/adjustViewportToElement';
+import { placeObjectInFrame } from './eventHandlers/placeObjectInFrame';
 
 interface ImageComponentProps {
   fabricCanvas: React.MutableRefObject<fabric.Canvas | null>;
@@ -23,28 +23,8 @@ const ImageComponent: React.FC<ImageComponentProps> = ({ fabricCanvas, images, s
   useEffect(() => {
     if (fabricCanvas.current && images) {
       const canvas = fabricCanvas.current;
-      const canvasWidth = canvas.getWidth();
-      const canvasHeight = canvas.getHeight();
-      const canvasCenter = {
-        left: canvasWidth / 2,
-        top: canvasHeight / 2 - 30,
-      };
-
       images.forEach((image) => {
         fabric.Image.fromURL(image.src, (oImg) => {
-          // Calculate the aspect ratio of the image
-          const imgAspectRatio = (oImg.width || 1) / (oImg.height || 1);
-
-          // Determine the dimensions such that the image is scaled to fit within 50% of the canvas dimensions while maintaining its aspect ratio
-          let imgWidth = canvasWidth * 0.5;
-          let imgHeight = imgWidth / imgAspectRatio;
-
-          if (imgHeight > canvasHeight * 0.5) {
-            imgHeight = canvasHeight * 0.5;
-            imgWidth = imgHeight * imgAspectRatio;
-          }
-
-          // Center the image on the canvas
           oImg.set({
             id: image.id,
             // left: canvasCenter.left - imgWidth / 2,
@@ -61,8 +41,10 @@ const ImageComponent: React.FC<ImageComponentProps> = ({ fabricCanvas, images, s
 
           const objectExists = findObjectById(canvas, image.id);
           if (!objectExists) {
+            placeObjectInFrame(canvas, oImg, { frameWidth, frameHeight });
             canvas.add(oImg);
-            //if (image.category === "image") adjustViewportToElement({ canvas, obj: oImg, setOffsetY: 50 });
+            canvas.setActiveObject(oImg);
+            canvas.requestRenderAll();
             saveState();
           }
         });
