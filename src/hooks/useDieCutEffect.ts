@@ -37,14 +37,15 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
 
   const applyMaterial = useCallback((background: fabric.Path) => {
     const remoteMaterials = stickerData?.materials?.length ? stickerData.materials : materialStore;
-    const materials = remoteMaterials.some((entry) => entry.value === "solid-color") ? remoteMaterials : [materialStore[0], ...remoteMaterials];
+    const customMaterials = materialStore.filter((entry) => !remoteMaterials.some((remote) => remote.id === entry.id));
+    const materials = [...customMaterials, ...remoteMaterials];
     const material = materials.find((entry) => entry.id === materialId);
     if (material?.value === "clear") {
       background.set({ fill: "rgba(255,255,255,0.06)" });
       return;
     }
     if (!material?.src) {
-      const colors:Record<string,string>={mirror:"#d9e2ec","pixie-dust":"#eadcff",prismatic:"#d8f8f0","brushed-alloy":"#cbd5e1"};
+      const colors:Record<string,string>={mirror:"#d9e2ec","pixie-dust":"#eadcff",prismatic:"#d8f8f0","brushed-alloy":"#cbd5e1","matte-white":"#f8fafc","kraft-paper":"#c9a574",neon:"#dfff00"};
       if(material?.value && colors[material.value]) background.set({fill:colors[material.value]});
       else
       background.set({ fill: canvasProperties.backgroundColor });

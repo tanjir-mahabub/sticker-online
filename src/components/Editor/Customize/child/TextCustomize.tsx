@@ -4,7 +4,7 @@ import { upsertText, clearTexts } from "@/redux/features/textSlice"; // Adjust t
 import ColorInput from './Input/ColorInput';
 import { customizeFonts } from "@/store/customizeFontStore"; // Adjust the import path as necessary
 import TextInput from './Input/TextInput';
-import { useAppSelector } from "@/redux/store"; // Adjust the import path as necessary
+import { persistor, useAppSelector } from "@/redux/store"; // Adjust the import path as necessary
 import Image from 'next/image';
 import { deleteAllHistoriesByCategory } from '@/redux/features/historySlice';
 import { generateUniqueId } from '@/components/Utils/function';
@@ -69,6 +69,7 @@ const TextCustomize: React.FC = () => {
         dispatch(setCategoryToRemove("text"))
         dispatch(clearTexts());
         dispatch(deleteAllHistoriesByCategory("textPath"))
+        void persistor.flush();
     };
 
     return (

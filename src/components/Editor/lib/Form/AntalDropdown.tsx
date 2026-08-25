@@ -7,7 +7,7 @@ import { setAntalLastSelected } from '@/redux/features/formSlice';
 import { useAppSelector } from '@/redux/store';
 import { useCanvas } from '@/context/CanvasContext';
 import { AntalOptionProps } from '@/types/types';
-import { formattedTotalCost } from '@/components/Utils/function';
+import { useEditorI18n } from '@/context/EditorI18nContext';
 
 const defaultAntalOptions = [
     { id: 1, object_id: 1, st: '500 st', cost: 4990, rate: '10', value: '500-st' },
@@ -20,6 +20,7 @@ const defaultAntalOptions = [
 
 const AntalDropdown: React.FC = () => {
     const dispatch = useDispatch();
+    const { formatCurrency, t } = useEditorI18n();
     const { stickerData } = useCanvas();
 
     const antalOptions = stickerData?.antals?.length ? stickerData.antals : defaultAntalOptions;
@@ -74,7 +75,7 @@ const AntalDropdown: React.FC = () => {
                         {selectedOption?.st}
                     </div>
                     <div className='w-fit text-xs font-semibold bg-black text-white rounded px-1.5 py-1.5'>
-                        {formattedTotalCost(parseInt(selectedOption?.rate || '1'))} / st
+                        {formatCurrency(parseFloat((selectedOption?.rate || '1').replace(',', '.')))} {t('perPiece')}
                     </div>
                 </div>
                 <span className={`transition transform ${isOpen ? 'rotate-180' : ''}`}><Image src={'/downArrow.svg'} alt='down-arrow' width={11} height={11} /></span>

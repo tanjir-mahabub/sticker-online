@@ -12,7 +12,11 @@ export function EditorI18nProvider({children}:{children:React.ReactNode}){
  const [language,setLanguage]=useState<EditorLanguage>("en");
  useEffect(()=>{if(localStorage.getItem("sticker-online-language")==="sv")setLanguage("sv")},[]);
  useEffect(()=>{localStorage.setItem("sticker-online-language",language);document.documentElement.lang=language;document.title=language==="sv"?"Sticker Online – Designa stansade stickers":"Sticker Online – Design die-cut stickers"},[language]);
- const value=useMemo<Value>(()=>({language,setLanguage,t:key=>copy[language][key],formatCurrency:(value,decimals=true)=>new Intl.NumberFormat(language==="sv"?"sv-SE":"en-SE",{style:"currency",currency:"SEK",currencyDisplay:language==="sv"?"symbol":"code",minimumFractionDigits:decimals?2:0,maximumFractionDigits:decimals?2:0}).format(value),formatNumber:value=>new Intl.NumberFormat(language==="sv"?"sv-SE":"en-SE").format(value)}),[language]);
+ const value=useMemo<Value>(()=>({language,setLanguage,t:key=>copy[language][key],formatCurrency:(sekValue,decimals=true)=>{
+   const isSwedish=language==="sv";
+   const displayValue=isSwedish?sekValue:sekValue/10.5;
+   return new Intl.NumberFormat(isSwedish?"sv-SE":"en-US",{style:"currency",currency:isSwedish?"SEK":"USD",currencyDisplay:"symbol",minimumFractionDigits:decimals?2:0,maximumFractionDigits:decimals?2:0}).format(displayValue);
+ },formatNumber:value=>new Intl.NumberFormat(language==="sv"?"sv-SE":"en-US").format(value)}),[language]);
  return <Context.Provider value={value}>{children}</Context.Provider>;
 }
 export const useEditorI18n=()=>useContext(Context);

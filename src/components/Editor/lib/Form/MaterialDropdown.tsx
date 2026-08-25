@@ -9,13 +9,14 @@ import { useAppSelector } from '@/redux/store';
 import { useCanvas } from '@/context/CanvasContext';
 import { MaterialOptionProps } from '@/types/types';
 import { useEditorI18n } from '@/context/EditorI18nContext';
+import { selectedSideNav } from '@/redux/features/sideNavSlice';
 
 const MaterialDropdown: React.FC = () => {
     const materialDefault = useAppSelector(state => state.formValues.materialLastSelected);
     const { stickerData } = useCanvas();
 
     const remoteMaterials = stickerData?.materials?.length ? stickerData.materials : materialStore;
-    const materials = remoteMaterials.some(option => option.value === "solid-color") ? remoteMaterials : [materialStore[0], ...remoteMaterials];
+    const materials = [...materialStore.filter(option => !remoteMaterials.some(remote => remote.id === option.id)), ...remoteMaterials];
     const { t } = useEditorI18n();
 
     const selected = materials.find(option => option.id === materialDefault);
@@ -26,24 +27,13 @@ const MaterialDropdown: React.FC = () => {
 
     const dispatch = useDispatch();
 
-    // Determine the number of columns and split the materials accordingly
-    let columns = 1;
-    if (materials.length > 8) {
-        columns = 3;
-    } else if (materials.length > 4) {
-        columns = 2;
-    }
-
-    const materialsPerColumn = Math.ceil(materials.length / columns);
-    const splitMaterials = Array.from({ length: columns }, (_, i) =>
-        materials.slice(i * materialsPerColumn, (i + 1) * materialsPerColumn)
-    );
 
     const handleOptionChange = (option: MaterialOptionProps) => {
         setIsOpen(false);
         setSelectedOption(option);
 
         dispatch(setMaterialLastSelected(option.id));
+        if (option.value === 'color') dispatch(selectedSideNav({ id: 4 }));
     };
 
     useEffect(() => {
@@ -61,9 +51,6 @@ const MaterialDropdown: React.FC = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    // Determine the width of the material-option based on the number of columns
-    const materialOptionWidth = columns * 300;
-
     return (
         <div className="lg:relative w-full" ref={dropdownRef}>
             <button
@@ -73,21 +60,14 @@ const MaterialDropdown: React.FC = () => {
                 }}
                 className="mt-1 px-3.5 py-3 font-semibold bg-so-gray border border-gray-300 rounded-md w-full focus:outline-none focus:ring focus:border-blue-300 relative flex justify-between items-center"
             >
-                {selectedOption?.value === "solid-color" ? t('solidColor') : selectedOption?.label || t('selectMaterial')}
+                {selectedOption?.value === "color" ? t('color') : selectedOption?.label || t('selectMaterial')}
                 <span className={`transition transform ${isOpen ? 'rotate-180' : ''}`}><Image src={'/downArrow.svg'} alt='down-arrow' width={11} height={11} /></span>
             </button>
             {isOpen && (
-                <div
-                    className={`material-option`}
-                    style={{ width: `${materialOptionWidth}px` }} // Dynamic width based on columns
-                >
-                    <div className={`grid grid-cols-${columns} gap-4 divide-x`}>
-                        {splitMaterials.map((materialColumn, columnIndex) => (
-                            <ul key={columnIndex} className="w-full">
-                                <MaterialOptions materials={materialColumn} onSelectOption={handleOptionChange} />
-                            </ul>
-                        ))}
-                    </div>
+                <div className="material-option">
+                    <ul className="material-option-grid">
+                        <MaterialOptions materials={materials} onSelectOption={handleOptionChange} />
+                    </ul>
                 </div>
             )}
         </div>

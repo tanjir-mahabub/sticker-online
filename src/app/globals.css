@@ -111,8 +111,10 @@ svg.radial-loader[data-mode=buffer] .radial-loader__circle {
 }
 
 .material-option {
-  @apply absolute left-0 bottom-[92px] mb-2 w-[300px] bg-white border border-gray-300 divide-x rounded-md z-50 grid overflow-hidden;
+  @apply absolute left-0 bottom-[92px] mb-2 bg-white border border-gray-300 rounded-md z-50 overflow-hidden;
+  width:min(560px,calc(100vw - 32px));max-height:430px;overflow-y:auto;padding:10px;
 }
+.material-option-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:0;padding:0;list-style:none}.material-option-card{display:grid;grid-template-columns:52px minmax(0,1fr) auto;align-items:center;gap:10px;min-height:68px;padding:8px;border:1px solid #ebe8f1;border-radius:11px;background:#fff;cursor:pointer;transition:border-color .2s,box-shadow .2s,transform .2s}.material-option-card:hover{z-index:1;border-color:#b9abff;box-shadow:0 8px 22px rgba(52,42,112,.12);transform:translateY(-1px)}.material-option-preview{width:52px;height:52px;overflow:hidden;border:1px solid #e3dfea;border-radius:10px;background:#f7f6fa}.material-option-swatch{width:100%;height:100%}.material-option-copy{display:grid;min-width:0}.material-option-copy strong{overflow:hidden;color:#24212f;font-size:11px;text-overflow:ellipsis;white-space:nowrap}.material-option-copy small{margin-top:3px;color:#8a8495;font-size:8px;text-transform:capitalize}.material-option-info{padding:5px!important;border:0!important;background:transparent!important;color:#6d4aff;font-size:8px;font-weight:800;white-space:nowrap}
 
 .antal-option {
   @apply absolute left-0 bottom-[92px] mb-2 grid gap-4 w-[280px] bg-white border border-gray-300 divide-x rounded-md z-50 overflow-hidden;
@@ -126,6 +128,7 @@ svg.radial-loader[data-mode=buffer] .radial-loader__circle {
   .material-option {
     @apply absolute left-0 top-[10px] w-full h-full bg-white border-t border-0 rounded-none border-gray-300 divide-x grid grid-cols-1 pb-3 overflow-y-auto;
   }
+  .material-option-grid{grid-template-columns:1fr}.material-option-card{min-height:64px}
 
   .antal-option {
     @apply absolute left-0 top-1 w-full h-full border-t border-0 rounded-none grid gap-4 overflow-y-auto pb-3;

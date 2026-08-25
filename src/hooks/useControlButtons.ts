@@ -6,7 +6,7 @@ import { removeText } from "@/redux/features/textSlice";
 import { setCanvasProperties } from "@/redux/features/canvasSlice";
 import { useCanvas } from "@/context/CanvasContext";
 import { getFrameBounds } from "@/components/Editor/CanvasTools/eventHandlers/constrainObjectToFrame";
-import { useAppSelector } from "@/redux/store";
+import { persistor, useAppSelector } from "@/redux/store";
 
 interface ControlButtonsProps {
   canvasRef: React.MutableRefObject<fabric.Canvas | null>;
@@ -97,6 +97,7 @@ export const useControlButtons = ({ canvasRef, updateButtonStates }: ControlButt
       activeObject.id && activeObject.data?.category === "text" && dispatch(removeText(activeObject.id))           
       canvasRef.current?.remove(activeObject);
       commit();
+      void persistor.flush();
     }
   }, [canvasRef, commit, dispatch]);
   

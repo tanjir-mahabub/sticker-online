@@ -4,7 +4,7 @@ import { motiveStore } from "@/store/motiveStore";
 import Image from "next/image";
 import { useDispatch } from "react-redux";
 import { addImage, clearImages } from "@/redux/features/imagePreviewSlice";
-import { RootState, useAppSelector } from "@/redux/store";
+import { persistor, RootState, useAppSelector } from "@/redux/store";
 import { deleteAllHistoriesByCategory } from "@/redux/features/historySlice";
 import { generateUniqueId } from "@/components/Utils/function";
 import { setCategoryToRemove } from "@/redux/features/categoryToRemove";
@@ -86,6 +86,7 @@ const MotivCustomize = () => {
         dispatch(setCategoryToRemove("motiv"))
         dispatch(clearImages("motiv"));
         dispatch(deleteAllHistoriesByCategory("motiv"))
+        void persistor.flush();
     };
 
     return (

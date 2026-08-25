@@ -1,6 +1,9 @@
 
 const materialStore = [
-    { id: 9, object_id: 9, label: "Solid color", value: "solid-color", cost: 37, icon: "", label_icon: "", src: "", popup: { title: "Solid color", imgSrc: "", content: "A clean, printable solid fill using the color selected in the Color panel." } },
+    { id: 9, object_id: 9, label: "Color", value: "color", cost: 37, icon: "", label_icon: "", src: "", popup: { title: "Color", imgSrc: "", content: "A clean, printable solid fill using the color selected in the Color panel." } },
+    { id: 10, object_id: 10, label: "Matte White", value: "matte-white", cost: 35, icon: "", label_icon: "", src: "", popup: { title: "Matte White", imgSrc: "", content: "A premium non-reflective white stock for crisp text and illustrations." } },
+    { id: 11, object_id: 11, label: "Kraft Paper", value: "kraft-paper", cost: 41, icon: "", label_icon: "", src: "", popup: { title: "Kraft Paper", imgSrc: "", content: "A warm natural-paper appearance for organic and handmade branding." } },
+    { id: 12, object_id: 12, label: "Neon", value: "neon", cost: 46, icon: "", label_icon: "", src: "", popup: { title: "Neon", imgSrc: "", content: "A high-visibility fluorescent stock for labels that need maximum impact." } },
     {
         id: 1,
         object_id: 1,

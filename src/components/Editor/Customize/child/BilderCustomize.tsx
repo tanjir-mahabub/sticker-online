@@ -2,7 +2,7 @@ import ImageUpload from "@/components/Utils/ImageUploader";
 import ImagePreview from "@/components/Utils/ImagePreview";
 import { useDispatch } from "react-redux";
 import { addImage, clearImages } from "@/redux/features/imagePreviewSlice";
-import { RootState, useAppSelector } from "@/redux/store";
+import { persistor, RootState, useAppSelector } from "@/redux/store";
 import Image from "next/image";
 import { deleteAllHistoriesByCategory } from "@/redux/features/historySlice";
 import { generateUniqueId } from "@/components/Utils/function";
@@ -59,6 +59,7 @@ const BilderCustomize = () => {
         dispatch(setCategoryToRemove("image"));
         dispatch(clearImages("image"));
         dispatch(deleteAllHistoriesByCategory("image"));
+        void persistor.flush();
     };
 
     return (
