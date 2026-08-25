@@ -22,6 +22,16 @@ const FabricCanvas: React.FC = () => {
 
   const { fabricCanvasRef, htmlCanvasRef, historyControllerRef, iconImageRef, saveState } = useCanvas();
   const canvasProperties = useAppSelector((state) => state.canvas);
+  const artboardStateRef = useRef({
+    frameWidth: canvasProperties.frameWidth,
+    frameHeight: canvasProperties.frameHeight,
+    grow: canvasProperties.grow,
+  });
+  artboardStateRef.current = {
+    frameWidth: canvasProperties.frameWidth,
+    frameHeight: canvasProperties.frameHeight,
+    grow: canvasProperties.grow,
+  };
   const imagePreviews = useAppSelector((state) => state.imagePreview.images);
 
   const dispatch = useDispatch();
@@ -87,7 +97,12 @@ const FabricCanvas: React.FC = () => {
       // own add/remove events creates an endless contour regeneration loop.
       if (category === 'generated' || id === DIE_CUT_BACKGROUND_ID || id === DIE_CUT_LINE_ID || id === DIE_CUT_LAMINATE_ID) return;
       if (contourTimerRef.current) clearTimeout(contourTimerRef.current);
-      contourTimerRef.current = setTimeout(() => handleDieCut(canvasProperties.grow), 220);
+      contourTimerRef.current = setTimeout(async () => {
+        await handleDieCut(canvasProperties.grow);
+        // The contour is derived asynchronously. Notify the stable artboard
+        // controller so it can reconcile after Fabric has replaced its paths.
+        canvas.fire('artboard:reconcile');
+      }, 220);
     };
 
     canvas.on('object:added', scheduleContour);
@@ -108,13 +123,21 @@ const FabricCanvas: React.FC = () => {
     if (!canvas || !isReady) return;
 
     const resizeArtboard = (fitViewport: boolean) => {
+      const current = artboardStateRef.current;
       const result = expandArtboardToArtwork(canvas, {
-        frameWidth: canvasProperties.frameWidth,
-        frameHeight: canvasProperties.frameHeight,
-        cutlinePadding: Math.min(30, Math.max(4, canvasProperties.grow)),
+        frameWidth: current.frameWidth,
+        frameHeight: current.frameHeight,
+        cutlinePadding: Math.min(30, Math.max(4, current.grow)),
         fitViewport,
       });
       if (!result || (!result.expanded && !result.zoomChanged)) return;
+      // Update synchronously as well as Redux. Subsequent Fabric events can
+      // arrive before React renders the new store snapshot.
+      artboardStateRef.current = {
+        ...current,
+        frameWidth: result.frameWidth,
+        frameHeight: result.frameHeight,
+      };
       dispatch(setCanvasProperties({
         frameWidth: result.frameWidth,
         frameHeight: result.frameHeight,
@@ -138,6 +161,7 @@ const FabricCanvas: React.FC = () => {
     canvas.on('object:scaling', scheduleLiveResize);
     canvas.on('object:rotating', scheduleLiveResize);
     canvas.on('object:modified', settleArtboard);
+    canvas.on('artboard:reconcile', settleArtboard);
     resizeArtboard(true);
 
     return () => {
@@ -149,8 +173,9 @@ const FabricCanvas: React.FC = () => {
       canvas.off('object:scaling', scheduleLiveResize);
       canvas.off('object:rotating', scheduleLiveResize);
       canvas.off('object:modified', settleArtboard);
+      canvas.off('artboard:reconcile', settleArtboard);
     };
-  }, [canvasProperties.frameHeight, canvasProperties.frameWidth, canvasProperties.grow, dispatch, fabricCanvasRef, isReady]);
+  }, [dispatch, fabricCanvasRef, isReady]);
   
   
   
