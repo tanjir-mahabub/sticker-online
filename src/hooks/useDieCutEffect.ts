@@ -12,6 +12,7 @@ import {
   StickerContourEngine,
   getArtworkObjects,
 } from "@/lib/sticker-contour/StickerContourEngine";
+import { expandArtboardToArtwork } from "@/components/Editor/CanvasTools/eventHandlers/expandArtboardToArtwork";
 
 export interface ObjectWithPercentage { object: fabric.Object; percentageInside: number; }
 export type ObjectsWithPercentageArray = ObjectWithPercentage[];
@@ -118,7 +119,25 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
       applyLaminate(result.pathData,canvas);
       cutline.bringToFront();
 
-      dispatch(setCanvasProperties({ isLoading: false }));
+      // Contour generation is the authoritative completion point for artwork
+      // geometry. Reconcile the production frame here as a safety net for
+      // transforms whose final Fabric event is interrupted by a React render.
+      const artboard = expandArtboardToArtwork(canvas, {
+        frameWidth: canvasProperties.frameWidth,
+        frameHeight: canvasProperties.frameHeight,
+        cutlinePadding: safePadding,
+        fitViewport: true,
+      });
+      dispatch(setCanvasProperties({
+        isLoading: false,
+        ...(artboard?.expanded || artboard?.zoomChanged ? {
+          frameWidth: artboard.frameWidth,
+          frameHeight: artboard.frameHeight,
+          bredd: artboard.bredd,
+          hojd: artboard.hojd,
+          canvasInitialZoom: artboard.zoom,
+        } : {}),
+      }));
       canvas.requestRenderAll();
       onDieCutReady?.(fabricCanvasRef);
     } catch (error) {
@@ -127,7 +146,7 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
         dispatch(setCanvasProperties({ isLoading: false }));
       }
     }
-  }, [applyLaminate, applyMaterial, canvasProperties.backgroundColor, canvasProperties.grow, deletePrevDieCut, dispatch, engine, fabricCanvasRef, onDieCutReady]);
+  }, [applyLaminate, applyMaterial, canvasProperties.backgroundColor, canvasProperties.frameHeight, canvasProperties.frameWidth, canvasProperties.grow, deletePrevDieCut, dispatch, engine, fabricCanvasRef, onDieCutReady]);
 
   const handleDownloadSVG = useCallback(async () => {
     const canvas = fabricCanvasRef.current;
