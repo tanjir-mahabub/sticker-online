@@ -16,7 +16,8 @@ interface ControlElementsProps {
 
 const ControlElements: React.FC<ControlElementsProps> = ({ canvasRef, selected }) => {  
   
-  const [rangeSliderValue, setRangeSliderValue] = useState<number>(0);
+  const [, setRangeSliderValue] = useState<number>(0);
+  const [hasActiveObject, setHasActiveObject] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -26,7 +27,7 @@ const ControlElements: React.FC<ControlElementsProps> = ({ canvasRef, selected }
 
   const updateButtonStates = useCallback(() => {
     const activeObject = canvasRef.current?.getActiveObject();   
-    if (activeObject && canvasRef.current && selected) {
+    if (activeObject && canvasRef.current) {
       const objects = canvasRef.current.getObjects();
       const objectIndex = objects.indexOf(activeObject);
 
@@ -35,14 +36,16 @@ const ControlElements: React.FC<ControlElementsProps> = ({ canvasRef, selected }
       setSendForwardBTN(objectIndex < objects.length - 1);
       setSendBackwardBTN(objectIndex > 0);
       dispatch(setCanvasProperties({ hasSelected: true }))
+      setHasActiveObject(true);
     } else {
       setSendFrontBTN(false);
       setSendBackBTN(false);
       setSendForwardBTN(false);
       setSendBackwardBTN(false);
       dispatch(setCanvasProperties({ hasSelected: false }))
+      setHasActiveObject(false);
     }
-  }, [canvasRef, selected, dispatch]);
+  }, [canvasRef, dispatch]);
 
   const DieCutHandler = (value: number) => {
     setRangeSliderValue(value); // Update the slider's internal state
@@ -65,14 +68,14 @@ const ControlElements: React.FC<ControlElementsProps> = ({ canvasRef, selected }
   useEffect(() => {
     const canvas = canvasRef.current;
     if (canvas) {
-      canvas.on('object:selected', updateButtonStates);
+      canvas.on('selection:created', updateButtonStates);
       canvas.on('selection:updated', updateButtonStates);
       canvas.on('selection:cleared', updateButtonStates);
       canvas.on('object:modified', updateButtonStates);
     }
     return () => {
       if (canvas) {
-        canvas.off('object:selected', updateButtonStates);
+        canvas.off('selection:created', updateButtonStates);
         canvas.off('selection:updated', updateButtonStates);
         canvas.off('selection:cleared', updateButtonStates);
         canvas.off('object:modified', updateButtonStates);
@@ -108,7 +111,7 @@ const ControlElements: React.FC<ControlElementsProps> = ({ canvasRef, selected }
         <div className="absolute bottom-20 lg:bottom-2 left-0 w-full mx-auto h-3 flex justify-start items-end gap-5 z-40">
           <div className="flex justify-center items-center w-full">
             <div className='editor-selection-tools flex justify-center items-center rounded-full'>
-              {selected && buttons.map((button, index) => (
+              {hasActiveObject && buttons.map((button, index) => (
                 <ButtonControl key={index} {...button} />
               ))}
             </div>

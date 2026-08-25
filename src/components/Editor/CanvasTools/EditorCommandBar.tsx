@@ -91,11 +91,15 @@ export default function EditorCommandBar() {
     canvas.on("object:removed", sync);
     canvas.on("object:modified", sync);
     canvas.on("selection:updated", sync);
+    canvas.on("selection:created", sync);
+    canvas.on("selection:cleared", sync);
     return () => {
       canvas.off("object:added", sync);
       canvas.off("object:removed", sync);
       canvas.off("object:modified", sync);
       canvas.off("selection:updated", sync);
+      canvas.off("selection:created", sync);
+      canvas.off("selection:cleared", sync);
     };
   }, [fabricCanvasRef]);
 

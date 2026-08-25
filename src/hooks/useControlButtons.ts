@@ -5,26 +5,21 @@ import { deleteImage } from "@/redux/features/imagePreviewSlice";
 import { removeText } from "@/redux/features/textSlice";
 import { setCanvasProperties } from "@/redux/features/canvasSlice";
 import { useCanvas } from "@/context/CanvasContext";
+import { getFrameBounds } from "@/components/Editor/CanvasTools/eventHandlers/constrainObjectToFrame";
+import { useAppSelector } from "@/redux/store";
 
 interface ControlButtonsProps {
   canvasRef: React.MutableRefObject<fabric.Canvas | null>;
   updateButtonStates: () => void;
 }
 
-const isLastItem = (canvas: fabric.Canvas, object: fabric.Object): boolean => {
-  const objects = canvas.getObjects();
-  return objects.indexOf(object) === objects.length - 1;
-};
-
-const isFirstItem = (canvas: fabric.Canvas, object: fabric.Object): boolean => {
-  const objects = canvas.getObjects();
-  return objects.indexOf(object) === 0;
-};
+const artworkStack = (canvas: fabric.Canvas) => canvas.getObjects().filter((object) => object.data?.category !== "generated");
 
 export const useControlButtons = ({ canvasRef, updateButtonStates }: ControlButtonsProps) => {
   
   const dispatch = useDispatch();
   const { saveState } = useCanvas();
+  const { frameWidth, frameHeight } = useAppSelector((state) => state.canvas);
 
   const commit = useCallback(() => {
     canvasRef.current?.requestRenderAll();
@@ -49,33 +44,47 @@ export const useControlButtons = ({ canvasRef, updateButtonStates }: ControlButt
   }, [canvasRef, commit]);
 
   const handleSendFront = useCallback(() => {
-    const activeObject = canvasRef.current?.getActiveObject();
-    if (activeObject && !isLastItem(canvasRef.current!, activeObject)) {
-      canvasRef.current?.bringToFront(activeObject);
+    const canvas = canvasRef.current;
+    const activeObject = canvas?.getActiveObject();
+    const layers = canvas ? artworkStack(canvas) : [];
+    const target = layers.at(-1);
+    if (canvas && activeObject && target && activeObject !== target) {
+      canvas.moveTo(activeObject, canvas.getObjects().indexOf(target));
       commit();
     }
   }, [canvasRef, commit]);
 
   const handleSendBack = useCallback(() => {
-    const activeObject = canvasRef.current?.getActiveObject();
-    if (activeObject && !isFirstItem(canvasRef.current!, activeObject)) {
-      canvasRef.current?.sendToBack(activeObject);
+    const canvas = canvasRef.current;
+    const activeObject = canvas?.getActiveObject();
+    const layers = canvas ? artworkStack(canvas) : [];
+    const target = layers[0];
+    if (canvas && activeObject && target && activeObject !== target) {
+      canvas.moveTo(activeObject, canvas.getObjects().indexOf(target));
       commit();
     }
   }, [canvasRef, commit]);
 
   const handleSendForward = useCallback(() => {
-    const activeObject = canvasRef.current?.getActiveObject();
-    if (activeObject && !isLastItem(canvasRef.current!, activeObject)) {
-      canvasRef.current?.bringForward(activeObject);
+    const canvas = canvasRef.current;
+    const activeObject = canvas?.getActiveObject();
+    const layers = canvas ? artworkStack(canvas) : [];
+    const index = activeObject ? layers.indexOf(activeObject) : -1;
+    const target = layers[index + 1];
+    if (canvas && activeObject && target) {
+      canvas.moveTo(activeObject, canvas.getObjects().indexOf(target));
       commit();
     }
   }, [canvasRef, commit]);
 
   const handleSendBackward = useCallback(() => {
-    const activeObject = canvasRef.current?.getActiveObject();
-    if (activeObject && !isFirstItem(canvasRef.current!, activeObject)) {
-      canvasRef.current?.sendBackwards(activeObject);
+    const canvas = canvasRef.current;
+    const activeObject = canvas?.getActiveObject();
+    const layers = canvas ? artworkStack(canvas) : [];
+    const index = activeObject ? layers.indexOf(activeObject) : -1;
+    const target = layers[index - 1];
+    if (canvas && activeObject && target) {
+      canvas.moveTo(activeObject, canvas.getObjects().indexOf(target));
       commit();
     }
   }, [canvasRef, commit]);
@@ -106,24 +115,18 @@ export const useControlButtons = ({ canvasRef, updateButtonStates }: ControlButt
     const activeObject = canvas?.getActiveObject();
   
     if (canvas && activeObject) {
-      const zoom = canvas.getZoom();
-      const viewportTransform = canvas.viewportTransform!;
-      const canvasWidth = canvas.getWidth();
-      const canvasHeight = canvas.getHeight();
-  
-      // Calculate the new position considering the current viewport transformation
-      const centerX = (canvasWidth / 2 - viewportTransform[4]) / zoom;
-      const centerY = (canvasHeight / 2 - viewportTransform[5]) / zoom;
-  
+      const bounds = getFrameBounds(canvas, frameWidth, frameHeight);
       activeObject.set({
-        left: centerX - activeObject.getScaledWidth() / 2,
-        top: (centerY - activeObject.getScaledHeight() / 2) - 30,
+        originX: "center",
+        originY: "center",
+        left: (bounds.left + bounds.right) / 2,
+        top: (bounds.top + bounds.bottom) / 2,
       });
   
       activeObject.setCoords();
       commit();
     }
-  }, [canvasRef, commit]);
+  }, [canvasRef, commit, frameHeight, frameWidth]);
 
   useEffect(() => {
     const activeObject = canvasRef.current?.getActiveObject();
