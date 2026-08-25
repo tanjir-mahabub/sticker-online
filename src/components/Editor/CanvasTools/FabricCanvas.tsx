@@ -253,14 +253,16 @@ const FabricCanvas: React.FC = () => {
   return (
     <div className="absolute inset-0">
       {canvasProperties.isLoading && <Spinner />}
-      <CanvasFrame fabricCanvas={fabricCanvasRef.current} />
-      <div className='absolute z-[100]'>
+      <div className="pointer-events-none absolute inset-0 z-10">
+        <CanvasFrame fabricCanvas={fabricCanvasRef.current} />
+      </div>
+      <div className='absolute left-3 top-3 z-[100]'>
         <Controls canvasRef={fabricCanvasRef} />
       </div>
       {fabricCanvasRef.current && isReady && <TextPath fabricCanvas={fabricCanvasRef} saveState={saveState} />}
       {fabricCanvasRef.current && isReady && <ImageComponent fabricCanvas={fabricCanvasRef} images={imagePreviews} saveState={saveState} />}
       <ControlElements canvasRef={fabricCanvasRef} selected={canvasProperties.hasSelected} />
-      <canvas ref={htmlCanvasRef} width={Math.max(1, Math.round(canvasProperties.canvasWidth))} height={Math.max(1, Math.round(canvasProperties.canvasHeight))} className="bg-transparent" />
+      <canvas ref={htmlCanvasRef} width={Math.max(1, Math.round(canvasProperties.canvasWidth))} height={Math.max(1, Math.round(canvasProperties.canvasHeight))} className="absolute inset-0 bg-transparent" />
     </div>
   );
 };
