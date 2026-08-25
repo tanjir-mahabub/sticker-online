@@ -102,7 +102,7 @@ const ControlElements: React.FC<ControlElementsProps> = ({ canvasRef, selected }
       <div className='absolute z-50 left-0 bottom-0 w-full h-fit transition duration-500 delay-300 ease-in-out'>
         <div className="absolute bottom-0 left-0 w-fit mx-auto h-3 hidden lg:flex justify-start items-end gap-5 z-50">
           <div className="flex gap-3 p-4 space-y-3 w-60">
-            <RangeSlider minValue={4} maxValue={80} step={1} defaultValue={grow} handleDieCut={DieCutHandler} label="Cutline spacing" />
+            <RangeSlider minValue={4} maxValue={30} step={1} defaultValue={Math.min(30, Math.max(4, grow))} handleDieCut={DieCutHandler} label="Cutline spacing" />
           </div>
         </div>
         <div className="absolute bottom-20 lg:bottom-2 left-0 w-full mx-auto h-3 flex justify-start items-end gap-5 z-40">

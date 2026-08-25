@@ -1,8 +1,7 @@
 import { fabric } from 'fabric';
-import { useEffect, MutableRefObject, useRef } from 'react';
+import { useEffect, MutableRefObject } from 'react';
 import HistoryController from '@/components/Editor/CanvasTools/eventHandlers/historyController';
 import { checkAndAdjust } from '@/components/Editor/CanvasTools/eventHandlers/checkAndAdjust';
-import { handleScaling } from '@/components/Editor/CanvasTools/eventHandlers/handleScaling';
 
 export const useCanvasSetup = (
   htmlCanvasRef: MutableRefObject<HTMLCanvasElement | null>,
@@ -11,8 +10,6 @@ export const useCanvasSetup = (
   iconImageRef: MutableRefObject<HTMLImageElement | null>,
   saveState: () => void
 ) => {
-  const scaling = useRef(false);
-
   useEffect(() => {
     const iconImage = new Image();
     iconImage.src = '/rotateIcon.svg'; // Replace with the path to your icon image
@@ -74,35 +71,10 @@ export const useCanvasSetup = (
         saveState();
       };
 
-      const handleObjectScaling = () => {
-        scaling.current = true;
-        handleScaling(fabricCanvas);
-      };
-
-      const handleObjectScaled = () => {
-        if (scaling.current) {
-          checkAndAdjustHandler();
-          saveState();
-          scaling.current = false;
-        }
-      };
-
       // Handle group modifications and scaling
       fabricCanvas.on('object:modified', (e) => {
         if (e.target) {
           handleObjectModified();
-        }
-      });
-
-      fabricCanvas.on('object:scaling', (e) => {
-        if (e.target) {
-          handleObjectScaling();
-        }
-      });
-
-      fabricCanvas.on('object:scaled', (e) => {
-        if (e.target) {
-          handleObjectScaled();
         }
       });
 

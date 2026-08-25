@@ -1,5 +1,5 @@
 import { fabric } from "fabric";
-import { curveBasisClosed, line } from "d3-shape";
+import { curveLinearClosed, line } from "d3-shape";
 import geom from "@/lib/geom";
 
 export const DIE_CUT_BACKGROUND_ID = "dieCutImage";
@@ -236,7 +236,7 @@ export class StickerContourEngine {
     const pathBuilder = line<[number, number]>()
       .x((point) => point[0])
       .y((point) => point[1])
-      .curve(curveBasisClosed);
+      .curve(curveLinearClosed);
     const paths: string[] = [];
     for (const component of components) {
       const componentMask = new Set(component.pixels);
@@ -247,7 +247,7 @@ export class StickerContourEngine {
       const scenePoints = points.map(([x, y]) => [bounds.left + x / resolution, bounds.top + y / resolution]);
       const tolerance = options.simplifyTolerance ?? Math.max(.35,.8/resolution);
       const simplified = simplify([...scenePoints, scenePoints[0]], tolerance).slice(0, -1);
-      const smoothed = smoothClosed(simplified, options.padding >= 35 ? 2 : 1) as [number,number][];
+      const smoothed = smoothClosed(simplified, 2) as [number,number][];
       const path = smoothed.length >= 3 ? pathBuilder(smoothed) : null;
       if (path) paths.push(path);
     }

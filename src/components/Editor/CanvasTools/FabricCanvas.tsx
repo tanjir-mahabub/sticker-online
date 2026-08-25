@@ -13,6 +13,7 @@ import CanvasFrame from './CanvasFrame';
 import { useDieCutEffect } from '@/hooks/useDieCutEffect';
 import { DIE_CUT_BACKGROUND_ID, DIE_CUT_LAMINATE_ID, DIE_CUT_LINE_ID } from '@/lib/sticker-contour/StickerContourEngine';
 import EditorCommandBar from './EditorCommandBar';
+import { constrainObjectToFrame } from './eventHandlers/constrainObjectToFrame';
 
 const FabricCanvas: React.FC = () => {
   const [isReady, setIsReady] = useState(false);
@@ -100,6 +101,42 @@ const FabricCanvas: React.FC = () => {
       canvas.off('object:removed', scheduleContour);
     };
   }, [canvasProperties.grow, fabricCanvasRef, handleDieCut, isReady]);
+
+  useEffect(() => {
+    const canvas = fabricCanvasRef.current;
+    if (!canvas || !isReady) return;
+    const keepInsideFrame = (event: { target?: fabric.Object }) => {
+      if (!event.target) return;
+      const changed = constrainObjectToFrame(canvas, event.target, {
+        frameWidth: canvasProperties.frameWidth,
+        frameHeight: canvasProperties.frameHeight,
+        cutlinePadding: Math.min(30, Math.max(4, canvasProperties.grow)),
+      });
+      if (changed) canvas.requestRenderAll();
+    };
+    canvas.on('object:moving', keepInsideFrame);
+    canvas.on('object:scaling', keepInsideFrame);
+    canvas.on('object:rotating', keepInsideFrame);
+    canvas.on('object:modified', keepInsideFrame);
+    let adjusted = false;
+    canvas.getObjects().forEach((object) => {
+      adjusted = constrainObjectToFrame(canvas, object, {
+        frameWidth: canvasProperties.frameWidth,
+        frameHeight: canvasProperties.frameHeight,
+        cutlinePadding: Math.min(30, Math.max(4, canvasProperties.grow)),
+      }) || adjusted;
+    });
+    if (adjusted) {
+      canvas.requestRenderAll();
+      void handleDieCut(Math.min(30, Math.max(4, canvasProperties.grow)));
+    }
+    return () => {
+      canvas.off('object:moving', keepInsideFrame);
+      canvas.off('object:scaling', keepInsideFrame);
+      canvas.off('object:rotating', keepInsideFrame);
+      canvas.off('object:modified', keepInsideFrame);
+    };
+  }, [canvasProperties.frameHeight, canvasProperties.frameWidth, canvasProperties.grow, fabricCanvasRef, handleDieCut, isReady]);
   
   
   

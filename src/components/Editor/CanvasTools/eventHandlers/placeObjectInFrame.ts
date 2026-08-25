@@ -1,4 +1,5 @@
 import { fabric } from "fabric";
+import { getFrameBounds } from "./constrainObjectToFrame";
 
 interface FramePlacementOptions {
   frameWidth: number;
@@ -13,9 +14,8 @@ export const placeObjectInFrame = (
   object: fabric.Object,
   { frameWidth, frameHeight, coverage = 0.68, verticalOffset = -30 }: FramePlacementOptions,
 ) => {
-  const viewport = canvas.viewportTransform ?? fabric.iMatrix.concat();
-  const screenCenter = new fabric.Point(canvas.getWidth() / 2, canvas.getHeight() / 2 + verticalOffset);
-  const frameCenter = fabric.util.transformPoint(screenCenter, fabric.util.invertTransform(viewport));
+  const bounds = getFrameBounds(canvas, frameWidth, frameHeight, verticalOffset);
+  const frameCenter = new fabric.Point((bounds.left + bounds.right) / 2, (bounds.top + bounds.bottom) / 2);
 
   const safeWidth = Math.max(40, frameWidth * coverage);
   const safeHeight = Math.max(40, frameHeight * coverage);

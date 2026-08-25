@@ -12,7 +12,6 @@ import {
   StickerContourEngine,
   getArtworkObjects,
 } from "@/lib/sticker-contour/StickerContourEngine";
-import { pixelToCm } from "@/components/Utils/function";
 
 export interface ObjectWithPercentage { object: fabric.Object; percentageInside: number; }
 export type ObjectsWithPercentageArray = ObjectWithPercentage[];
@@ -78,13 +77,14 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
       return;
     }
 
-    dispatch(setCanvasProperties({ isLoading: true, grow: padding }));
+    const safePadding = Math.min(30, Math.max(4, padding));
+    dispatch(setCanvasProperties({ isLoading: true, grow: safePadding }));
     try {
       const result = await engine.generate(canvas, {
-        padding,
-        resolution: padding >= 45 ? 3 : 2.5,
-        alphaThreshold: 28,
-        simplifyTolerance: 0.65,
+        padding: safePadding,
+        resolution: 3,
+        alphaThreshold: 12,
+        simplifyTolerance: 0.3,
       });
       if (generation !== generationRef.current || !result) return;
 
@@ -118,11 +118,7 @@ export const useDieCutEffect = (onDieCutReady?: OnDieCutReady) => {
       applyLaminate(result.pathData,canvas);
       cutline.bringToFront();
 
-      const box = background.getBoundingRect(true, true);
-      dispatch(setCanvasProperties({
-        bredd: pixelToCm(box.width), hojd: pixelToCm(box.height),
-        frameWidth: box.width, frameHeight: box.height, isLoading: false,
-      }));
+      dispatch(setCanvasProperties({ isLoading: false }));
       canvas.requestRenderAll();
       onDieCutReady?.(fabricCanvasRef);
     } catch (error) {
