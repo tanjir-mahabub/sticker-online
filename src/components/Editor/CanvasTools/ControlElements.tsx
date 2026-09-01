@@ -27,8 +27,12 @@ const ControlElements: React.FC<ControlElementsProps> = ({ canvasRef, ready }) =
   const { handleDieCut } = useDieCutEffect();
 
   const updateButtonStates = useCallback(() => {
-    const activeObject = canvasRef.current?.getActiveObject();   
-    if (activeObject && canvasRef.current) {
+    const activeObject = canvasRef.current?.getActiveObject();
+    const isEditableArtwork = activeObject &&
+      activeObject.visible !== false &&
+      ['image', 'motiv', 'text'].includes(activeObject.data?.category);
+
+    if (isEditableArtwork && activeObject && canvasRef.current) {
       const objects = canvasRef.current.getObjects();
       const objectIndex = objects.indexOf(activeObject);
 
@@ -74,6 +78,7 @@ const ControlElements: React.FC<ControlElementsProps> = ({ canvasRef, ready }) =
       canvas.on('selection:updated', updateButtonStates);
       canvas.on('selection:cleared', updateButtonStates);
       canvas.on('object:modified', updateButtonStates);
+      canvas.on('object:removed', updateButtonStates);
     }
     return () => {
       if (canvas) {
@@ -81,6 +86,7 @@ const ControlElements: React.FC<ControlElementsProps> = ({ canvasRef, ready }) =
         canvas.off('selection:updated', updateButtonStates);
         canvas.off('selection:cleared', updateButtonStates);
         canvas.off('object:modified', updateButtonStates);
+        canvas.off('object:removed', updateButtonStates);
       }
     };
   }, [canvasRef, ready, updateButtonStates]);
@@ -110,15 +116,17 @@ const ControlElements: React.FC<ControlElementsProps> = ({ canvasRef, ready }) =
             <RangeSlider minValue={4} maxValue={30} step={1} defaultValue={Math.min(30, Math.max(4, grow))} handleDieCut={DieCutHandler} label="Cutline spacing" />
           </div>
         </div>
-        <div className="absolute bottom-20 lg:bottom-2 left-0 w-full mx-auto h-3 flex justify-start items-end gap-5 z-40">
-          <div className="flex justify-center items-center w-full">
-            <div className='editor-selection-tools flex justify-center items-center rounded-full'>
-              {hasActiveObject && buttons.map((button, index) => (
+        {hasActiveObject && (
+          <div className="absolute bottom-20 lg:bottom-2 left-0 w-full mx-auto h-3 flex justify-start items-end gap-5 z-40">
+            <div className="flex justify-center items-center w-full">
+              <div className='editor-selection-tools flex justify-center items-center rounded-full' data-visible={buttons.length > 0 ? 'true' : 'false'}>
+                {buttons.map((button, index) => (
                 <ButtonControl key={index} {...button} />
-              ))}
+                ))}
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </>
   );
